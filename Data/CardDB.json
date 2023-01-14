@@ -1,11 +1,28 @@
 [
-  {"Card_ID": 0},
+  {
+    "Card_ID": 0,
+    "CardName": null,
+    "CardType": null,
+    "Attribute": null,
+    "Description": null,
+    "ShortDescription": null,
+    "Attack": null,
+    "Cost": null,
+    "Health": null,
+    "CardArt": null,
+    "SpecialEditionText": null,
+    "Rarity": null,
+    "Passcode": null,
+    "DeckCapacity": null,
+    "Copyright": null
+  },
   {
     "Card_ID": 1,
     "CardName": "Farmer",
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "An ordinary farmer. Working the land has not prepared him for the trials he is destined to face.",
+    "ShortDescription": "",
     "Attack": 1,
     "Cost": 1,
     "Health": 1,
@@ -13,7 +30,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 38181083,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2,
@@ -21,6 +39,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "As war gripped his land he was conscripted into the army. He really doesn't want to be here.",
+    "ShortDescription": "",
     "Attack": 1,
     "Cost": 1,
     "Health": 1,
@@ -28,7 +47,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 34788839,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 3,
@@ -36,6 +56,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 1,
     "Cost": 1,
     "Health": 5,
@@ -43,7 +64,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 82138567,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 4,
@@ -51,6 +73,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 1,
     "Cost": 1,
     "Health": 2,
@@ -58,7 +81,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 11681585,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 5,
@@ -66,6 +90,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 14,
     "Cost": 5,
     "Health": 20,
@@ -73,7 +98,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 22731659,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 6,
@@ -81,6 +107,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 2,
     "Cost": 3,
     "Health": 18,
@@ -88,7 +115,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 90540336,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 7,
@@ -96,6 +124,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 11,
     "Cost": 2,
     "Health": 4,
@@ -103,7 +132,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 14958378,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 8,
@@ -111,6 +141,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 10,
     "Cost": 4,
     "Health": 17,
@@ -118,7 +149,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 68488756,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 9,
@@ -126,6 +158,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 16,
     "Cost": 5,
     "Health": 17,
@@ -133,7 +166,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 66731868,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 10,
@@ -141,6 +175,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 19,
     "Cost": 3,
     "Health": 1,
@@ -148,7 +183,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 83913903,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 11,
@@ -156,6 +192,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 10,
     "Cost": 2,
     "Health": 4,
@@ -163,7 +200,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 50430881,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 12,
@@ -171,6 +209,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 11,
     "Cost": 2,
     "Health": 6,
@@ -178,7 +217,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 32628866,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 13,
@@ -186,6 +226,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 1,
     "Cost": 2,
     "Health": 12,
@@ -193,7 +234,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 26528059,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 14,
@@ -201,6 +243,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 9,
     "Cost": 2,
     "Health": 8,
@@ -208,7 +251,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 51075207,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 15,
@@ -216,6 +260,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 15,
     "Cost": 5,
     "Health": 18,
@@ -223,7 +268,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 39242825,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 16,
@@ -231,6 +277,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 14,
     "Cost": 3,
     "Health": 9,
@@ -238,7 +285,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 58418181,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 17,
@@ -246,6 +294,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior/Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 12,
     "Cost": 5,
     "Health": 20,
@@ -253,7 +302,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 98983779,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 18,
@@ -261,6 +311,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 7,
     "Cost": 2,
     "Health": 9,
@@ -268,7 +319,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 98185660,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 19,
@@ -276,6 +328,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 14,
     "Cost": 3,
     "Health": 10,
@@ -283,7 +336,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 98560511,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 20,
@@ -291,6 +345,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 12,
     "Cost": 2,
     "Health": 3,
@@ -298,7 +353,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 45711341,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 21,
@@ -306,6 +362,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 7,
     "Cost": 2,
     "Health": 10,
@@ -313,7 +370,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 51065781,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 22,
@@ -321,6 +379,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 8,
     "Cost": 1,
     "Health": 1,
@@ -328,7 +387,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 63647322,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 23,
@@ -336,6 +396,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 19,
     "Cost": 6,
     "Health": 16,
@@ -343,7 +404,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 23528199,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 24,
@@ -351,6 +413,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 19,
     "Cost": 4,
     "Health": 9,
@@ -358,7 +421,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 50603253,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 25,
@@ -366,6 +430,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 14,
     "Cost": 5,
     "Health": 18,
@@ -373,7 +438,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 23015931,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 26,
@@ -381,6 +447,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 9,
     "Cost": 4,
     "Health": 20,
@@ -388,7 +455,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 62282691,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 27,
@@ -396,6 +464,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 1,
     "Cost": 1,
     "Health": 7,
@@ -403,7 +472,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 44417545,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 28,
@@ -411,6 +481,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 5,
     "Cost": 2,
     "Health": 10,
@@ -418,7 +489,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 98453176,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 29,
@@ -426,6 +498,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 17,
     "Cost": 3,
     "Health": 6,
@@ -433,7 +506,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 96143937,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 30,
@@ -441,6 +515,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 10,
     "Cost": 2,
     "Health": 4,
@@ -448,7 +523,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 27109959,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 31,
@@ -456,6 +532,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged/Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 3,
     "Cost": 1,
     "Health": 2,
@@ -463,7 +540,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 19949715,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 32,
@@ -471,6 +549,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged/Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 17,
     "Cost": 3,
     "Health": 4,
@@ -478,7 +557,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 66962453,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 33,
@@ -486,6 +566,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged/Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 11,
     "Cost": 2,
     "Health": 8,
@@ -493,7 +574,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 45445777,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 34,
@@ -501,6 +583,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 11,
     "Cost": 2,
     "Health": 4,
@@ -508,7 +591,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 19797822,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 35,
@@ -516,6 +600,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 1,
     "Cost": 1,
     "Health": 7,
@@ -523,7 +608,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 54528688,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 36,
@@ -531,6 +617,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 15,
     "Cost": 3,
     "Health": 4,
@@ -538,7 +625,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 29046869,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 37,
@@ -546,6 +634,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 14,
     "Cost": 3,
     "Health": 9,
@@ -553,7 +642,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 98984149,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 38,
@@ -561,6 +651,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 4,
     "Cost": 1,
     "Health": 3,
@@ -568,7 +659,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 73685669,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 39,
@@ -576,6 +668,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 6,
     "Cost": 4,
     "Health": 19,
@@ -583,7 +676,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 33949236,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 40,
@@ -591,6 +685,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 5,
     "Cost": 2,
     "Health": 10,
@@ -598,7 +693,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 20648253,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 41,
@@ -606,6 +702,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 11,
     "Cost": 3,
     "Health": 12,
@@ -613,7 +710,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 74777060,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 42,
@@ -621,6 +719,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 16,
     "Cost": 5,
     "Health": 14,
@@ -628,7 +727,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 48803119,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 43,
@@ -636,6 +736,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 10,
     "Cost": 3,
     "Health": 12,
@@ -643,7 +744,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 77376542,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 44,
@@ -651,6 +753,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 6,
     "Cost": 1,
     "Health": 5,
@@ -658,7 +761,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 28726737,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 45,
@@ -666,6 +770,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 18,
     "Cost": 6,
     "Health": 18,
@@ -673,7 +778,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 81588200,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 46,
@@ -681,6 +787,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 3,
     "Cost": 1,
     "Health": 4,
@@ -688,7 +795,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 28351704,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 47,
@@ -696,6 +804,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 15,
     "Cost": 3,
     "Health": 1,
@@ -703,7 +812,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 80843601,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 48,
@@ -711,6 +821,7 @@
     "CardType": "Normal",
     "Attribute": "Wizard/Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 7,
     "Cost": 3,
     "Health": 14,
@@ -718,7 +829,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 33999473,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 49,
@@ -726,6 +838,7 @@
     "CardType": "Normal",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 3,
     "Cost": 1,
     "Health": 8,
@@ -733,7 +846,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 86984153,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 50,
@@ -741,6 +855,7 @@
     "CardType": "Normal",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 4,
     "Cost": 2,
     "Health": 11,
@@ -748,7 +863,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 63126935,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 51,
@@ -756,6 +872,7 @@
     "CardType": "Normal",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 2,
     "Cost": 3,
     "Health": 16,
@@ -763,7 +880,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 51733302,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 52,
@@ -771,6 +889,7 @@
     "CardType": "Normal",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 13,
     "Cost": 4,
     "Health": 16,
@@ -778,7 +897,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 22023644,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 53,
@@ -786,6 +906,7 @@
     "CardType": "Normal",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 18,
     "Cost": 5,
     "Health": 16,
@@ -793,7 +914,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 87867960,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 54,
@@ -801,6 +923,7 @@
     "CardType": "Normal",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 12,
     "Cost": 4,
     "Health": 17,
@@ -808,7 +931,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 90652672,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 55,
@@ -816,6 +940,7 @@
     "CardType": "Normal",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 11,
     "Cost": 2,
     "Health": 7,
@@ -823,7 +948,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 38158251,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 56,
@@ -831,6 +957,7 @@
     "CardType": "Normal",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 12,
     "Cost": 4,
     "Health": 14,
@@ -838,7 +965,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 61610263,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 57,
@@ -846,6 +974,7 @@
     "CardType": "Normal",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 1,
     "Cost": 4,
     "Health": 20,
@@ -853,7 +982,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 93507395,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 58,
@@ -861,6 +991,7 @@
     "CardType": "Normal",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 10,
     "Cost": 2,
     "Health": 5,
@@ -868,7 +999,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 49026283,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 60,
@@ -876,6 +1008,7 @@
     "CardType": "Normal",
     "Attribute": "Creature",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 2,
     "Cost": 3,
     "Health": 15,
@@ -883,7 +1016,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 16938845,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 61,
@@ -891,6 +1025,7 @@
     "CardType": "Normal",
     "Attribute": "Creature",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 20,
     "Cost": 6,
     "Health": 17,
@@ -898,7 +1033,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 91066632,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 62,
@@ -906,6 +1042,7 @@
     "CardType": "Normal",
     "Attribute": "Creature",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 3,
     "Cost": 1,
     "Health": 8,
@@ -913,7 +1050,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 60317991,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 63,
@@ -921,6 +1059,7 @@
     "CardType": "Normal",
     "Attribute": "Creature",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 12,
     "Cost": 2,
     "Health": 2,
@@ -928,7 +1067,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 24842439,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 64,
@@ -936,6 +1076,7 @@
     "CardType": "Normal",
     "Attribute": "Creature",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 5,
     "Cost": 3,
     "Health": 15,
@@ -943,7 +1084,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 63719295,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 65,
@@ -951,6 +1093,7 @@
     "CardType": "Normal",
     "Attribute": "Ranged",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 12,
     "Cost": 3,
     "Health": 8,
@@ -958,7 +1101,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 86150431,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 66,
@@ -966,6 +1110,7 @@
     "CardType": "Normal",
     "Attribute": "Warrior",
     "Description": "Better than nothing",
+    "ShortDescription": "",
     "Attack": 1,
     "Cost": 1,
     "Health": 1,
@@ -973,7 +1118,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 33558297,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1001,
@@ -981,6 +1127,7 @@
     "CardType": "Hero",
     "Attribute": "Wizard/Warrior",
     "Description": "A legend like no other. He is known not only for his immense power, but also his kindness. This Hero remains on the field until beaten. At the start of each Battle Phase gain +1 Power. As long as this card remains in your Graveyard, all Normal/Hero cards on your side of the field gain +3 Power.",
+    "ShortDescription": "",
     "Attack": 6,
     "Cost": 1,
     "Health": 8,
@@ -988,7 +1135,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 83324791,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1002,
@@ -996,6 +1144,7 @@
     "CardType": "Hero",
     "Attribute": "Wizard",
     "Description": "A gifted visionary known for predicting the future. Look at the top 3 cards in your deck and replace them in any order you desire.",
+    "ShortDescription": "",
     "Attack": 15,
     "Cost": 5,
     "Health": 19,
@@ -1003,7 +1152,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 40340898,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1003,
@@ -1011,6 +1161,7 @@
     "CardType": "Hero",
     "Attribute": "Wizard",
     "Description": "A being said to be capable of speaking things into existence. Look at the top 3 cards in your opponents deck and replace them in any order you desire.",
+    "ShortDescription": "",
     "Attack": 25,
     "Cost": 5,
     "Health": 8,
@@ -1018,7 +1169,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 71851240,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1004,
@@ -1026,6 +1178,7 @@
     "CardType": "Hero",
     "Attribute": "Wizard",
     "Description": "A wizard capable of venturing to the land beyond and bringing back that which was lost. Add one card from your graveyard to your hand when this Hero is Summoned.",
+    "ShortDescription": "",
     "Attack": 20,
     "Cost": 6,
     "Health": 22,
@@ -1033,7 +1186,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 59828977,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1005,
@@ -1041,6 +1195,7 @@
     "CardType": "Hero",
     "Attribute": "Scientist",
     "Description": "A notoriously studious individuals who is said to know all. Pick 1 card from your opponents hand or field to view each turn.",
+    "ShortDescription": "",
     "Attack": 22,
     "Cost": 6,
     "Health": 19,
@@ -1048,7 +1203,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 45604671,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1006,
@@ -1056,6 +1212,7 @@
     "CardType": "Hero",
     "Attribute": "Ranged",
     "Description": "A mysterious figure who keeps mostly to the shadows. His/her identity and machinations are unknown even to the most devout of lorekeepers. You may shuffle the cards in your hand and on your side of the field once per turn.",
+    "ShortDescription": "",
     "Attack": 8,
     "Cost": 2,
     "Health": 8,
@@ -1063,7 +1220,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 81708426,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1007,
@@ -1071,6 +1229,7 @@
     "CardType": "Hero",
     "Attribute": "Wizard",
     "Description": "A sorcerer whose tampering with the Forbidden Arts has led him down a dark path. He frequently clashes with the White Sage. Steal one magic card from your opponents deck when Summoned.",
+    "ShortDescription": "",
     "Attack": 26,
     "Cost": 6,
     "Health": 21,
@@ -1078,7 +1237,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 76068352,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1008,
@@ -1086,6 +1246,7 @@
     "CardType": "Hero",
     "Attribute": "Wizard",
     "Description": "A paragon of light whose shining example has been an inspiration for many Apprentices that came after him. He frequently clashes with the Dark Sage. Select one Magic card from your deck and add it to your hand when Summoned.",
+    "ShortDescription": "",
     "Attack": 14,
     "Cost": 3,
     "Health": 9,
@@ -1093,7 +1254,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 47352419,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1009,
@@ -1101,6 +1263,7 @@
     "CardType": "Hero",
     "Attribute": "Scientist",
     "Description": "The original Grand Elder who guided his people out of the Dark Ages. If you have an activatable Tech card you may play it for free the turn this Hero is Summoned.",
+    "ShortDescription": "",
     "Attack": 10,
     "Cost": 4,
     "Health": 15,
@@ -1108,7 +1271,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 52251441,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1010,
@@ -1116,6 +1280,7 @@
     "CardType": "Hero",
     "Attribute": "Warrior",
     "Description": "He has spent lifetimes taking the very concept of strength further than any before him. He's still seeking something more. Cannot be destroyed by Battle.",
+    "ShortDescription": "",
     "Attack": 18,
     "Cost": 4,
     "Health": 11,
@@ -1123,7 +1288,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 89799949,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1011,
@@ -1131,6 +1297,7 @@
     "CardType": "Hero",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 15,
     "Cost": 5,
     "Health": 18,
@@ -1138,7 +1305,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 80378700,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1012,
@@ -1146,6 +1314,7 @@
     "CardType": "Hero",
     "Attribute": "Explorer",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 21,
     "Cost": 6,
     "Health": 16,
@@ -1153,7 +1322,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 61245444,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1013,
@@ -1161,6 +1331,7 @@
     "CardType": "Hero",
     "Attribute": "Support",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 9,
     "Cost": 2,
     "Health": 9,
@@ -1168,7 +1339,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 40418044,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1014,
@@ -1176,6 +1348,7 @@
     "CardType": "Hero",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 29,
     "Cost": 6,
     "Health": 12,
@@ -1183,7 +1356,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 95990172,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1015,
@@ -1191,6 +1365,7 @@
     "CardType": "Hero",
     "Attribute": "Support",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 16,
     "Cost": 6,
     "Health": 29,
@@ -1198,7 +1373,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 60842289,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1016,
@@ -1206,6 +1382,7 @@
     "CardType": "Hero",
     "Attribute": "Politician",
     "Description": "Rebirth: Player can choose to immediately reshuffle the cards from their Medical Bay back into their Main Deck.",
+    "ShortDescription": "",
     "Attack": 27,
     "Cost": 6,
     "Health": 10,
@@ -1213,7 +1390,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 31684896,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1017,
@@ -1221,6 +1399,7 @@
     "CardType": "Hero",
     "Attribute": "Politician",
     "Description": "Nationalistic Oration: Inspires fanatical fervor in his followers. The Player's Fighter can attack twice during each Battle Phase while this card remains on the field.",
+    "ShortDescription": "",
     "Attack": 22,
     "Cost": 6,
     "Health": 30,
@@ -1228,7 +1407,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 35839583,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1018,
@@ -1236,6 +1416,7 @@
     "CardType": "Hero",
     "Attribute": "Philosopher",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 25,
     "Cost": 6,
     "Health": 23,
@@ -1243,7 +1424,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 13548269,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1019,
@@ -1251,6 +1433,7 @@
     "CardType": "Hero",
     "Attribute": "Warrior",
     "Description": "Never Lost A Battle: Add a Token to this card when summoned and anytime this card defeats an enemy Fighter by Battle. Anytime this card would have its Health reduced to zero, remove a Token from this card. This card cannot be defeated by Battle until its Health is zero and it has no remaining Tokens attached to it.",
+    "ShortDescription": "",
     "Attack": 12,
     "Cost": 3,
     "Health": 8,
@@ -1258,7 +1441,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 36691150,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1020,
@@ -1266,6 +1450,7 @@
     "CardType": "Hero",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 10,
     "Cost": 2,
     "Health": 7,
@@ -1273,7 +1458,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 27325502,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1021,
@@ -1281,6 +1467,7 @@
     "CardType": "Hero",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 18,
     "Cost": 4,
     "Health": 8,
@@ -1288,7 +1475,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 25604732,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1022,
@@ -1296,6 +1484,7 @@
     "CardType": "Hero",
     "Attribute": "Politician",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 17,
     "Cost": 6,
     "Health": 30,
@@ -1303,7 +1492,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 25157924,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1023,
@@ -1311,6 +1501,7 @@
     "CardType": "Hero",
     "Attribute": "Support",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 15,
     "Cost": 3,
     "Health": 9,
@@ -1318,7 +1509,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 54145211,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1024,
@@ -1326,6 +1518,7 @@
     "CardType": "Hero",
     "Attribute": "Support",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 17,
     "Cost": 4,
     "Health": 10,
@@ -1333,7 +1526,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 65723261,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1025,
@@ -1341,6 +1535,7 @@
     "CardType": "Hero",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 25,
     "Cost": 5,
     "Health": 8,
@@ -1348,7 +1543,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 45758052,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1026,
@@ -1356,6 +1552,7 @@
     "CardType": "Hero",
     "Attribute": "Support",
     "Description": "While this card remains on the field all Summon Crest dice rolls gain a +1 bonus. During the End Phase, add 1 Token to the Player's total. When this card is removed from the field decrease the Player's summon crests by an amount equal to the Token count.",
+    "ShortDescription": "",
     "Attack": 23,
     "Cost": 6,
     "Health": 19,
@@ -1363,7 +1560,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 99914813,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1027,
@@ -1371,6 +1569,7 @@
     "CardType": "Hero",
     "Attribute": "Warrior",
     "Description": "Player has the option to immediately summon as many Mongol cards as they can fill in the open Reinforcement slots upon summoning this card. While this card remains on the field, Mongol reinforcements can also serve in the role of the Fighter and target any opposing Fighter or Reinforcement card for attack.",
+    "ShortDescription": "",
     "Attack": 15,
     "Cost": 6,
     "Health": 25,
@@ -1378,7 +1577,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 97276243,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1028,
@@ -1386,6 +1586,7 @@
     "CardType": "Hero",
     "Attribute": "Philosopher",
     "Description": "Nihilistic Aggression: Half of the damage inflicted by this card is reflected back on itself.",
+    "ShortDescription": "",
     "Attack": 25,
     "Cost": 6,
     "Health": 25,
@@ -1393,7 +1594,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 42423658,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1029,
@@ -1401,6 +1603,7 @@
     "CardType": "Hero",
     "Attribute": "Support",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 20,
     "Cost": 4,
     "Health": 6,
@@ -1408,7 +1611,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 80882097,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1030,
@@ -1416,6 +1620,7 @@
     "CardType": "Hero",
     "Attribute": "Support",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 8,
     "Cost": 4,
     "Health": 18,
@@ -1423,7 +1628,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 39909720,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1031,
@@ -1431,6 +1637,7 @@
     "CardType": "Hero",
     "Attribute": "Philosopher",
     "Description": "Name one Attribute. Both Players can only summon Normal/Hero cards of that Attribute as long as this card remains on the field.",
+    "ShortDescription": "",
     "Attack": 29,
     "Cost": 6,
     "Health": 7,
@@ -1438,7 +1645,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 94787371,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1032,
@@ -1446,6 +1654,7 @@
     "CardType": "Hero",
     "Attribute": "Warrior",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 19,
     "Cost": 6,
     "Health": 17,
@@ -1453,7 +1662,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 55316594,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1033,
@@ -1461,6 +1671,7 @@
     "CardType": "Hero",
     "Attribute": "Support",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 13,
     "Cost": 2,
     "Health": 5,
@@ -1468,7 +1679,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 60798840,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1034,
@@ -1476,6 +1688,7 @@
     "CardType": "Hero",
     "Attribute": "Warrior",
     "Description": "When summoned the Player has the option to add Merlin and/or the Knights of the Round Table from their Deck or Hand to any open Reinforcement slots. Additionally, equip Excalibur from Deck or Hand, boosts Attack of allied Warrior-type cards by +2, and debuffs opposing Warrior-Type Fighter's Attack by -3.",
+    "ShortDescription": "",
     "Attack": 15,
     "Cost": 6,
     "Health": 21,
@@ -1483,7 +1696,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 61978912,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1035,
@@ -1491,6 +1705,7 @@
     "CardType": "Hero",
     "Attribute": "Wizard",
     "Description": "When reinforcing King Arthur roll a pair of dice at the beginning of the Battle Phase. If the sum of the roll is at least 7, King Arthur gains invulnerability for the remainder of the Turn.",
+    "ShortDescription": "",
     "Attack": 23,
     "Cost": 6,
     "Health": 25,
@@ -1498,7 +1713,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 26432104,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1036,
@@ -1506,6 +1722,7 @@
     "CardType": "Hero",
     "Attribute": "Warrior",
     "Description": "Can be Fusion Summoned on top of any other card whose name is \"Knight of the Round Table\". The Attack and Health stat of the newly summoned card is added to that of the card it was fused with.",
+    "ShortDescription": "",
     "Attack": 22,
     "Cost": 6,
     "Health": 24,
@@ -1513,7 +1730,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 79248843,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1037,
@@ -1521,6 +1739,7 @@
     "CardType": "Hero",
     "Attribute": "Wizard",
     "Description": "Player gains +1 Life Point per Turn while on the field.",
+    "ShortDescription": "",
     "Attack": 28,
     "Cost": 6,
     "Health": 19,
@@ -1528,7 +1747,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 22502249,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1038,
@@ -1536,6 +1756,7 @@
     "CardType": "Hero",
     "Attribute": "Wizard",
     "Description": "Fighter gains +1 Health per Turn while this card remains on the field in a Reinforcement slot.",
+    "ShortDescription": "",
     "Attack": 24,
     "Cost": 6,
     "Health": 13,
@@ -1543,7 +1764,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 78044413,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1039,
@@ -1551,6 +1773,7 @@
     "CardType": "Hero",
     "Attribute": "",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 7,
     "Cost": 2,
     "Health": 10,
@@ -1558,7 +1781,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 78749099,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1040,
@@ -1566,6 +1790,7 @@
     "CardType": "Hero",
     "Attribute": "",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 12,
     "Cost": 2,
     "Health": 7,
@@ -1573,7 +1798,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 35537798,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1041,
@@ -1581,6 +1807,7 @@
     "CardType": "Hero",
     "Attribute": "",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 11,
     "Cost": 2,
     "Health": 5,
@@ -1588,7 +1815,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 35051848,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1042,
@@ -1596,6 +1824,7 @@
     "CardType": "Hero",
     "Attribute": "Warrior",
     "Description": "Loses 3 Health during the End Phase of the Player's Turn.",
+    "ShortDescription": "",
     "Attack": 23,
     "Cost": 6,
     "Health": 17,
@@ -1603,7 +1832,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 51437562,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1043,
@@ -1611,6 +1841,7 @@
     "CardType": "Hero",
     "Attribute": "Warrior",
     "Description": "Gains 2 Attack per Turn while on the field.",
+    "ShortDescription": "",
     "Attack": 5,
     "Cost": 4,
     "Health": 24,
@@ -1618,7 +1849,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 23737403,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1044,
@@ -1626,6 +1858,7 @@
     "CardType": "Hero",
     "Attribute": "Support",
     "Description": "Decreases the Summon Cost of any of the Player's Reinforcements by 1 while on the field.",
+    "ShortDescription": "",
     "Attack": 8,
     "Cost": 5,
     "Health": 23,
@@ -1633,7 +1866,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 95731512,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1045,
@@ -1641,6 +1875,7 @@
     "CardType": "Hero",
     "Attribute": "Philosopher",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 22,
     "Cost": 6,
     "Health": 22,
@@ -1648,7 +1883,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 33932814,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1046,
@@ -1656,6 +1892,7 @@
     "CardType": "Hero",
     "Attribute": "Ranged",
     "Description": "Boosts the Attack of all Ranged allies by +2 while on the field.",
+    "ShortDescription": "",
     "Attack": 7,
     "Cost": 5,
     "Health": 24,
@@ -1663,7 +1900,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 52804189,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1047,
@@ -1671,6 +1909,7 @@
     "CardType": "Hero",
     "Attribute": "Politician",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 9,
     "Cost": 6,
     "Health": 26,
@@ -1678,7 +1917,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 89972593,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1048,
@@ -1686,6 +1926,7 @@
     "CardType": "Hero",
     "Attribute": "Politician",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 22,
     "Cost": 6,
     "Health": 18,
@@ -1693,7 +1934,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 87150073,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1049,
@@ -1701,6 +1943,7 @@
     "CardType": "Hero",
     "Attribute": "Scientist",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 10,
     "Cost": 4,
     "Health": 15,
@@ -1708,7 +1951,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 48742820,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1050,
@@ -1716,6 +1960,7 @@
     "CardType": "Hero",
     "Attribute": "Support",
     "Description": "While this card remains in either Player's Medical Bay, boost the Attack stat of the card's original owner by +1.",
+    "ShortDescription": "",
     "Attack": 7,
     "Cost": 3,
     "Health": 13,
@@ -1723,7 +1968,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 95605676,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1051,
@@ -1731,6 +1977,7 @@
     "CardType": "Hero",
     "Attribute": "Divine",
     "Description": "The Player may resurrect 1 card from the Graveyard/Junkyard per Turn.",
+    "ShortDescription": "",
     "Attack": 20,
     "Cost": 6,
     "Health": 16,
@@ -1738,7 +1985,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 50316560,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1052,
@@ -1746,6 +1994,7 @@
     "CardType": "Hero",
     "Attribute": "Divine",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 12,
     "Cost": 4,
     "Health": 14,
@@ -1753,7 +2002,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 72430176,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1053,
@@ -1761,6 +2011,7 @@
     "CardType": "Hero",
     "Attribute": "Divine",
     "Description": "Ares gains Attack and Health equal to the combined amount of his Reinforcements during the Battle Phase.",
+    "ShortDescription": "",
     "Attack": 25,
     "Cost": 6,
     "Health": 14,
@@ -1768,7 +2019,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 25486317,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1054,
@@ -1776,6 +2028,7 @@
     "CardType": "Hero",
     "Attribute": "Divine",
     "Description": "Lowers the Attack of Opposing Fighter by -2 while on the field.",
+    "ShortDescription": "",
     "Attack": 29,
     "Cost": 6,
     "Health": 24,
@@ -1783,7 +2036,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 47338587,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1055,
@@ -1791,6 +2045,7 @@
     "CardType": "Hero",
     "Attribute": "Scientist/Divine",
     "Description": "All Equip cards gain +3 to the appropriate stat while Hephaestus is on the field.",
+    "ShortDescription": "",
     "Attack": 22,
     "Cost": 6,
     "Health": 15,
@@ -1798,7 +2053,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 93958804,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1056,
@@ -1806,6 +2062,7 @@
     "CardType": "Hero",
     "Attribute": "Divine",
     "Description": "",
+    "ShortDescription": "",
     "Attack": 18,
     "Cost": 6,
     "Health": 25,
@@ -1813,7 +2070,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 65380714,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1057,
@@ -1821,6 +2079,7 @@
     "CardType": "Hero",
     "Attribute": "Mythological",
     "Description": "Player gains access to the Fire Technology Card when Prometheus is summoned (Activate Tech Card requirements are ignored).",
+    "ShortDescription": "",
     "Attack": 7,
     "Cost": 5,
     "Health": 23,
@@ -1828,7 +2087,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 11537421,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1058,
@@ -1836,6 +2096,7 @@
     "CardType": "Hero",
     "Attribute": "Mythological",
     "Description": "When summoned the Player will choose to view either the top 3 cards in their Main Deck or the top 3 cards in their Opponents Main Deck. Replace them in any order the Player desires.",
+    "ShortDescription": "",
     "Attack": 16,
     "Cost": 6,
     "Health": 22,
@@ -1843,7 +2104,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 85763540,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1059,
@@ -1851,6 +2113,7 @@
     "CardType": "Hero",
     "Attribute": "Wizard",
     "Description": "Roll a pair of dice whenver the Opponent summons a new Fighter to the field. If the total of the dice roll is below 7, the opposing Fighter is immediately sent to the Medical bay.",
+    "ShortDescription": "",
     "Attack": 30,
     "Cost": 6,
     "Health": 5,
@@ -1858,7 +2121,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 92830075,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1060,
@@ -1866,6 +2130,7 @@
     "CardType": "Hero",
     "Attribute": "Spy",
     "Description": "When summoned the Opponent must reveal their hand to the Player.",
+    "ShortDescription": "",
     "Attack": 11,
     "Cost": 4,
     "Health": 15,
@@ -1873,7 +2138,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 32840731,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1061,
@@ -1881,6 +2147,7 @@
     "CardType": "Hero",
     "Attribute": "Mythological",
     "Description": "Returns to the Player's Hand during the End Phase. Summon crests used to play this card is restored upon resolving this effect.",
+    "ShortDescription": "",
     "Attack": 30,
     "Cost": 6,
     "Health": 29,
@@ -1888,7 +2155,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 93226041,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1062,
@@ -1896,6 +2164,7 @@
     "CardType": "Hero",
     "Attribute": "Mythological",
     "Description": "This card cannot be destroyed by Battle. It gains 2 Health per Turn while on the field.",
+    "ShortDescription": "",
     "Attack": 11,
     "Cost": 5,
     "Health": 21,
@@ -1903,7 +2172,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 44072586,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1063,
@@ -1911,6 +2181,7 @@
     "CardType": "Hero",
     "Attribute": "Spy",
     "Description": "When this card is defeated, the Player may capture one Magic or Trap card from the Opponent's Medical Bay and add it to their Hand.",
+    "ShortDescription": "",
     "Attack": 23,
     "Cost": 5,
     "Health": 7,
@@ -1918,7 +2189,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 91688551,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1064,
@@ -1926,6 +2198,7 @@
     "CardType": "Hero",
     "Attribute": "Thief (or Outlaw?)",
     "Description": "When summoned Player has the choice to steal one Equip card from the Opponent's field, Medical Bay, Deck, or Hand and add it to their Fighter.",
+    "ShortDescription": "",
     "Attack": 22,
     "Cost": 6,
     "Health": 16,
@@ -1933,7 +2206,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 85381406,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1065,
@@ -1941,6 +2215,7 @@
     "CardType": "Hero",
     "Attribute": "Wizard",
     "Description": "Once per Turn, revive one card from either Player's Medical Bay or Graveyard/Junkyard and immediately activate it on the field.",
+    "ShortDescription": "",
     "Attack": 29,
     "Cost": 6,
     "Health": 10,
@@ -1948,7 +2223,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 43506429,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1066,
@@ -1956,6 +2232,7 @@
     "CardType": "Hero",
     "Attribute": "Wizard",
     "Description": "Once per Turn, flip a coin. If the result is Heads, heal one of the cards on your field for +5 health. If the result is tails, inflict 5 points of damage on the opposing Fighter.",
+    "ShortDescription": "",
     "Attack": 12,
     "Cost": 5,
     "Health": 15,
@@ -1963,7 +2240,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 28269385,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1067,
@@ -1971,6 +2249,7 @@
     "CardType": "Hero",
     "Attribute": "Warrior",
     "Description": "When sharing the field with King Arthur, gains +3 Attack. During the Standby Phase of the Player's Turn, roll a die. If the result is 1 or 6, Lancelot enters a state of \"madness\" over Guinevere and gains +3 Attack, but cannot Attack during the Battle Phase this Turn.",
+    "ShortDescription": "",
     "Attack": 25,
     "Cost": 6,
     "Health": 21,
@@ -1978,7 +2257,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 67892655,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 1068,
@@ -1986,6 +2266,7 @@
     "CardType": "Hero",
     "Attribute": "Warrior",
     "Description": "If King Arthur is defeated while this card is on the field, immediately send this card to the Opponent's Medical Bay. When this card is played by someone other than the original Owner, all Fighter and Reinforcement cards (excluding this one) lose 3 Health at the start of each Standby Phase. If King Arthur is summoned by the Opponent while this card is in your hand, add this card to your side of the field.",
+    "ShortDescription": "",
     "Attack": 20,
     "Cost": 4,
     "Health": 15,
@@ -1993,7 +2274,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 22716806,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2001,
@@ -2001,6 +2283,7 @@
     "CardType": "Magic",
     "Attribute": "Equip",
     "Description": "Grants +1 to the Attack stat of a Normal or Hero card that the Player controls.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 2,
     "Health": "N/A",
@@ -2008,7 +2291,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 38431837,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2002,
@@ -2016,6 +2300,7 @@
     "CardType": "Magic",
     "Attribute": "Equip",
     "Description": "Grants +2 to the Attack stat of a Normal or Hero card that the Player controls.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 3,
     "Health": "N/A",
@@ -2023,7 +2308,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 79138586,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2003,
@@ -2031,6 +2317,7 @@
     "CardType": "Magic",
     "Attribute": "Equip",
     "Description": "Grants +3 to the Attack stat of a Normal or Hero Warrior-Type card that the Player controls.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 3,
     "Health": "N/A",
@@ -2038,7 +2325,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 15178943,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2004,
@@ -2046,6 +2334,7 @@
     "CardType": "Magic",
     "Attribute": "Equip",
     "Description": "Grants +3 to the Attack stat of a Normal or Hero Ranged-Type card that the Player controls.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 2,
     "Health": "N/A",
@@ -2053,7 +2342,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 43204408,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2005,
@@ -2061,6 +2351,7 @@
     "CardType": "Magic",
     "Attribute": "Equip",
     "Description": "Grants +4 to the Attack stat of a Normal or Hero Ranged-Type card that the Player controls.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 5,
     "Health": "N/A",
@@ -2068,7 +2359,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 24810101,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2006,
@@ -2076,6 +2368,7 @@
     "CardType": "Magic",
     "Attribute": "Equip",
     "Description": "Grants +5 to the Attack stat of a Normal or Hero Ranged-Type card that the Player controls.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 4,
     "Health": "N/A",
@@ -2083,7 +2376,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 57786813,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2007,
@@ -2091,6 +2385,7 @@
     "CardType": "Magic",
     "Attribute": "Equip",
     "Description": "Grants +6 to the Attack stat of a Normal or Hero Ranged-Type card that the Player controls.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 4,
     "Health": "N/A",
@@ -2098,7 +2393,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 99851582,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2008,
@@ -2106,6 +2402,7 @@
     "CardType": "Magic",
     "Attribute": "Equip",
     "Description": "Grants +7 to the Attack stat of a Normal or Hero Scientist-Type card that the Player controls.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 1,
     "Health": "N/A",
@@ -2113,7 +2410,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 47062189,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2009,
@@ -2121,6 +2419,7 @@
     "CardType": "Magic",
     "Attribute": "Equip",
     "Description": "The next Normal/Hero card you Summon gets +3 Attack.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 6,
     "Health": "N/A",
@@ -2128,7 +2427,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 15703787,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2010,
@@ -2136,6 +2436,7 @@
     "CardType": "Magic",
     "Attribute": "Equip",
     "Description": "The next Normal/Hero card you Summon gains +1 Attack.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 6,
     "Health": "N/A",
@@ -2143,7 +2444,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 13925137,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2011,
@@ -2151,6 +2453,7 @@
     "CardType": "Magic",
     "Attribute": "Equip",
     "Description": "Your next Normal/Hero card Summoned gets +5 Attack. For the next two turns any Normal/Hero cards you Summon gets -3 Attack.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 2,
     "Health": "N/A",
@@ -2158,7 +2461,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 17369913,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2012,
@@ -2166,6 +2470,7 @@
     "CardType": "Magic",
     "Attribute": "Standard",
     "Description": "Add one Equip Attribute Magic card from your Graveyard/Junkyard to your hand.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 6,
     "Health": "N/A",
@@ -2173,7 +2478,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 42151268,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2013,
@@ -2181,6 +2487,7 @@
     "CardType": "Magic",
     "Attribute": "Standard",
     "Description": "The Cost of Magic cards is reduced by 1 for the Player for the remainder of this turn.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 1,
     "Health": "N/A",
@@ -2188,7 +2495,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 39573503,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2014,
@@ -2196,6 +2504,7 @@
     "CardType": "Magic",
     "Attribute": "Standard",
     "Description": "Discard 1 card to the Graveyard/Junkyard. You win the Battle this round.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 3,
     "Health": "N/A",
@@ -2203,7 +2512,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 75246631,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2015,
@@ -2211,6 +2521,7 @@
     "CardType": "Magic",
     "Attribute": "Standard",
     "Description": "Roll a six-sided dice and apply the result:\n 1: Skip the Battle Phase. You lose the Battle this round.\n 2-5: ???\n 6: Skip the Battle Phase. You win the Battle this round.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 1,
     "Health": "N/A",
@@ -2218,7 +2529,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 68754341,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2016,
@@ -2226,6 +2538,7 @@
     "CardType": "Magic",
     "Attribute": "Standard",
     "Description": "Revive one card from either Player's Graveyard/Junkyard and add it to your hand. Upon resolving this card's effect, banish it.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 3,
     "Health": "N/A",
@@ -2233,7 +2546,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 68535761,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2017,
@@ -2241,6 +2555,7 @@
     "CardType": "Magic",
     "Attribute": "Standard",
     "Description": "Choose one card from either player's Medical Bay to heal and add it to your hand.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 1,
     "Health": "N/A",
@@ -2248,7 +2563,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 74496062,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 2018,
@@ -2256,6 +2572,7 @@
     "CardType": "Magic",
     "Attribute": "Standard",
     "Description": "Inflict 5 Life Points of Damage to the Opponent.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 2,
     "Health": "N/A",
@@ -2263,7 +2580,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 42768067,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 3001,
@@ -2271,6 +2589,7 @@
     "CardType": "Trap",
     "Attribute": "Standard",
     "Description": "Switch decks with your opponent (Med Bays are not switched). Your opponent gets to take 1 card from your hand (or field if no cards are in your hand) and add it to their own hand.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 4,
     "Health": "N/A",
@@ -2278,7 +2597,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 23851215,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 3002,
@@ -2286,6 +2606,7 @@
     "CardType": "Trap",
     "Attribute": "Standard",
     "Description": "When your opponent activates a Tech Card, play this card to force them to skip their next Draw during the Opening Phase.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 6,
     "Health": "N/A",
@@ -2293,7 +2614,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 60111908,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 3003,
@@ -2301,6 +2623,7 @@
     "CardType": "Trap",
     "Attribute": "Standard",
     "Description": "If your opponent Summons a Normal/Hero card that is stronger than your own you may activate this card; A Normal/Hero card of your choosing gains +7 Attack for this turn only.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 1,
     "Health": "N/A",
@@ -2308,7 +2631,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 73282505,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 3004,
@@ -2316,6 +2640,7 @@
     "CardType": "Trap",
     "Attribute": "Equip",
     "Description": "When equipped to one of your Normal/Hero cards you may choose one Equip Attribute card on the opponent's field and send it to the Graveyard/Junkyard.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 6,
     "Health": "N/A",
@@ -2323,7 +2648,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 58494934,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 3005,
@@ -2331,6 +2657,7 @@
     "CardType": "Trap",
     "Attribute": "Standard",
     "Description": "Upon inflicting Life Point damage on the Opponent, they must discard their entire hand to the Graveyard/Junkyard/Medical Bay as appropriate.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 3,
     "Health": "N/A",
@@ -2338,7 +2665,8 @@
     "SpecialEditionText": "Standard",
     "Rarity": "Common",
     "Passcode": 90311906,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 3006,
@@ -2346,6 +2674,7 @@
     "CardType": "Trap",
     "Attribute": "Standard",
     "Description": "Activate when to Opponent summons a new Fighter to the field. The Fighter is immediately captured and sent to the Player's Medical Bay.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": 6,
     "Health": "N/A",
@@ -2353,7 +2682,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 83893341,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 4001,
@@ -2361,6 +2691,7 @@
     "CardType": "Tech",
     "Attribute": "N/A",
     "Description": "All Player's Normal and Hero cards immediately gain +5 Health when summoned for the remainder of the game.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": "N/A",
     "Health": "N/A",
@@ -2368,7 +2699,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 30093650,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 4002,
@@ -2376,6 +2708,7 @@
     "CardType": "Tech",
     "Attribute": "N/A",
     "Description": "The Opponent must re-roll any dice roll that results in a total greater than '6.'",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": "N/A",
     "Health": "N/A",
@@ -2383,7 +2716,8 @@
     "SpecialEditionText": "LIMITED EDITION",
     "Rarity": "Common",
     "Passcode": 57834008,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 4003,
@@ -2391,6 +2725,7 @@
     "CardType": "Tech",
     "Attribute": "N/A",
     "Description": "Duplicates the effect of one of the Opponent's active Tech cards. If Opponent has multiple Tech cards active, the Player can choose which card to mimic.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": "N/A",
     "Health": "N/A",
@@ -2398,7 +2733,8 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 37482999,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   },
   {
     "Card_ID": 9999,
@@ -2406,6 +2742,7 @@
     "CardType": "Special",
     "Attribute": "N/A",
     "Description": "Both Players must draw the top card from their Tech Deck and Activate it in their Tech Zone.",
+    "ShortDescription": "",
     "Attack": "N/A",
     "Cost": "N/A",
     "Health": "N/A",
@@ -2413,6 +2750,7 @@
     "SpecialEditionText": "1st Edition",
     "Rarity": "Common",
     "Passcode": 42489363,
-    "DeckCapacity": 0
+    "DeckCapacity": 0,
+    "Copyright": ""
   }
 ]

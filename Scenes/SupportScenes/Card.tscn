@@ -1,0 +1,64 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Assets/Cards/Frame/Normal_Card_Frame.png" type="Texture" id=1]
+[ext_resource path="res://Assets/Cards/Art/Barbarian.png" type="Texture" id=2]
+[ext_resource path="res://Resources/Themes/Card_Text_72.tres" type="Theme" id=4]
+[ext_resource path="res://Resources/Themes/Card_Text_54.tres" type="Theme" id=5]
+[ext_resource path="res://Resources/Themes/Card_Text_35.tres" type="Theme" id=6]
+[ext_resource path="res://Scripts/Card.gd" type="Script" id=7]
+
+[node name="Card" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -1316.0
+margin_bottom = -176.0
+script = ExtResource( 7 )
+
+[node name="Frame" type="TextureRect" parent="."]
+margin_right = 604.0
+margin_bottom = 904.0
+texture = ExtResource( 1 )
+
+[node name="Art" type="TextureRect" parent="."]
+margin_left = 190.0
+margin_top = 175.0
+margin_right = 402.0
+margin_bottom = 540.0
+texture = ExtResource( 2 )
+
+[node name="Name" type="RichTextLabel" parent="."]
+margin_left = 23.0
+margin_top = 45.0
+margin_right = 581.0
+margin_bottom = 125.0
+theme = ExtResource( 4 )
+bbcode_enabled = true
+
+[node name="Description" type="RichTextLabel" parent="."]
+margin_left = 20.0
+margin_top = 565.0
+margin_right = 583.0
+margin_bottom = 810.0
+theme = ExtResource( 6 )
+bbcode_enabled = true
+
+[node name="Attack" type="RichTextLabel" parent="."]
+margin_left = 40.0
+margin_top = 815.0
+margin_right = 90.0
+margin_bottom = 876.0
+theme = ExtResource( 5 )
+bbcode_enabled = true
+
+[node name="Cost" type="TextureRect" parent="."]
+margin_left = 280.0
+margin_top = 836.0
+margin_right = 320.0
+margin_bottom = 876.0
+
+[node name="Health" type="RichTextLabel" parent="."]
+margin_left = 525.0
+margin_top = 815.0
+margin_right = 575.0
+margin_bottom = 876.0
+theme = ExtResource( 5 )
