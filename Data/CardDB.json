@@ -1003,7 +1003,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 60,
+    "Card_ID": 59,
     "CardName": "Dog",
     "CardType": "Normal",
     "Attribute": "Creature",
@@ -1020,7 +1020,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 61,
+    "Card_ID": 60,
     "CardName": "Hawk",
     "CardType": "Normal",
     "Attribute": "Creature",
@@ -1037,7 +1037,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 62,
+    "Card_ID": 61,
     "CardName": "Eagle",
     "CardType": "Normal",
     "Attribute": "Creature",
@@ -1054,7 +1054,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 63,
+    "Card_ID": 62,
     "CardName": "Bear",
     "CardType": "Normal",
     "Attribute": "Creature",
@@ -1071,7 +1071,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 64,
+    "Card_ID": 63,
     "CardName": "Dragon",
     "CardType": "Normal",
     "Attribute": "Creature",
@@ -1088,7 +1088,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 65,
+    "Card_ID": 64,
     "CardName": "Mongol",
     "CardType": "Normal",
     "Attribute": "Ranged",
@@ -1105,7 +1105,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 66,
+    "Card_ID": 65,
     "CardName": "Serf",
     "CardType": "Normal",
     "Attribute": "Warrior",
@@ -1122,7 +1122,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1001,
+    "Card_ID": 66,
     "CardName": "The Hero of Carna",
     "CardType": "Hero",
     "Attribute": "Wizard/Warrior",
@@ -1139,7 +1139,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1002,
+    "Card_ID": 67,
     "CardName": "The Seer of Dorsha Pass",
     "CardType": "Hero",
     "Attribute": "Wizard",
@@ -1156,7 +1156,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1003,
+    "Card_ID": 68,
     "CardName": "The Oracle",
     "CardType": "Hero",
     "Attribute": "Wizard",
@@ -1173,7 +1173,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1004,
+    "Card_ID": 69,
     "CardName": "The Spirit Walker",
     "CardType": "Hero",
     "Attribute": "Wizard",
@@ -1190,7 +1190,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1005,
+    "Card_ID": 70,
     "CardName": "The Lorekeeper",
     "CardType": "Hero",
     "Attribute": "Scientist",
@@ -1207,7 +1207,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1006,
+    "Card_ID": 71,
     "CardName": "The Forgotten One",
     "CardType": "Hero",
     "Attribute": "Ranged",
@@ -1224,7 +1224,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1007,
+    "Card_ID": 72,
     "CardName": "Dark Sage",
     "CardType": "Hero",
     "Attribute": "Wizard",
@@ -1241,7 +1241,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1008,
+    "Card_ID": 73,
     "CardName": "White Sage",
     "CardType": "Hero",
     "Attribute": "Wizard",
@@ -1258,7 +1258,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1009,
+    "Card_ID": 74,
     "CardName": "Eriman the Wise",
     "CardType": "Hero",
     "Attribute": "Scientist",
@@ -1275,7 +1275,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1010,
+    "Card_ID": 75,
     "CardName": "The Level Beyond",
     "CardType": "Hero",
     "Attribute": "Warrior",
@@ -1292,7 +1292,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1011,
+    "Card_ID": 76,
     "CardName": "Albert Einstein",
     "CardType": "Hero",
     "Attribute": "Scientist",
@@ -1309,7 +1309,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1012,
+    "Card_ID": 77,
     "CardName": "Christopher Columbus",
     "CardType": "Hero",
     "Attribute": "Explorer",
@@ -1326,7 +1326,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1013,
+    "Card_ID": 78,
     "CardName": "Johannes Gutenberg",
     "CardType": "Hero",
     "Attribute": "Support",
@@ -1343,7 +1343,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1014,
+    "Card_ID": 79,
     "CardName": "Napoleon",
     "CardType": "Hero",
     "Attribute": "Warrior",
@@ -1360,7 +1360,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1015,
+    "Card_ID": 80,
     "CardName": "William Shakespeare",
     "CardType": "Hero",
     "Attribute": "Support",
@@ -1377,7 +1377,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1016,
+    "Card_ID": 81,
     "CardName": "George Washington",
     "CardType": "Hero",
     "Attribute": "Politician",
@@ -1394,7 +1394,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1017,
+    "Card_ID": 82,
     "CardName": "Adolf Hitler",
     "CardType": "Hero",
     "Attribute": "Politician",
@@ -1411,7 +1411,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1018,
+    "Card_ID": 83,
     "CardName": "Aristotle",
     "CardType": "Hero",
     "Attribute": "Philosopher",
@@ -1428,7 +1428,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1019,
+    "Card_ID": 84,
     "CardName": "Alexander the Great",
     "CardType": "Hero",
     "Attribute": "Warrior",
@@ -1445,7 +1445,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1020,
+    "Card_ID": 85,
     "CardName": "Charles Darwin",
     "CardType": "Hero",
     "Attribute": "Scientist",
@@ -1462,7 +1462,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1021,
+    "Card_ID": 86,
     "CardName": "Julius Caesar",
     "CardType": "Hero",
     "Attribute": "Warrior",
@@ -1479,7 +1479,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1022,
+    "Card_ID": 87,
     "CardName": "Joseph Stalin",
     "CardType": "Hero",
     "Attribute": "Politician",
@@ -1496,7 +1496,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1023,
+    "Card_ID": 88,
     "CardName": "Wolfgang Amadeus Mozart",
     "CardType": "Hero",
     "Attribute": "Support",
@@ -1513,7 +1513,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1024,
+    "Card_ID": 89,
     "CardName": "Ludwig van Beethoven",
     "CardType": "Hero",
     "Attribute": "Support",
@@ -1530,7 +1530,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1025,
+    "Card_ID": 90,
     "CardName": "Leonardo da Vinci",
     "CardType": "Hero",
     "Attribute": "Scientist",
@@ -1547,7 +1547,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1026,
+    "Card_ID": 91,
     "CardName": "Ronald Reagan",
     "CardType": "Hero",
     "Attribute": "Support",
@@ -1564,7 +1564,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1027,
+    "Card_ID": 92,
     "CardName": "Genghis Khan",
     "CardType": "Hero",
     "Attribute": "Warrior",
@@ -1581,7 +1581,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1028,
+    "Card_ID": 93,
     "CardName": "Friedrich Nietzsche",
     "CardType": "Hero",
     "Attribute": "Philosopher",
@@ -1598,7 +1598,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1029,
+    "Card_ID": 94,
     "CardName": "Gandhi",
     "CardType": "Hero",
     "Attribute": "Support",
@@ -1615,7 +1615,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1030,
+    "Card_ID": 95,
     "CardName": "Adam Smith",
     "CardType": "Hero",
     "Attribute": "Support",
@@ -1632,7 +1632,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1031,
+    "Card_ID": 96,
     "CardName": "Immanuel Kant",
     "CardType": "Hero",
     "Attribute": "Philosopher",
@@ -1649,7 +1649,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1032,
+    "Card_ID": 97,
     "CardName": "William the Conquerer",
     "CardType": "Hero",
     "Attribute": "Warrior",
@@ -1666,7 +1666,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1033,
+    "Card_ID": 98,
     "CardName": "Richard Nixon",
     "CardType": "Hero",
     "Attribute": "Support",
@@ -1683,7 +1683,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1034,
+    "Card_ID": 99,
     "CardName": "King Arthur",
     "CardType": "Hero",
     "Attribute": "Warrior",
@@ -1700,7 +1700,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1035,
+    "Card_ID": 100,
     "CardName": "Merlin",
     "CardType": "Hero",
     "Attribute": "Wizard",
@@ -1717,7 +1717,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1036,
+    "Card_ID": 101,
     "CardName": "Knight of the Round Table",
     "CardType": "Hero",
     "Attribute": "Warrior",
@@ -1734,7 +1734,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1037,
+    "Card_ID": 102,
     "CardName": "Joan of Arc",
     "CardType": "Hero",
     "Attribute": "Wizard",
@@ -1751,7 +1751,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1038,
+    "Card_ID": 103,
     "CardName": "Rasputin",
     "CardType": "Hero",
     "Attribute": "Wizard",
@@ -1768,7 +1768,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1039,
+    "Card_ID": 104,
     "CardName": "Amenhotep III",
     "CardType": "Hero",
     "Attribute": "",
@@ -1785,7 +1785,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1040,
+    "Card_ID": 105,
     "CardName": "Buddah",
     "CardType": "Hero",
     "Attribute": "",
@@ -1802,7 +1802,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1041,
+    "Card_ID": 106,
     "CardName": "Cleopatra",
     "CardType": "Hero",
     "Attribute": "",
@@ -1819,7 +1819,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1042,
+    "Card_ID": 107,
     "CardName": "Achilles",
     "CardType": "Hero",
     "Attribute": "Warrior",
@@ -1836,7 +1836,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1043,
+    "Card_ID": 108,
     "CardName": "Hercules",
     "CardType": "Hero",
     "Attribute": "Warrior",
@@ -1853,7 +1853,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1044,
+    "Card_ID": 109,
     "CardName": "Mansa Musa",
     "CardType": "Hero",
     "Attribute": "Support",
@@ -1870,7 +1870,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1045,
+    "Card_ID": 110,
     "CardName": "Karl Marx",
     "CardType": "Hero",
     "Attribute": "Philosopher",
@@ -1887,7 +1887,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1046,
+    "Card_ID": 111,
     "CardName": "Sitting Bull",
     "CardType": "Hero",
     "Attribute": "Ranged",
@@ -1904,7 +1904,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1047,
+    "Card_ID": 112,
     "CardName": "Vladimir Lenin",
     "CardType": "Hero",
     "Attribute": "Politician",
@@ -1921,7 +1921,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1048,
+    "Card_ID": 113,
     "CardName": "Winston Churchill",
     "CardType": "Hero",
     "Attribute": "Politician",
@@ -1938,7 +1938,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1049,
+    "Card_ID": 114,
     "CardName": "Alan Turing",
     "CardType": "Hero",
     "Attribute": "Scientist",
@@ -1955,7 +1955,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1050,
+    "Card_ID": 115,
     "CardName": "Anne Frank",
     "CardType": "Hero",
     "Attribute": "Support",
@@ -1972,7 +1972,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1051,
+    "Card_ID": 116,
     "CardName": "Hades",
     "CardType": "Hero",
     "Attribute": "Divine",
@@ -1989,7 +1989,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1052,
+    "Card_ID": 117,
     "CardName": "Zeus",
     "CardType": "Hero",
     "Attribute": "Divine",
@@ -2006,7 +2006,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1053,
+    "Card_ID": 118,
     "CardName": "Ares",
     "CardType": "Hero",
     "Attribute": "Divine",
@@ -2023,7 +2023,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1054,
+    "Card_ID": 119,
     "CardName": "Aphrodite",
     "CardType": "Hero",
     "Attribute": "Divine",
@@ -2040,7 +2040,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1055,
+    "Card_ID": 120,
     "CardName": "Hephaestus",
     "CardType": "Hero",
     "Attribute": "Scientist/Divine",
@@ -2057,7 +2057,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1056,
+    "Card_ID": 121,
     "CardName": "Cronos",
     "CardType": "Hero",
     "Attribute": "Divine",
@@ -2074,7 +2074,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1057,
+    "Card_ID": 122,
     "CardName": "Prometheus",
     "CardType": "Hero",
     "Attribute": "Mythological",
@@ -2091,7 +2091,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1058,
+    "Card_ID": 123,
     "CardName": "The Fates",
     "CardType": "Hero",
     "Attribute": "Mythological",
@@ -2108,7 +2108,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1059,
+    "Card_ID": 124,
     "CardName": "Medusa",
     "CardType": "Hero",
     "Attribute": "Wizard",
@@ -2125,7 +2125,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1060,
+    "Card_ID": 125,
     "CardName": "James Bond",
     "CardType": "Hero",
     "Attribute": "Spy",
@@ -2142,7 +2142,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1061,
+    "Card_ID": 126,
     "CardName": "Big Foot",
     "CardType": "Hero",
     "Attribute": "Mythological",
@@ -2159,7 +2159,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1062,
+    "Card_ID": 127,
     "CardName": "Hydra",
     "CardType": "Hero",
     "Attribute": "Mythological",
@@ -2176,7 +2176,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1063,
+    "Card_ID": 128,
     "CardName": "Agent 0",
     "CardType": "Hero",
     "Attribute": "Spy",
@@ -2193,7 +2193,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1064,
+    "Card_ID": 129,
     "CardName": "Robin Hood",
     "CardType": "Hero",
     "Attribute": "Thief (or Outlaw?)",
@@ -2210,7 +2210,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1065,
+    "Card_ID": 130,
     "CardName": "Necromancer",
     "CardType": "Hero",
     "Attribute": "Wizard",
@@ -2227,7 +2227,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1066,
+    "Card_ID": 131,
     "CardName": "Morgan le Fay",
     "CardType": "Hero",
     "Attribute": "Wizard",
@@ -2244,7 +2244,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1067,
+    "Card_ID": 132,
     "CardName": "Lancelot",
     "CardType": "Hero",
     "Attribute": "Warrior",
@@ -2261,7 +2261,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 1068,
+    "Card_ID": 133,
     "CardName": "Mordred",
     "CardType": "Hero",
     "Attribute": "Warrior",
@@ -2278,7 +2278,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2001,
+    "Card_ID": 134,
     "CardName": "Fists",
     "CardType": "Magic",
     "Attribute": "Equip",
@@ -2295,7 +2295,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2002,
+    "Card_ID": 135,
     "CardName": "Rock",
     "CardType": "Magic",
     "Attribute": "Equip",
@@ -2312,7 +2312,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2003,
+    "Card_ID": 136,
     "CardName": "Sword",
     "CardType": "Magic",
     "Attribute": "Equip",
@@ -2329,7 +2329,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2004,
+    "Card_ID": 137,
     "CardName": "Gun",
     "CardType": "Magic",
     "Attribute": "Equip",
@@ -2346,7 +2346,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2005,
+    "Card_ID": 138,
     "CardName": "Cannon",
     "CardType": "Magic",
     "Attribute": "Equip",
@@ -2363,7 +2363,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2006,
+    "Card_ID": 139,
     "CardName": "Missile Launcher",
     "CardType": "Magic",
     "Attribute": "Equip",
@@ -2380,7 +2380,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2007,
+    "Card_ID": 140,
     "CardName": "Rocket Launcher",
     "CardType": "Magic",
     "Attribute": "Equip",
@@ -2397,7 +2397,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2008,
+    "Card_ID": 141,
     "CardName": "Death Ray",
     "CardType": "Magic",
     "Attribute": "Equip",
@@ -2414,7 +2414,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2009,
+    "Card_ID": 142,
     "CardName": "Power Up",
     "CardType": "Magic",
     "Attribute": "Equip",
@@ -2431,7 +2431,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2010,
+    "Card_ID": 143,
     "CardName": "Morale Boost",
     "CardType": "Magic",
     "Attribute": "Equip",
@@ -2448,7 +2448,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2011,
+    "Card_ID": 144,
     "CardName": "Last Stand",
     "CardType": "Magic",
     "Attribute": "Equip",
@@ -2465,7 +2465,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2012,
+    "Card_ID": 145,
     "CardName": "Blade Song",
     "CardType": "Magic",
     "Attribute": "Standard",
@@ -2482,7 +2482,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2013,
+    "Card_ID": 146,
     "CardName": "Runetouched",
     "CardType": "Magic",
     "Attribute": "Standard",
@@ -2499,7 +2499,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2014,
+    "Card_ID": 147,
     "CardName": "Snatch Victory",
     "CardType": "Magic",
     "Attribute": "Standard",
@@ -2516,7 +2516,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2015,
+    "Card_ID": 148,
     "CardName": "Prayer",
     "CardType": "Magic",
     "Attribute": "Standard",
@@ -2533,7 +2533,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2016,
+    "Card_ID": 149,
     "CardName": "Ressurection",
     "CardType": "Magic",
     "Attribute": "Standard",
@@ -2550,7 +2550,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2017,
+    "Card_ID": 150,
     "CardName": "Miraculous Recovery",
     "CardType": "Magic",
     "Attribute": "Standard",
@@ -2567,7 +2567,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 2018,
+    "Card_ID": 151,
     "CardName": "Firebolt",
     "CardType": "Magic",
     "Attribute": "Standard",
@@ -2584,7 +2584,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 3001,
+    "Card_ID": 152,
     "CardName": "Unbalanced Trade",
     "CardType": "Trap",
     "Attribute": "Standard",
@@ -2601,7 +2601,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 3002,
+    "Card_ID": 153,
     "CardName": "Bypass",
     "CardType": "Trap",
     "Attribute": "Standard",
@@ -2618,7 +2618,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 3003,
+    "Card_ID": 154,
     "CardName": "Heart of the Underdog",
     "CardType": "Trap",
     "Attribute": "Standard",
@@ -2635,7 +2635,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 3004,
+    "Card_ID": 155,
     "CardName": "Disable",
     "CardType": "Trap",
     "Attribute": "Equip",
@@ -2652,7 +2652,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 3005,
+    "Card_ID": 156,
     "CardName": "Desecration",
     "CardType": "Trap",
     "Attribute": "Standard",
@@ -2669,7 +2669,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 3006,
+    "Card_ID": 157,
     "CardName": "Deep Pit",
     "CardType": "Trap",
     "Attribute": "Standard",
@@ -2686,7 +2686,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 4001,
+    "Card_ID": 158,
     "CardName": "Fire",
     "CardType": "Tech",
     "Attribute": "N/A",
@@ -2703,7 +2703,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 4002,
+    "Card_ID": 159,
     "CardName": "Time Machine",
     "CardType": "Tech",
     "Attribute": "N/A",
@@ -2720,7 +2720,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 4003,
+    "Card_ID": 160,
     "CardName": "Espionage",
     "CardType": "Tech",
     "Attribute": "N/A",
@@ -2737,7 +2737,7 @@
     "Copyright": ""
   },
   {
-    "Card_ID": 9999,
+    "Card_ID": 161,
     "CardName": "Activate Technology",
     "CardType": "Special",
     "Attribute": "N/A",

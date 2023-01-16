@@ -16,8 +16,7 @@ var Passcode
 var Deck_Capacity
 
 func _ready():
-	set_variable_values(11)
-	set_card_text()
+	pass
 
 func set_variable_values(Card_ID):
 	Name = GameData.CardData[Card_ID]["CardName"]
