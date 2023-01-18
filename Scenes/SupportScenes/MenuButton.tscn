@@ -8,6 +8,7 @@
 margin_right = 1820.0
 margin_bottom = 100.0
 rect_min_size = Vector2( 1820, 100 )
+focus_mode = 1
 script = ExtResource( 1 )
 text = "New Game"
 
@@ -19,11 +20,15 @@ mouse_filter = 2
 size_flags_vertical = 4
 theme = ExtResource( 2 )
 bbcode_enabled = true
+bbcode_text = "[center] New Game [/center]"
+text = " New Game "
 
 [node name="LeftArrow" type="Sprite" parent="."]
+position = Vector2( 810, 33.3333 )
 texture = ExtResource( 3 )
 
 [node name="RightArrow" type="Sprite" parent="."]
+position = Vector2( 1010, 33.3333 )
 texture = ExtResource( 3 )
 flip_h = true
 

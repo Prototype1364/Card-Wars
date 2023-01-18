@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/Switch Button.png-6e125078f2d94dc40f8768bc1ef4f8be.stex"
+path="res://.import/Switch Button.png-ca2445fd5e1fb2c5ddf6cf7922a36c2f.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Board/Switch Button.png"
-dest_files=[ "res://.import/Switch Button.png-6e125078f2d94dc40f8768bc1ef4f8be.stex" ]
+source_file="res://Assets/Playmat/Switch Button.png"
+dest_files=[ "res://.import/Switch Button.png-ca2445fd5e1fb2c5ddf6cf7922a36c2f.stex" ]
 
 [params]
 

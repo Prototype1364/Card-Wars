@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/Duel_Field_Flipped.png-e7a3ae374ab71bd1063b9c982a15ed38.stex"
+path="res://.import/BoardImage.png-5dbfaa9bbe16183476a82a29fc8b37e8.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Playmat/Duel_Field_Flipped.png"
-dest_files=[ "res://.import/Duel_Field_Flipped.png-e7a3ae374ab71bd1063b9c982a15ed38.stex" ]
+source_file="res://Assets/Playmat/BoardImage.png"
+dest_files=[ "res://.import/BoardImage.png-5dbfaa9bbe16183476a82a29fc8b37e8.stex" ]
 
 [params]
 
