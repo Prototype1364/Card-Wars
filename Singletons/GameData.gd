@@ -5,6 +5,16 @@ var Master_Deck_List
 
 var Current_Turn = "Player"
 
+var FocusedCardName = ""
+var FocusedCardParentName = ""
+
+var CardFrom = ""
+var CardTo = ""
+var CardMoved = ""
+var CardSwitched = ""
+
+var CardCounter = 0
+
 func _ready():
 	# Loads Card Pool Into Game.
 	var CardData_File = File.new()

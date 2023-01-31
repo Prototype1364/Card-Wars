@@ -1,281 +1,525 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Assets/Playmat/BoardImage.png" type="Texture" id=1]
-[ext_resource path="res://Assets/Playmat/Switch Button.png" type="Texture" id=2]
-[ext_resource path="res://Scripts/BoardImage.gd" type="Script" id=3]
+[ext_resource path="res://Scripts/BoardImage.gd" type="Script" id=2]
+[ext_resource path="res://Assets/Playmat/Switch Button.png" type="Texture" id=3]
+[ext_resource path="res://Scenes/SupportScenes/BigCard.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Scripts/CardExaminer.gd" type="Script" id=6]
+[ext_resource path="res://Assets/Playmat/Large Empty Slot.png" type="Texture" id=7]
 
-[node name="Duel" type="Control"]
+[node name="SceneHandler" type="Node"]
 
-[node name="BoardImage" type="Sprite" parent="."]
-position = Vector2( 0, -300 )
+[node name="Node2D" type="Node2D" parent="."]
+
+[node name="BoardImage" type="Sprite" parent="Node2D"]
+position = Vector2( 0, -648 )
 texture = ExtResource( 1 )
 centered = false
-script = ExtResource( 3 )
+script = ExtResource( 2 )
 
-[node name="CardSpots" type="Control" parent="BoardImage"]
-margin_left = -5.0
-margin_top = -2.0
-margin_right = 1019.0
-margin_bottom = 898.0
-rect_pivot_offset = Vector2( 512, 450 )
+[node name="CardSpots" type="Control" parent="Node2D/BoardImage"]
+margin_left = 974.0
+margin_top = 243.0
+margin_right = 1866.0
+margin_bottom = 1486.0
+rect_pivot_offset = Vector2( 446, 621 )
 
-[node name="EquipWL" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 399.0
-margin_top = 457.0
-margin_right = 465.0
-margin_bottom = 556.0
+[node name="BHandScroller" type="ScrollContainer" parent="Node2D/BoardImage/CardSpots"]
+margin_left = 33.0
+margin_top = -220.0
+margin_right = 868.0
+margin_bottom = -20.0
+follow_focus = true
+scroll_vertical_enabled = false
 
-[node name="FighterW" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 478.0
-margin_top = 457.0
-margin_right = 544.0
-margin_bottom = 556.0
+[node name="BHand" type="HBoxContainer" parent="Node2D/BoardImage/CardSpots/BHandScroller"]
+rect_pivot_offset = Vector2( 317, 100 )
+focus_neighbour_left = NodePath("../../NonHands/BTechDeck")
+focus_neighbour_top = NodePath("../../NonHands/BTrap1")
+focus_neighbour_right = NodePath("../../../../BoardScroller")
+focus_neighbour_bottom = NodePath("../../NonHands/BAttacker")
+focus_previous = NodePath("../../NonHands/BMainDeck")
 
-[node name="EquipWR" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 557.0
-margin_top = 457.0
-margin_right = 623.0
-margin_bottom = 556.0
+[node name="WHandScroller" type="ScrollContainer" parent="Node2D/BoardImage/CardSpots"]
+margin_left = 33.0
+margin_top = 1258.0
+margin_right = 863.0
+margin_bottom = 1458.0
+follow_focus = true
+scroll_vertical_enabled = false
 
-[node name="BanishmentW" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 267.0
-margin_top = 473.0
-margin_right = 366.0
-margin_bottom = 539.0
+[node name="WHand" type="HBoxContainer" parent="Node2D/BoardImage/CardSpots/WHandScroller"]
+rect_pivot_offset = Vector2( 317, 100 )
+focus_neighbour_left = NodePath("../../NonHands/WTechDeck")
+focus_neighbour_top = NodePath("../../NonHands/WTrap1")
+focus_neighbour_right = NodePath("../../../../BoardScroller")
+focus_neighbour_bottom = NodePath("../../NonHands/WAttacker")
+focus_previous = NodePath("../../NonHands/WMainDeck")
 
-[node name="ScrapyardW" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 657.0
-margin_top = 473.0
-margin_right = 756.0
-margin_bottom = 539.0
-hint_tooltip = "Graveyard/Junkyard/Scrapyard?"
+[node name="NonHands" type="Control" parent="Node2D/BoardImage/CardSpots"]
+margin_right = 892.0
+margin_bottom = 1238.0
 
-[node name="ReinforcementWL" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 399.0
-margin_top = 569.0
-margin_right = 465.0
-margin_bottom = 668.0
+[node name="WAttacker" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 386.0
+margin_top = 646.0
+margin_right = 506.0
+margin_bottom = 826.0
+focus_neighbour_left = NodePath("../WEquip1")
+focus_neighbour_top = NodePath("../BAttacker")
+focus_neighbour_right = NodePath("../WEquip2")
+focus_neighbour_bottom = NodePath("../WR2")
+focus_next = NodePath("../WEquip2")
+focus_previous = NodePath("../WEquip1")
+flat = true
 
-[node name="ReinforcementWC" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 478.0
-margin_top = 569.0
-margin_right = 544.0
-margin_bottom = 668.0
+[node name="WEquip1" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 242.0
+margin_top = 646.0
+margin_right = 362.0
+margin_bottom = 826.0
+focus_neighbour_left = NodePath("../WBanished")
+focus_neighbour_top = NodePath("../BEquip2")
+focus_neighbour_right = NodePath("../WAttacker")
+focus_neighbour_bottom = NodePath("../WR1")
+focus_next = NodePath("../WAttacker")
+focus_previous = NodePath("../WBanished")
+flat = true
 
-[node name="ReinforcementWR" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 557.0
-margin_top = 569.0
-margin_right = 623.0
-margin_bottom = 668.0
+[node name="WEquip2" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 530.0
+margin_top = 646.0
+margin_right = 650.0
+margin_bottom = 826.0
+focus_neighbour_left = NodePath("../WAttacker")
+focus_neighbour_top = NodePath("../BEquip1")
+focus_neighbour_right = NodePath("../WGraveyard")
+focus_neighbour_bottom = NodePath("../WR3")
+focus_next = NodePath("../WGraveyard")
+focus_previous = NodePath("../WAttacker")
+flat = true
 
-[node name="TrapWL" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 399.0
-margin_top = 679.0
-margin_right = 465.0
-margin_bottom = 778.0
+[node name="WR1" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 242.0
+margin_top = 850.0
+margin_right = 362.0
+margin_bottom = 1030.0
+focus_neighbour_left = NodePath("../WTech")
+focus_neighbour_top = NodePath("../WEquip1")
+focus_neighbour_right = NodePath("../WR2")
+focus_neighbour_bottom = NodePath("../WTrap1")
+focus_next = NodePath("../WR2")
+focus_previous = NodePath("../WTech")
+flat = true
 
-[node name="TrapWC" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 478.0
-margin_top = 679.0
-margin_right = 544.0
-margin_bottom = 778.0
+[node name="WR2" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 386.0
+margin_top = 850.0
+margin_right = 506.0
+margin_bottom = 1030.0
+focus_neighbour_left = NodePath("../WR1")
+focus_neighbour_top = NodePath("../WAttacker")
+focus_neighbour_right = NodePath("../WR3")
+focus_neighbour_bottom = NodePath("../WTrap2")
+focus_next = NodePath("../WR3")
+focus_previous = NodePath("../WR1")
+flat = true
 
-[node name="TrapWR" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 557.0
-margin_top = 679.0
-margin_right = 623.0
-margin_bottom = 778.0
+[node name="WR3" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 530.0
+margin_top = 850.0
+margin_right = 650.0
+margin_bottom = 1030.0
+focus_neighbour_left = NodePath("../WR2")
+focus_neighbour_top = NodePath("../WEquip2")
+focus_neighbour_right = NodePath("../WMedBay")
+focus_neighbour_bottom = NodePath("../WTrap3")
+focus_next = NodePath("../WMedBay")
+focus_previous = NodePath("../WR2")
+flat = true
 
-[node name="TechPlayedW" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 283.0
-margin_top = 569.0
-margin_right = 349.0
-margin_bottom = 668.0
+[node name="WTrap1" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 242.0
+margin_top = 1051.0
+margin_right = 362.0
+margin_bottom = 1231.0
+focus_neighbour_left = NodePath("../WTechDeck")
+focus_neighbour_top = NodePath("../WR1")
+focus_neighbour_right = NodePath("../WTrap2")
+focus_neighbour_bottom = NodePath("../../WHandScroller/WHand")
+focus_next = NodePath("../WTrap2")
+focus_previous = NodePath("../WTechDeck")
+flat = true
 
-[node name="TechDeckW" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 283.0
-margin_top = 679.0
-margin_right = 349.0
-margin_bottom = 778.0
+[node name="WTrap2" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 386.0
+margin_top = 1051.0
+margin_right = 506.0
+margin_bottom = 1231.0
+focus_neighbour_left = NodePath("../WTrap1")
+focus_neighbour_top = NodePath("../WR2")
+focus_neighbour_right = NodePath("../WTrap3")
+focus_neighbour_bottom = NodePath("../../WHandScroller/WHand")
+focus_next = NodePath("../WTrap3")
+focus_previous = NodePath("../WTrap1")
+flat = true
 
-[node name="MedBayW" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 673.0
-margin_top = 569.0
-margin_right = 739.0
-margin_bottom = 668.0
+[node name="WTrap3" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 530.0
+margin_top = 1051.0
+margin_right = 650.0
+margin_bottom = 1231.0
+focus_neighbour_left = NodePath("../WTrap2")
+focus_neighbour_top = NodePath("../WR3")
+focus_neighbour_right = NodePath("../WMainDeck")
+focus_neighbour_bottom = NodePath("../../WHandScroller/WHand")
+focus_next = NodePath("../WMainDeck")
+focus_previous = NodePath("../WTrap2")
+flat = true
 
-[node name="MainDeckW" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 673.0
-margin_top = 679.0
-margin_right = 739.0
-margin_bottom = 778.0
+[node name="WTech" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 31.0
+margin_top = 850.0
+margin_right = 151.0
+margin_bottom = 1030.0
+focus_neighbour_left = NodePath("../WGraveyard")
+focus_neighbour_top = NodePath("../WBanished")
+focus_neighbour_right = NodePath("../WR1")
+focus_neighbour_bottom = NodePath("../WTechDeck")
+focus_next = NodePath("../WR1")
+focus_previous = NodePath("../WGraveyard")
+flat = true
 
-[node name="HandW1" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 320.0
-margin_top = 792.0
-margin_right = 386.0
-margin_bottom = 891.0
+[node name="WTechDeck" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 31.0
+margin_top = 1051.0
+margin_right = 151.0
+margin_bottom = 1231.0
+focus_neighbour_left = NodePath("../WMedBay")
+focus_neighbour_top = NodePath("../WTech")
+focus_neighbour_right = NodePath("../WTrap1")
+focus_neighbour_bottom = NodePath("../../WHandScroller/WHand")
+focus_next = NodePath("../WTrap1")
+focus_previous = NodePath("../WMedBay")
+flat = true
 
-[node name="HandW2" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 399.0
-margin_top = 792.0
-margin_right = 465.0
-margin_bottom = 891.0
+[node name="WMedBay" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 741.0
+margin_top = 850.0
+margin_right = 861.0
+margin_bottom = 1030.0
+focus_neighbour_left = NodePath("../WR3")
+focus_neighbour_top = NodePath("../WGraveyard")
+focus_neighbour_right = NodePath("../../../../BoardScroller")
+focus_neighbour_bottom = NodePath("../WMainDeck")
+focus_next = NodePath("../WTechDeck")
+focus_previous = NodePath("../WR3")
+flat = true
 
-[node name="HandW3" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 478.0
-margin_top = 792.0
-margin_right = 544.0
-margin_bottom = 891.0
+[node name="WMainDeck" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 741.0
+margin_top = 1051.0
+margin_right = 861.0
+margin_bottom = 1231.0
+focus_neighbour_left = NodePath("../WTrap3")
+focus_neighbour_top = NodePath("../WMedBay")
+focus_neighbour_right = NodePath("../../../../BoardScroller")
+focus_neighbour_bottom = NodePath("../../WHandScroller/WHand")
+focus_next = NodePath("../BMainDeck")
+focus_previous = NodePath("../WTrap3")
+flat = true
 
-[node name="HandW4" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 557.0
-margin_top = 792.0
-margin_right = 623.0
-margin_bottom = 891.0
+[node name="WBanished" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 32.0
+margin_top = 647.0
+margin_right = 152.0
+margin_bottom = 827.0
+rect_rotation = -90.0
+rect_pivot_offset = Vector2( 60, 90 )
+focus_neighbour_left = NodePath("../BBanished")
+focus_neighbour_top = NodePath("../BGraveyard")
+focus_neighbour_right = NodePath("../WEquip1")
+focus_neighbour_bottom = NodePath("../WTech")
+focus_next = NodePath("../WEquip1")
+focus_previous = NodePath("../BBanished")
+flat = true
 
-[node name="HandW5" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 636.0
-margin_top = 792.0
-margin_right = 702.0
-margin_bottom = 891.0
+[node name="WGraveyard" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 742.0
+margin_top = 647.0
+margin_right = 862.0
+margin_bottom = 827.0
+rect_rotation = 90.0
+rect_pivot_offset = Vector2( 60, 90 )
+focus_neighbour_left = NodePath("../WEquip2")
+focus_neighbour_top = NodePath("../BBanished")
+focus_neighbour_right = NodePath("../../../../BoardScroller")
+focus_neighbour_bottom = NodePath("../WMedBay")
+focus_next = NodePath("../WTech")
+focus_previous = NodePath("../WEquip2")
+flat = true
 
-[node name="EquipBL" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 557.0
-margin_top = 344.0
-margin_right = 623.0
-margin_bottom = 443.0
+[node name="BAttacker" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 385.0
+margin_top = 410.0
+margin_right = 505.0
+margin_bottom = 590.0
+focus_neighbour_left = NodePath("../BEquip1")
+focus_neighbour_top = NodePath("../WAttacker")
+focus_neighbour_right = NodePath("../BEquip2")
+focus_neighbour_bottom = NodePath("../BR2")
+focus_next = NodePath("../BEquip2")
+focus_previous = NodePath("../BEquip1")
+flat = true
 
-[node name="BanishmentB" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 657.0
-margin_top = 359.0
-margin_right = 756.0
-margin_bottom = 425.0
+[node name="BEquip1" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 529.0
+margin_top = 410.0
+margin_right = 649.0
+margin_bottom = 590.0
+focus_neighbour_left = NodePath("../BBanished")
+focus_neighbour_top = NodePath("../WEquip2")
+focus_neighbour_right = NodePath("../BAttacker")
+focus_neighbour_bottom = NodePath("../BR1")
+focus_next = NodePath("../BAttacker")
+focus_previous = NodePath("../BBanished")
+flat = true
 
-[node name="ScrapyardB" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 267.0
-margin_top = 359.0
-margin_right = 366.0
-margin_bottom = 425.0
+[node name="BEquip2" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 242.0
+margin_top = 410.0
+margin_right = 362.0
+margin_bottom = 590.0
+focus_neighbour_left = NodePath("../BAttacker")
+focus_neighbour_top = NodePath("../WEquip1")
+focus_neighbour_right = NodePath("../BGraveyard")
+focus_neighbour_bottom = NodePath("../BR3")
+focus_next = NodePath("../BGraveyard")
+focus_previous = NodePath("../BAttacker")
+flat = true
 
-[node name="FighterB" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 478.0
-margin_top = 344.0
-margin_right = 544.0
-margin_bottom = 443.0
+[node name="BR1" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 529.0
+margin_top = 207.0
+margin_right = 649.0
+margin_bottom = 387.0
+focus_neighbour_left = NodePath("../BTech")
+focus_neighbour_top = NodePath("../BEquip1")
+focus_neighbour_right = NodePath("../BR2")
+focus_neighbour_bottom = NodePath("../BTrap1")
+focus_next = NodePath("../BR2")
+focus_previous = NodePath("../BTech")
+flat = true
 
-[node name="EquipBR" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 399.0
-margin_top = 344.0
-margin_right = 465.0
-margin_bottom = 443.0
+[node name="BR2" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 385.0
+margin_top = 207.0
+margin_right = 505.0
+margin_bottom = 387.0
+focus_neighbour_left = NodePath("../BR1")
+focus_neighbour_top = NodePath("../BAttacker")
+focus_neighbour_right = NodePath("../BR3")
+focus_neighbour_bottom = NodePath("../BTrap2")
+focus_next = NodePath("../BR3")
+focus_previous = NodePath("../BR1")
+flat = true
 
-[node name="ReinforcementBL" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 557.0
-margin_top = 231.0
-margin_right = 623.0
-margin_bottom = 330.0
+[node name="BR3" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 242.0
+margin_top = 207.0
+margin_right = 362.0
+margin_bottom = 387.0
+focus_neighbour_left = NodePath("../BR2")
+focus_neighbour_top = NodePath("../BEquip2")
+focus_neighbour_right = NodePath("../BMedBay")
+focus_neighbour_bottom = NodePath("../BTrap3")
+focus_next = NodePath("../BMedBay")
+focus_previous = NodePath("../BR2")
+flat = true
 
-[node name="ReinforcementBC" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 478.0
-margin_top = 231.0
-margin_right = 544.0
-margin_bottom = 330.0
+[node name="BTrap1" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 529.0
+margin_top = 6.0
+margin_right = 649.0
+margin_bottom = 186.0
+focus_neighbour_left = NodePath("../BTechDeck")
+focus_neighbour_top = NodePath("../BR1")
+focus_neighbour_right = NodePath("../BTrap2")
+focus_neighbour_bottom = NodePath("../../BHandScroller/BHand")
+focus_next = NodePath("../BTrap2")
+focus_previous = NodePath("../BTechDeck")
+flat = true
 
-[node name="ReinforcementBR" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 399.0
-margin_top = 231.0
-margin_right = 465.0
-margin_bottom = 330.0
+[node name="BTrap2" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 385.0
+margin_top = 6.0
+margin_right = 505.0
+margin_bottom = 186.0
+focus_neighbour_left = NodePath("../BTrap1")
+focus_neighbour_top = NodePath("../BR2")
+focus_neighbour_right = NodePath("../BTrap3")
+focus_neighbour_bottom = NodePath("../../BHandScroller/BHand")
+focus_next = NodePath("../BTrap3")
+focus_previous = NodePath("../BTrap1")
+flat = true
 
-[node name="TrapBL" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 557.0
-margin_top = 121.0
-margin_right = 623.0
-margin_bottom = 220.0
+[node name="BTrap3" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 242.0
+margin_top = 6.0
+margin_right = 362.0
+margin_bottom = 186.0
+focus_neighbour_left = NodePath("../BTrap2")
+focus_neighbour_top = NodePath("../BR3")
+focus_neighbour_right = NodePath("../BMainDeck")
+focus_neighbour_bottom = NodePath("../../BHandScroller/BHand")
+focus_next = NodePath("../BMainDeck")
+focus_previous = NodePath("../BTrap2")
+flat = true
 
-[node name="TrapBC" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 478.0
-margin_top = 121.0
-margin_right = 544.0
-margin_bottom = 220.0
+[node name="BTech" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 740.0
+margin_top = 207.0
+margin_right = 860.0
+margin_bottom = 387.0
+focus_neighbour_left = NodePath("../BGraveyard")
+focus_neighbour_top = NodePath("../BBanished")
+focus_neighbour_right = NodePath("../BR1")
+focus_neighbour_bottom = NodePath("../BTechDeck")
+focus_next = NodePath("../BR1")
+focus_previous = NodePath("../BGraveyard")
+flat = true
 
-[node name="TrapBR" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 399.0
-margin_top = 121.0
-margin_right = 465.0
-margin_bottom = 220.0
+[node name="BTechDeck" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 740.0
+margin_top = 6.0
+margin_right = 860.0
+margin_bottom = 186.0
+focus_neighbour_left = NodePath("../BMedBay")
+focus_neighbour_top = NodePath("../BTech")
+focus_neighbour_right = NodePath("../BTrap1")
+focus_neighbour_bottom = NodePath("../../BHandScroller/BHand")
+focus_next = NodePath("../BTrap1")
+focus_previous = NodePath("../BMedBay")
+flat = true
 
-[node name="TechPlayedB" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 673.0
-margin_top = 231.0
-margin_right = 739.0
-margin_bottom = 330.0
+[node name="BMedBay" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 31.0
+margin_top = 207.0
+margin_right = 151.0
+margin_bottom = 387.0
+focus_neighbour_left = NodePath("../BR3")
+focus_neighbour_top = NodePath("../BGraveyard")
+focus_neighbour_right = NodePath("../../../../BoardScroller")
+focus_neighbour_bottom = NodePath("../BMainDeck")
+focus_next = NodePath("../BTechDeck")
+focus_previous = NodePath("../BR3")
+flat = true
 
-[node name="TechDeckB" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 673.0
-margin_top = 121.0
-margin_right = 739.0
-margin_bottom = 220.0
+[node name="BMainDeck" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 31.0
+margin_top = 6.0
+margin_right = 151.0
+margin_bottom = 186.0
+focus_neighbour_left = NodePath("../BTrap3")
+focus_neighbour_top = NodePath("../BGraveyard")
+focus_neighbour_right = NodePath("../../../../BoardScroller")
+focus_neighbour_bottom = NodePath("../../BHandScroller/BHand")
+focus_next = NodePath("../WMainDeck")
+focus_previous = NodePath("../BTrap3")
+flat = true
 
-[node name="MedBayB" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 283.0
-margin_top = 231.0
-margin_right = 349.0
-margin_bottom = 330.0
+[node name="BBanished" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 741.0
+margin_top = 410.0
+margin_right = 861.0
+margin_bottom = 590.0
+rect_rotation = 90.0
+rect_pivot_offset = Vector2( 60, 90 )
+focus_neighbour_left = NodePath("../WBanished")
+focus_neighbour_top = NodePath("../WGraveyard")
+focus_neighbour_right = NodePath("../BEquip1")
+focus_neighbour_bottom = NodePath("../BTech")
+focus_next = NodePath("../BEquip1")
+focus_previous = NodePath("../WBanished")
+flat = true
 
-[node name="MainDeckB" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 283.0
-margin_top = 121.0
-margin_right = 349.0
-margin_bottom = 220.0
+[node name="BGraveyard" type="Button" parent="Node2D/BoardImage/CardSpots/NonHands"]
+margin_left = 31.0
+margin_top = 411.0
+margin_right = 151.0
+margin_bottom = 591.0
+rect_rotation = -90.0
+rect_pivot_offset = Vector2( 60, 90 )
+focus_neighbour_left = NodePath("../BEquip2")
+focus_neighbour_top = NodePath("../WBanished")
+focus_neighbour_right = NodePath("../../../../BoardScroller")
+focus_neighbour_bottom = NodePath("../BMedBay")
+focus_next = NodePath("../BTech")
+focus_previous = NodePath("../BEquip2")
+flat = true
 
-[node name="HandB1" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 636.0
-margin_top = 8.0
-margin_right = 702.0
-margin_bottom = 107.0
-
-[node name="HandB2" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 557.0
-margin_top = 9.0
-margin_right = 623.0
-margin_bottom = 108.0
-
-[node name="HandB3" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 478.0
-margin_top = 9.0
-margin_right = 544.0
-margin_bottom = 108.0
-
-[node name="HandB4" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 399.0
-margin_top = 9.0
-margin_right = 465.0
-margin_bottom = 108.0
-
-[node name="HandB5" type="Container" parent="BoardImage/CardSpots"]
-margin_left = 320.0
-margin_top = 8.0
-margin_right = 386.0
-margin_bottom = 107.0
-
-[node name="SwitchSides" type="TextureButton" parent="BoardImage"]
-margin_left = 847.0
-margin_top = 414.0
-margin_right = 919.0
-margin_bottom = 486.0
+[node name="SwitchSides" type="TextureButton" parent="Node2D/BoardImage"]
+margin_left = 836.0
+margin_top = 807.0
+margin_right = 950.0
+margin_bottom = 921.0
 hint_tooltip = "Flips the board."
-texture_normal = ExtResource( 2 )
+texture_normal = ExtResource( 3 )
+expand = true
 
-[node name="BoardScroller" type="VScrollBar" parent="."]
-margin_left = 1012.0
-margin_right = 1024.0
-margin_bottom = 600.0
+[node name="BoardScroller" type="VScrollBar" parent="Node2D"]
+margin_left = 1908.0
+margin_right = 1920.0
+margin_bottom = 1080.0
 hint_tooltip = "Controls board position."
-max_value = 300.0
-value = 300.0
+max_value = 648.0
+value = 648.0
 rounded = true
 
-[connection signal="pressed" from="BoardImage/SwitchSides" to="BoardImage" method="_on_SwitchSides_pressed"]
-[connection signal="value_changed" from="BoardScroller" to="BoardImage" method="_on_VScrollBar_value_changed"]
+[node name="CardExaminer" type="Container" parent="Node2D"]
+margin_left = 67.0
+margin_top = 67.0
+margin_right = 697.0
+margin_bottom = 1012.0
+
+[node name="LargeEmptySlot" type="Sprite" parent="Node2D/CardExaminer"]
+texture = ExtResource( 7 )
+centered = false
+
+[node name="BigCard" parent="Node2D/CardExaminer" instance=ExtResource( 5 )]
+script = ExtResource( 6 )
+
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WAttacker" to="Node2D/BoardImage" method="_on_WAttacker_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WEquip1" to="Node2D/BoardImage" method="_on_WEquip1_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WEquip2" to="Node2D/BoardImage" method="_on_WEquip2_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WR1" to="Node2D/BoardImage" method="_on_WR1_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WR2" to="Node2D/BoardImage" method="_on_WR2_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WR3" to="Node2D/BoardImage" method="_on_WR3_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WTrap1" to="Node2D/BoardImage" method="_on_WTrap1_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WTrap2" to="Node2D/BoardImage" method="_on_WTrap2_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WTrap3" to="Node2D/BoardImage" method="_on_WTrap3_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WTech" to="Node2D/BoardImage" method="_on_WTech_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WTechDeck" to="Node2D/BoardImage" method="_on_WTechDeck_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WMedBay" to="Node2D/BoardImage" method="_on_WMedBay_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WMainDeck" to="Node2D/BoardImage" method="_on_WMainDeck_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WBanished" to="Node2D/BoardImage" method="_on_WBanished_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/WGraveyard" to="Node2D/BoardImage" method="_on_WGraveyard_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BAttacker" to="Node2D/BoardImage" method="_on_BAttacker_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BEquip1" to="Node2D/BoardImage" method="_on_BEquip1_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BEquip2" to="Node2D/BoardImage" method="_on_BEquip2_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BR1" to="Node2D/BoardImage" method="_on_BR1_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BR2" to="Node2D/BoardImage" method="_on_BR2_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BR3" to="Node2D/BoardImage" method="_on_BR3_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BTrap1" to="Node2D/BoardImage" method="_on_BTrap1_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BTrap2" to="Node2D/BoardImage" method="_on_BTrap2_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BTrap3" to="Node2D/BoardImage" method="_on_BTrap3_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BTech" to="Node2D/BoardImage" method="_on_BTech_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BTechDeck" to="Node2D/BoardImage" method="_on_BTechDeck_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BMedBay" to="Node2D/BoardImage" method="_on_BMedBay_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BMainDeck" to="Node2D/BoardImage" method="_on_BMainDeck_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BBanished" to="Node2D/BoardImage" method="_on_BBanished_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/CardSpots/NonHands/BGraveyard" to="Node2D/BoardImage" method="_on_BGraveyard_pressed"]
+[connection signal="pressed" from="Node2D/BoardImage/SwitchSides" to="Node2D/BoardImage" method="_on_SwitchSides_pressed"]
+[connection signal="value_changed" from="Node2D/BoardScroller" to="Node2D/BoardImage" method="_on_VScrollBar_value_changed"]
+[connection signal="focus_entered" from="Node2D/CardExaminer" to="Node2D/CardExaminer/BigCard" method="_on_CardExaminer_focus_entered"]
+[connection signal="mouse_entered" from="Node2D/CardExaminer" to="Node2D/CardExaminer/BigCard" method="_on_CardExaminer_mouse_entered"]
