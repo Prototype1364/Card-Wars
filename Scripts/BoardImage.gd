@@ -36,6 +36,8 @@ func MoveInProgress():
 		MoveFrom = self.get_node("CardSpots/BHandScroller/BHand")
 	elif GameData.CardFrom == "WHand":
 		MoveFrom = self.get_node("CardSpots/WHandScroller/WHand")
+	elif GameData.CardFrom == "WBanished" or GameData.CardFrom == "WGraveyard" or GameData.CardFrom == "BBanished" or GameData.CardFrom == "BGraveyard":
+		return
 	else:
 		MoveFrom = self.get_node("CardSpots/NonHands/" + GameData.CardFrom)
 	if GameData.CardTo == "BHand":
@@ -49,6 +51,13 @@ func MoveInProgress():
 	CardMoved.rect_position.y = 0
 	MoveFrom.remove_child(CardMoved)
 	MoveTo.add_child(CardMoved)
+	var Moved = MoveTo.get_node(GameData.CardMoved)
+	Moved.focus_neighbour_left = Moved.get_parent().focus_neighbour_left
+	Moved.focus_neighbour_top = Moved.get_parent().focus_neighbour_top
+	Moved.focus_neighbour_right = Moved.get_parent().focus_neighbour_right
+	Moved.focus_neighbour_bottom = Moved.get_parent().focus_neighbour_bottom
+	Moved.focus_next = Moved.get_parent().focus_next
+	Moved.focus_previous = Moved.get_parent().focus_previous
 	GameData.CardMoved = ""
 	GameData.CardFrom = ""
 	GameData.CardTo = ""
@@ -58,6 +67,9 @@ func SwitchInProgress():
 	var MoveTo
 	var CardMoved
 	var CardSwitched
+	var MoveWithoutSwitching = true
+	if GameData.CardFrom == "WBanished" or GameData.CardFrom == "WGraveyard" or GameData.CardFrom == "BBanished" or GameData.CardFrom == "BGraveyard" or GameData.CardTo == "WBanished" or GameData.CardTo == "WGraveyard" or GameData.CardTo == "BBanished" or GameData.CardTo == "BGraveyard":
+		MoveWithoutSwitching = false
 	if GameData.CardFrom == "BHand":
 		MoveFrom = self.get_node("CardSpots/BHandScroller/BHand")
 	elif GameData.CardFrom == "WHand":
@@ -80,9 +92,24 @@ func SwitchInProgress():
 		CardSwitched.rect_position.x = 0
 		CardSwitched.rect_position.y = 0
 		MoveFrom.remove_child(CardMoved)
-		MoveTo.remove_child(CardSwitched)
-		MoveFrom.add_child(CardSwitched)
+		if MoveWithoutSwitching == true:
+			MoveTo.remove_child(CardSwitched)
+			MoveFrom.add_child(CardSwitched)
 		MoveTo.add_child(CardMoved)
+	var Moved = MoveTo.get_node(GameData.CardMoved)
+	Moved.focus_neighbour_left = Moved.get_parent().focus_neighbour_left
+	Moved.focus_neighbour_top = Moved.get_parent().focus_neighbour_top
+	Moved.focus_neighbour_right = Moved.get_parent().focus_neighbour_right
+	Moved.focus_neighbour_bottom = Moved.get_parent().focus_neighbour_bottom
+	Moved.focus_next = Moved.get_parent().focus_next
+	Moved.focus_previous = Moved.get_parent().focus_previous
+	Moved = MoveFrom.get_node(GameData.CardSwitched)
+	Moved.focus_neighbour_left = Moved.get_parent().focus_neighbour_left
+	Moved.focus_neighbour_top = Moved.get_parent().focus_neighbour_top
+	Moved.focus_neighbour_right = Moved.get_parent().focus_neighbour_right
+	Moved.focus_neighbour_bottom = Moved.get_parent().focus_neighbour_bottom
+	Moved.focus_next = Moved.get_parent().focus_next
+	Moved.focus_previous = Moved.get_parent().focus_previous
 	GameData.CardMoved = ""
 	GameData.CardFrom = ""
 	GameData.CardTo = ""
@@ -164,6 +191,30 @@ func _on_WMainDeck_pressed():
 	InstanceCard.name = "Card " + str(GameData.CardCounter)
 	GameData.CardCounter += 1
 	WHand.add_child(InstanceCard)
+	var PreviousCard = "Empty"
+	var WhiteHand = WHand.get_children()
+	for i in WhiteHand:
+		if not str(PreviousCard) == "Empty":
+			WHand.get_node(i.name).focus_neighbour_left = PreviousCard.get_path()
+			WHand.get_node(i.name).focus_previous = PreviousCard.get_path()
+		else:
+			var LastCard = WhiteHand.back()
+			WHand.get_node(i.name).focus_neighbour_left = LastCard.get_path()
+			WHand.get_node(i.name).focus_previous = LastCard.get_path()
+		PreviousCard = i
+	var NextCard = "Empty"
+	WhiteHand.invert()
+	for i in WhiteHand:
+		if not str(NextCard) == "Empty":
+			WHand.get_node(i.name).focus_neighbour_right = NextCard.get_path()
+			WHand.get_node(i.name).focus_next = NextCard.get_path()
+		else:
+			var LastCard = WhiteHand.back()
+			WHand.get_node(i.name).focus_neighbour_left = LastCard.get_path()
+			WHand.get_node(i.name).focus_previous = LastCard.get_path()
+		NextCard = i
+	WhiteHand.invert()
+	self.get_node("CardSpots/NonHands/WMainDeck").focus_neighbour_bottom = WhiteHand.front().get_path()
 
 func _on_WBanished_pressed():
 	if GameData.CardFrom != "":
@@ -251,6 +302,30 @@ func _on_BMainDeck_pressed():
 	InstanceCard.name = "Card " + str(GameData.CardCounter)
 	GameData.CardCounter += 1
 	BHand.add_child(InstanceCard)
+	var PreviousCard = "Empty"
+	var BlackHand = BHand.get_children()
+	for i in BlackHand:
+		if not str(PreviousCard) == "Empty":
+			BHand.get_node(i.name).focus_neighbour_left = PreviousCard.get_path()
+			BHand.get_node(i.name).focus_previous = PreviousCard.get_path()
+		else:
+			var LastCard = BlackHand.back()
+			BHand.get_node(i.name).focus_neighbour_left = LastCard.get_path()
+			BHand.get_node(i.name).focus_previous = LastCard.get_path()
+		PreviousCard = i
+	var NextCard = "Empty"
+	BlackHand.invert()
+	for i in BlackHand:
+		if not str(NextCard) == "Empty":
+			BHand.get_node(i.name).focus_neighbour_right = NextCard.get_path()
+			BHand.get_node(i.name).focus_next = NextCard.get_path()
+		else:
+			var LastCard = BlackHand.back()
+			BHand.get_node(i.name).focus_neighbour_left = LastCard.get_path()
+			BHand.get_node(i.name).focus_previous = LastCard.get_path()
+		NextCard = i
+	BlackHand.invert()
+	self.get_node("CardSpots/NonHands/BMainDeck").focus_neighbour_bottom = BlackHand.front().get_path()
 
 func _on_BBanished_pressed():
 	if GameData.CardFrom != "":

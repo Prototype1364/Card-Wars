@@ -1,11 +1,19 @@
 extends Control
 
 var Name
-var Summon_Counters = 0
+var Cost = 0
 var Text = ""
 var Max_Health = 0
 var Health = 0
 var Damage = 0
+
+func _ready():
+	self.focus_neighbour_left = self.get_parent().focus_neighbour_left
+	self.focus_neighbour_top = self.get_parent().focus_neighbour_top
+	self.focus_neighbour_right = self.get_parent().focus_neighbour_right
+	self.focus_neighbour_bottom = self.get_parent().focus_neighbour_bottom
+	self.focus_next = self.get_parent().focus_next
+	self.focus_previous = self.get_parent().focus_previous
 
 func _on_FocusSensor_focus_entered():
 	self.focusing()
