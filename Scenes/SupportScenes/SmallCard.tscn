@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Resources/Fonts/MTCORSVA.TTF" type="DynamicFontData" id=1]
 [ext_resource path="res://Scripts/SmallCard.gd" type="Script" id=2]
-[ext_resource path="res://Assets/Cards/Frame/Normal_Card_Frame.png" type="Texture" id=3]
+[ext_resource path="res://Assets/Cards/Frame/Small_Frame_Normal.png" type="Texture" id=3]
 
 [sub_resource type="DynamicFont" id=1]
 size = 47
@@ -20,6 +20,7 @@ mouse_default_cursor_shape = 3
 script = ExtResource( 2 )
 
 [node name="Frame" type="TextureButton" parent="."]
+texture_normal = ExtResource( 3 )
 
 [node name="SummonContainer" type="Container" parent="."]
 margin_left = 10.0
@@ -58,7 +59,6 @@ margin_bottom = 96.0
 
 [node name="CardImage" type="Sprite" parent="ImageContainer"]
 position = Vector2( -12, -13 )
-texture = ExtResource( 3 )
 centered = false
 
 [node name="TokenContainer" type="Container" parent="."]

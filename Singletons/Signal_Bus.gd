@@ -1,5 +1,7 @@
 extends Node
 
+signal Load_Battle_Scene
+
 signal LookAtCard
 
 signal NotLookingAtCard

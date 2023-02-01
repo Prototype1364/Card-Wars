@@ -3,11 +3,8 @@ extends Control
 func _ready():
 	$"VBoxContainer/Button_Container/Quick Play".grab_focus()
 
-
-
-
 func _On_Quick_Play_Pressed():
-	pass # Replace with function body.
+	SignalBus.emit_signal("Load_Battle_Scene")
 
 
 func _On_Campaign_Pressed():

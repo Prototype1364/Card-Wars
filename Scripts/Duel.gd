@@ -8,7 +8,7 @@ func _ready():
 #	Draw_Card(5)
 
 func Load_Game_Decks():
-	# Loads Player & Enemy Decks for Duel into Game.
+	# Loads Player & Enemy Decks for Battle into Game.
 	for i in GameData.CardData.size():
 		# Load Player Deck (Currently defaults to Arthurian Pre-Built Deck).
 		if GameData.CardData[i]["Passcode"] in GameData.Master_Deck_List["Decks"]["Arthurian"]:
@@ -25,7 +25,7 @@ func Load_Game_Decks():
 #func Draw_Card(Cards_To_Draw = 1):
 #	# Draws cards from back of Deck based on number supplied, or 1 card if no number is supplied.
 #	for i in range(1,Cards_To_Draw + 1):
-#		var Card_Scene = preload("res://Scenes/SupportScenes/Card.tscn").instance() # WILL THROW ERRORS IN OUTPUT WINDOW DUE TO CARD SCENE BEING DELETED. JUST UPDATE TO WHICHEVER SCENE REPLACES ITS FUNCTION IN DUEL SCENE.
+#		var Card_Scene = preload("res://Scenes/SupportScenes/Card.tscn").instance() # WILL THROW ERRORS IN OUTPUT WINDOW DUE TO CARD SCENE BEING DELETED. JUST UPDATE TO WHICHEVER SCENE REPLACES ITS FUNCTION IN BATTLE SCENE.
 #		Card_Scene.name = "Card" + str(i)
 #		Card_Scene.set_variable_values(Player_Deck[-i]["Card_ID"])
 #		Card_Scene.set_card_text()

@@ -52,80 +52,80 @@ func LookAtCard():
 	self.GetCardData()
 	self.visible = true
 	if SelectedCard != null:
-		if SelectedCard.get_node("Frame").texture_normal == load("res://Assets/Cards/Frame/Normal_Card_Frame.png"):
+		if SelectedCard.get_node("Frame").texture_normal == load("res://Assets/Cards/Frame/Small_Frame_Normal.png"):
 			self.get_node("Frame").texture = NormalFrame
-			if SelectedCard.Summon_Counters == 1:
+			if SelectedCard.Cost == 1:
 				self.get_node("SummonContainer/SummonCounters").texture = S1N
-			elif SelectedCard.Summon_Counters == 2:
+			elif SelectedCard.Cost == 2:
 				self.get_node("SummonContainer/SummonCounters").texture = S2N
-			elif SelectedCard.Summon_Counters == 3:
+			elif SelectedCard.Cost == 3:
 				self.get_node("SummonContainer/SummonCounters").texture = S3N
-			elif SelectedCard.Summon_Counters == 4:
+			elif SelectedCard.Cost == 4:
 				self.get_node("SummonContainer/SummonCounters").texture = S4N
-			elif SelectedCard.Summon_Counters == 5:
+			elif SelectedCard.Cost == 5:
 				self.get_node("SummonContainer/SummonCounters").texture = S5N
-			elif SelectedCard.Summon_Counters == 6:
+			elif SelectedCard.Cost == 6:
 				self.get_node("SummonContainer/SummonCounters").texture = S6N
 			self.get_node("Text").set("custom_colors/font_outline_modulate", Color("676767"))
 			self.get_node("Damage").set("custom_colors/font_outline_modulate", Color("676767"))
 			self.get_node("Health").set("custom_colors/font_outline_modulate", Color("676767"))
-		elif SelectedCard.get_node("Frame").texture_normal == load("res://Assets/Cards/Frame/Hero_Card_Frame.png"):
+		elif SelectedCard.get_node("Frame").texture_normal == load("res://Assets/Cards/Frame/Small_Frame_Hero.png"):
 			self.get_node("Frame").texture = HeroFrame
-			if SelectedCard.Summon_Counters == 1:
+			if SelectedCard.Cost == 1:
 				self.get_node("SummonContainer/SummonCounters").texture = S1H
-			elif SelectedCard.Summon_Counters == 2:
+			elif SelectedCard.Cost == 2:
 				self.get_node("SummonContainer/SummonCounters").texture = S2H
-			elif SelectedCard.Summon_Counters == 3:
+			elif SelectedCard.Cost == 3:
 				self.get_node("SummonContainer/SummonCounters").texture = S3H
-			elif SelectedCard.Summon_Counters == 4:
+			elif SelectedCard.Cost == 4:
 				self.get_node("SummonContainer/SummonCounters").texture = S4H
-			elif SelectedCard.Summon_Counters == 5:
+			elif SelectedCard.Cost == 5:
 				self.get_node("SummonContainer/SummonCounters").texture = S5H
-			elif SelectedCard.Summon_Counters == 6:
+			elif SelectedCard.Cost == 6:
 				self.get_node("SummonContainer/SummonCounters").texture = S6H
 			self.get_node("Text").set("custom_colors/font_outline_modulate", Color("cdaf2f"))
 			self.get_node("Damage").set("custom_colors/font_outline_modulate", Color("cdaf2f"))
 			self.get_node("Health").set("custom_colors/font_outline_modulate", Color("cdaf2f"))
-		elif SelectedCard.get_node("Frame").texture_normal == load("res://Assets/Cards/Frame/Magic_Card_Frame.png"):
+		elif SelectedCard.get_node("Frame").texture_normal == load("res://Assets/Cards/Frame/Small_Frame_Magic.png"):
 			self.get_node("Frame").texture = MagicFrame
-			if SelectedCard.Summon_Counters == 1:
+			if SelectedCard.Cost == 1:
 				self.get_node("SummonContainer/SummonCounters").texture = S1M
-			elif SelectedCard.Summon_Counters == 2:
+			elif SelectedCard.Cost == 2:
 				self.get_node("SummonContainer/SummonCounters").texture = S2M
-			elif SelectedCard.Summon_Counters == 3:
+			elif SelectedCard.Cost == 3:
 				self.get_node("SummonContainer/SummonCounters").texture = S3M
-			elif SelectedCard.Summon_Counters == 4:
+			elif SelectedCard.Cost == 4:
 				self.get_node("SummonContainer/SummonCounters").texture = S4M
-			elif SelectedCard.Summon_Counters == 5:
+			elif SelectedCard.Cost == 5:
 				self.get_node("SummonContainer/SummonCounters").texture = S5M
-			elif SelectedCard.Summon_Counters == 6:
+			elif SelectedCard.Cost == 6:
 				self.get_node("SummonContainer/SummonCounters").texture = S6M
 			self.get_node("Text").set("custom_colors/font_outline_modulate", Color("7a51a0"))
 			self.get_node("Damage").set("custom_colors/font_outline_modulate", Color("7a51a0"))
 			self.get_node("Health").set("custom_colors/font_outline_modulate", Color("7a51a0"))
-		elif SelectedCard.get_node("Frame").texture_normal == load("res://Assets/Cards/Frame/Trap_Card_Frame.png"):
+		elif SelectedCard.get_node("Frame").texture_normal == load("res://Assets/Cards/Frame/Small_Frame_Trap.png"):
 			self.get_node("Frame").texture = TrapFrame
-			if SelectedCard.Summon_Counters == 1:
+			if SelectedCard.Cost == 1:
 				self.get_node("SummonContainer/SummonCounters").texture = S1T
-			elif SelectedCard.Summon_Counters == 2:
+			elif SelectedCard.Cost == 2:
 				self.get_node("SummonContainer/SummonCounters").texture = S2T
-			elif SelectedCard.Summon_Counters == 3:
+			elif SelectedCard.Cost == 3:
 				self.get_node("SummonContainer/SummonCounters").texture = S3T
-			elif SelectedCard.Summon_Counters == 4:
+			elif SelectedCard.Cost == 4:
 				self.get_node("SummonContainer/SummonCounters").texture = S4T
-			elif SelectedCard.Summon_Counters == 5:
+			elif SelectedCard.Cost == 5:
 				self.get_node("SummonContainer/SummonCounters").texture = S5T
-			elif SelectedCard.Summon_Counters == 6:
+			elif SelectedCard.Cost == 6:
 				self.get_node("SummonContainer/SummonCounters").texture = S6T
 			self.get_node("Text").set("custom_colors/font_outline_modulate", Color("ff0000"))
 			self.get_node("Damage").set("custom_colors/font_outline_modulate", Color("ff0000"))
 			self.get_node("Health").set("custom_colors/font_outline_modulate", Color("ff0000"))
-		elif SelectedCard.get_node("Frame").texture_normal == load("res://Assets/Cards/Frame/Tech_Card_Frame.png"):
+		elif SelectedCard.get_node("Frame").texture_normal == load("res://Assets/Cards/Frame/Small_Frame_Tech.png"):
 			self.get_node("Frame").texture = TechFrame
 			self.get_node("Text").set("custom_colors/font_outline_modulate", Color("1f8742"))
 			self.get_node("Damage").set("custom_colors/font_outline_modulate", Color("1f8742"))
 			self.get_node("Health").set("custom_colors/font_outline_modulate", Color("1f8742"))
-		elif SelectedCard.get_node("Frame").texture_normal == load("res://Assets/Cards/Frame/Advance_Tech_Card.png"):
+		elif SelectedCard.get_node("Frame").texture_normal == load("res://Assets/Cards/Frame/Small_Advance_Tech_Card.png"):
 			self.get_node("Frame").texture = AdvanceTechImage
 		self.get_node("ImageContainer/CardImage").texture_normal = SelectedCard.get_node("ImageContainer/CardImage").texture
 		self.get_node("Text").text = SelectedCard.Text
