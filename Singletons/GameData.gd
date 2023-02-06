@@ -25,7 +25,7 @@ func _ready():
 	
 	# Loads List of Pre-Built Decks Into Game
 	# Currently DOESN'T include Player/Enemy Decks.
-	# During early testing it is assumed that the Player uses Arthurian Pre-Built Deck & Enemy uses Greek Mythology.
+	# During early testing it is assumed that White uses Arthurian Pre-Built Deck & Black uses Olympian.
 	var MasterDeckList_File = File.new()
 	MasterDeckList_File.open("res://Data/Master_Deck_List.json", File.READ)
 	var MasterDeckList_JSON = JSON.parse(MasterDeckList_File.get_as_text())

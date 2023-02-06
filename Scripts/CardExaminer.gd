@@ -42,11 +42,11 @@ func _ready():
 
 func GetCardData():
 	if GameData.FocusedCardParentName == "BHand":
-		SelectedCard = self.get_parent().get_parent().get_node("BoardImage/CardSpots/BHandScroller/BHand").get_node(GameData.FocusedCardName)
+		SelectedCard = self.get_parent().get_parent().get_node("Playmat/CardSpots/BHandScroller/BHand").get_node(GameData.FocusedCardName)
 	elif GameData.FocusedCardParentName == "WHand":
-		SelectedCard = self.get_parent().get_parent().get_node("BoardImage/CardSpots/WHandScroller/WHand").get_node(GameData.FocusedCardName)
+		SelectedCard = self.get_parent().get_parent().get_node("Playmat/CardSpots/WHandScroller/WHand").get_node(GameData.FocusedCardName)
 	else:
-		SelectedCard = self.get_parent().get_parent().get_node("BoardImage/CardSpots/NonHands/" + GameData.FocusedCardParentName + "/").get_node(GameData.FocusedCardName)
+		SelectedCard = self.get_parent().get_parent().get_node("Playmat/CardSpots/NonHands/" + GameData.FocusedCardParentName + "/").get_node(GameData.FocusedCardName)
 
 func LookAtCard():
 	self.GetCardData()
@@ -127,10 +127,13 @@ func LookAtCard():
 			self.get_node("Health").set("custom_colors/font_outline_modulate", Color("1f8742"))
 		elif SelectedCard.get_node("Frame").texture_normal == load("res://Assets/Cards/Frame/Small_Advance_Tech_Card.png"):
 			self.get_node("Frame").texture = AdvanceTechImage
+		
+		# Gets info from selected card and transfer it to big card proportions.
+		# ImageContainer/CardImage of BigCard scene MUST REMAIN as a TEXTURE_BUTTON node type as it allows for auto-expansion of image proportions, thus cutting Eric's card art work in half.
 		self.get_node("ImageContainer/CardImage").texture_normal = SelectedCard.get_node("ImageContainer/CardImage").texture
 		self.get_node("Text").text = SelectedCard.Text
 		self.get_node("Damage").text = SelectedCard.get_node("Damage").text
 		self.get_node("Health").text = SelectedCard.get_node("Health").text
-	
+
 func NotLookingAtCard():
 	self.visible = false

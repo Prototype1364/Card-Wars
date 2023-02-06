@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Resources/Fonts/MTCORSVA.TTF" type="DynamicFontData" id=1]
+[ext_resource path="res://Scripts/Card_Display.gd" type="Script" id=2]
 
 [sub_resource type="DynamicFont" id=1]
 size = 45
@@ -19,11 +20,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_right = -1290.0
 margin_bottom = -135.0
+script = ExtResource( 2 )
 
 [node name="Frame" type="Sprite" parent="."]
 centered = false
 
-[node name="SummonContainer" type="Container" parent="."]
+[node name="SummonContainer" type="Control" parent="."]
 margin_left = 215.0
 margin_top = 768.0
 margin_right = 415.0
@@ -67,7 +69,7 @@ custom_fonts/font = SubResource( 2 )
 align = 1
 valign = 1
 
-[node name="ImageContainer" type="Container" parent="."]
+[node name="ImageContainer" type="Control" parent="."]
 margin_left = 12.0
 margin_top = 13.0
 margin_right = 108.0
@@ -76,7 +78,7 @@ margin_bottom = 96.0
 [node name="CardImage" type="TextureButton" parent="ImageContainer"]
 expand = true
 
-[node name="TokenContainer" type="Container" parent="."]
+[node name="TokenContainer" type="Control" parent="."]
 margin_left = -105.0
 margin_top = 1.0
 margin_bottom = 946.0

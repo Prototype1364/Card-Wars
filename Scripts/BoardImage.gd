@@ -29,9 +29,9 @@ func _on_SwitchSides_pressed():
 	
 
 func MoveInProgress():
-	var MoveFrom
-	var MoveTo
-	var CardMoved
+	var MoveFrom # Grabs the parent of the selected scene instance.
+	var MoveTo # Reparents the selected scene instance only if said parent has no children (i.e. cannot multistack in Fighter slot).
+	var CardMoved # From GameData singleton, indicates the specific instance of the SmallCard scene that has been selected.
 	if GameData.CardFrom == "BHand":
 		MoveFrom = self.get_node("CardSpots/BHandScroller/BHand")
 	elif GameData.CardFrom == "WHand":
@@ -47,10 +47,15 @@ func MoveInProgress():
 	else:
 		MoveTo = self.get_node("CardSpots/NonHands/" + GameData.CardTo)
 	CardMoved = MoveFrom.get_node(GameData.CardMoved)
+	# Fixes bug regarding auto-updating of rect_pos of selected scene when moving from slot to slot.
 	CardMoved.rect_position.x = 0
 	CardMoved.rect_position.y = 0
+	
+	# Updates children for parents in From & To locations.
 	MoveFrom.remove_child(CardMoved)
 	MoveTo.add_child(CardMoved)
+	
+	# Matches focuses of child to new parent.
 	var Moved = MoveTo.get_node(GameData.CardMoved)
 	Moved.focus_neighbour_left = Moved.get_parent().focus_neighbour_left
 	Moved.focus_neighbour_top = Moved.get_parent().focus_neighbour_top
@@ -58,17 +63,19 @@ func MoveInProgress():
 	Moved.focus_neighbour_bottom = Moved.get_parent().focus_neighbour_bottom
 	Moved.focus_next = Moved.get_parent().focus_next
 	Moved.focus_previous = Moved.get_parent().focus_previous
+	
+	# Resets GameData variables for next movement.
 	GameData.CardMoved = ""
 	GameData.CardFrom = ""
 	GameData.CardTo = ""
 
-func SwitchInProgress():
+func SwitchInProgress(): # Basically the same as the MoveInProgress func, except it allows you to Reposition cards already slotted on the field.
 	var MoveFrom
 	var MoveTo
 	var CardMoved
-	var CardSwitched
+	var CardSwitched 
 	var MoveWithoutSwitching = true
-	if GameData.CardFrom == "WBanished" or GameData.CardFrom == "WGraveyard" or GameData.CardFrom == "BBanished" or GameData.CardFrom == "BGraveyard" or GameData.CardTo == "WBanished" or GameData.CardTo == "WGraveyard" or GameData.CardTo == "BBanished" or GameData.CardTo == "BGraveyard":
+	if GameData.CardFrom == "WBanished" or GameData.CardFrom == "WGraveyard" or GameData.CardFrom == "BBanished" or GameData.CardFrom == "BGraveyard" or GameData.CardTo == "WBanished" or GameData.CardTo == "WGraveyard" or GameData.CardTo == "BBanished" or GameData.CardTo == "BGraveyard": # W/B MedicalBay should also be in this chain.
 		MoveWithoutSwitching = false
 	if GameData.CardFrom == "BHand":
 		MoveFrom = self.get_node("CardSpots/BHandScroller/BHand")
@@ -86,13 +93,13 @@ func SwitchInProgress():
 	if GameData.CardSwitched == "BHand" or GameData.CardSwitched == "WHand":
 		return
 	CardSwitched = MoveTo.get_node(GameData.CardSwitched)
-	if not GameData.CardMoved == GameData.CardSwitched:
+	if not GameData.CardMoved == GameData.CardSwitched: # Ensures that you aren't switching a card with itself (same instance of scene). If this isn't here weird errors get thrown, particularly in CardExaminer scene/script.
 		CardMoved.rect_position.x = 0
 		CardMoved.rect_position.y = 0
 		CardSwitched.rect_position.x = 0
 		CardSwitched.rect_position.y = 0
 		MoveFrom.remove_child(CardMoved)
-		if MoveWithoutSwitching == true:
+		if MoveWithoutSwitching == true: # If FALSE, indicates that the zone targeted is meant for multistacking, thus no card switching occurs.
 			MoveTo.remove_child(CardSwitched)
 			MoveFrom.add_child(CardSwitched)
 		MoveTo.add_child(CardMoved)
@@ -166,6 +173,7 @@ func _on_WTech_pressed():
 		self.MoveToSpot()
 
 func _on_WTechDeck_pressed():
+	# Not sure this part needs to be here... func just adds a tech card from tech deck to tech zone.
 	GameData.CardMoved = ""
 	GameData.CardFrom = ""
 	GameData.CardTo = ""
@@ -182,10 +190,13 @@ func _on_WMedBay_pressed():
 		self.MoveToSpot()
 
 func _on_WMainDeck_pressed():
+	# Still not sure this part needs to be here... func just adds card to hand, while also updating focus data for all cards in hand.
 	GameData.CardMoved = ""
 	GameData.CardFrom = ""
 	GameData.CardTo = ""
 	GameData.CardSwitched = ""
+	
+	# Doesn't currently account for focus setting on empty hand (including at start of duel).
 	var WHand = self.get_node("CardSpots/WHandScroller/WHand")
 	var InstanceCard = DrawnCard.instance()
 	InstanceCard.name = "Card " + str(GameData.CardCounter)
@@ -214,6 +225,7 @@ func _on_WMainDeck_pressed():
 			WHand.get_node(i.name).focus_previous = LastCard.get_path()
 		NextCard = i
 	WhiteHand.invert()
+	# Changes bottom focus of MainDeck to first card in Hand.
 	self.get_node("CardSpots/NonHands/WMainDeck").focus_neighbour_bottom = WhiteHand.front().get_path()
 
 func _on_WBanished_pressed():
