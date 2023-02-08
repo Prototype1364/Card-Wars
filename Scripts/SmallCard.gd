@@ -2,7 +2,7 @@ extends Control
 
 var Name = "Barbarian"
 var Frame = "Normal"
-var Art = preload("res://Assets/Cards/Art/Barbarian.png")
+var Art = preload("res://Assets/Cards/Art/Normal_Barbarian.png")
 var Type = "Normal"
 var Effect_Type = "None"
 var Attribute = "Barbarian"
