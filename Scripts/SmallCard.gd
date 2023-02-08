@@ -2,7 +2,7 @@ extends Control
 
 var Name = "Barbarian"
 var Frame = "Normal"
-var Art = "res://Assets/Cards/Art/Barbarian_NEW.png"
+var Art = preload("res://Assets/Cards/Art/Barbarian.png")
 var Type = "Normal"
 var Effect_Type = "None"
 var Attribute = "Barbarian"
@@ -37,6 +37,8 @@ func _ready():
 	self.focus_neighbour_bottom = self.get_parent().focus_neighbour_bottom
 	self.focus_next = self.get_parent().focus_next
 	self.focus_previous = self.get_parent().focus_previous
+	
+	$ImageContainer/CardImage.texture = Art
 
 func _on_FocusSensor_focus_entered():
 	self.focusing()
@@ -47,7 +49,7 @@ func _on_FocusSensor_focus_exited():
 func focusing():
 	GameData.FocusedCardName = self.name
 	GameData.FocusedCardParentName = self.get_parent().name
-	SignalBus.emit_signal("LookAtCard", Frame, Cost)
+	SignalBus.emit_signal("LookAtCard", Frame, Art, Attack, Cost, Health)
 
 func defocusing():
 	GameData.FocusedCardName = ""

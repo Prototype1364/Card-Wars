@@ -19,7 +19,11 @@ func Reposition_Cards(Side_To_Set_For):
 	
 	# Ensures that cards are not switched out of the MedBay, Graveyard, or Banished piles.
 	if ("Banished" in GameData.CardTo or "Graveyard" in GameData.CardTo or "MedBay" in GameData.CardTo) or ("Banished" in GameData.CardFrom or "Graveyard" in GameData.CardFrom or "MedBay" in GameData.CardFrom):
-		MoveWithoutSwitching = false
+		if "Banished" in GameData.CardFrom or "Graveyard" in GameData.CardFrom or "MedBay" in GameData.CardFrom:
+			Reset_Reposition_Card_Variables()
+			return
+		else:
+			MoveWithoutSwitching = false
 	# Sets MoveFrom/To variable values for repositioning.
 	if GameData.CardFrom == Side_To_Set_For + "Hand":
 		MoveFrom = self.get_node("Playmat/CardSpots/" + Side_To_Set_For + "HandScroller/" + Side_To_Set_For + "Hand")

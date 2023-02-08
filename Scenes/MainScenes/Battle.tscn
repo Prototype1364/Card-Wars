@@ -27,6 +27,8 @@ margin_left = 33.0
 margin_top = -220.0
 margin_right = 868.0
 margin_bottom = -20.0
+rect_rotation = 180.0
+rect_pivot_offset = Vector2( 417, 100 )
 follow_focus = true
 scroll_vertical_enabled = false
 

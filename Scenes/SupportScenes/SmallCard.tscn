@@ -59,12 +59,17 @@ align = 1
 valign = 1
 
 [node name="ImageContainer" type="Control" parent="."]
-margin_left = 12.0
-margin_top = 13.0
-margin_right = 108.0
-margin_bottom = 96.0
+margin_left = 10.0
+margin_top = 12.0
+margin_right = 110.0
+margin_bottom = 97.0
+rect_min_size = Vector2( 100, 85 )
 
 [node name="CardImage" type="TextureRect" parent="ImageContainer"]
+margin_right = 100.0
+margin_bottom = 85.0
+rect_min_size = Vector2( 100, 85 )
+expand = true
 
 [node name="TokenContainer" type="Control" parent="."]
 margin_left = -20.0

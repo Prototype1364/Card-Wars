@@ -13,9 +13,9 @@ func GetCardData():
 	elif GameData.FocusedCardParentName == "WHand":
 		SelectedCard = self.get_parent().get_parent().get_node("Playmat/CardSpots/WHandScroller/WHand").get_node(GameData.FocusedCardName)
 	else:
-		SelectedCard = self.get_parent().get_parent().get_node("Playmat/CardSpots/NonHands/" + GameData.FocusedCardParentName + "/").get_node(GameData.FocusedCardName)
+		SelectedCard = self.get_parent().get_parent().get_node("Playmat/CardSpots/NonHands/" + GameData.FocusedCardParentName).get_node(GameData.FocusedCardName)
 
-func LookAtCard(FrameData, CostData):
+func LookAtCard(FrameData, ArtData, AttackData, CostData, HealthData):
 	self.GetCardData()
 	self.visible = true
 	
@@ -45,10 +45,10 @@ func LookAtCard(FrameData, CostData):
 		
 		# Gets info from selected card and transfer it to big card proportions.
 		# ImageContainer/CardImage of BigCard scene MUST REMAIN as a TEXTURE_BUTTON node type as it allows for auto-expansion of image proportions, thus cutting Eric's card art work in half.
-		self.get_node("ImageContainer/CardImage").texture_normal = SelectedCard.get_node("ImageContainer/CardImage").texture
-		self.get_node("Text").text = SelectedCard.Text
-		self.get_node("Damage").text = SelectedCard.get_node("Damage").text
-		self.get_node("Health").text = SelectedCard.get_node("Health").text
+		self.get_node("ImageContainer/CardImage").texture = ArtData
+		self.get_node("Text").text = SelectedCard.Short_Description
+		self.get_node("Damage").text = str(AttackData)
+		self.get_node("Health").text = str(HealthData)
 
 func NotLookingAtCard():
 	self.visible = false
