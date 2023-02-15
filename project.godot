@@ -8,6 +8,22 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Reference",
+"class": "Card",
+"language": "GDScript",
+"path": "res://Scripts/Class_Card.gd"
+}, {
+"base": "Reference",
+"class": "Duelist",
+"language": "GDScript",
+"path": "res://Scripts/Class_Duelist.gd"
+} ]
+_global_script_class_icons={
+"Card": "",
+"Duelist": ""
+}
+
 [application]
 
 config/name="Card Wars [Version E]"
@@ -18,6 +34,7 @@ config/icon="res://icon.png"
 
 GameData="*res://Singletons/GameData.gd"
 SignalBus="*res://Singletons/Signal_Bus.gd"
+CardEffects="*res://Singletons/Card_Effects.gd"
 
 [debug]
 
