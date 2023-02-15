@@ -8,4 +8,10 @@ signal NotLookingAtCard
 
 signal MoveInProgress
 
-signal SwitchInProgress
+signal Reposition_Field_Cards
+
+signal Play_Card
+
+signal Activate_Set_Card
+
+signal Check_For_Targets

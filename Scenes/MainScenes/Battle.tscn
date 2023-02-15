@@ -6,7 +6,7 @@
 [ext_resource path="res://Assets/Playmat/Switch Button.png" type="Texture" id=6]
 [ext_resource path="res://Scripts/Battle.gd" type="Script" id=7]
 
-[node name="Control" type="Control"]
+[node name="Battle" type="Control"]
 script = ExtResource( 7 )
 
 [node name="Playmat" type="TextureRect" parent="."]
@@ -478,6 +478,32 @@ focus_next = NodePath("../BTechZone")
 focus_previous = NodePath("../BEquipMagic")
 flat = true
 
+[node name="Turn_Controls" type="VBoxContainer" parent="Playmat"]
+margin_left = 845.0
+margin_top = 925.0
+margin_right = 945.0
+margin_bottom = 1053.0
+
+[node name="Next_Step" type="Button" parent="Playmat/Turn_Controls"]
+margin_right = 100.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 100, 40 )
+text = "Step"
+
+[node name="Next_Phase" type="Button" parent="Playmat/Turn_Controls"]
+margin_top = 44.0
+margin_right = 100.0
+margin_bottom = 84.0
+rect_min_size = Vector2( 100, 40 )
+text = "Phase"
+
+[node name="End_Turn" type="Button" parent="Playmat/Turn_Controls"]
+margin_top = 88.0
+margin_right = 100.0
+margin_bottom = 128.0
+rect_min_size = Vector2( 100, 40 )
+text = "End Turn"
+
 [node name="SwitchSides" type="TextureButton" parent="Playmat"]
 margin_left = 836.0
 margin_top = 807.0
@@ -537,5 +563,8 @@ texture = ExtResource( 5 )
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/BMainDeck" to="." method="_on_Card_Slot_pressed" binds= [ "BMainDeck" ]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/BBanished" to="." method="_on_Card_Slot_pressed" binds= [ "BBanished" ]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/BGraveyard" to="." method="_on_Card_Slot_pressed" binds= [ "BGraveyard" ]]
+[connection signal="pressed" from="Playmat/Turn_Controls/Next_Step" to="." method="_on_Next_Step_pressed"]
+[connection signal="pressed" from="Playmat/Turn_Controls/Next_Phase" to="." method="_on_Next_Phase_pressed"]
+[connection signal="pressed" from="Playmat/Turn_Controls/End_Turn" to="." method="_on_End_Turn_pressed"]
 [connection signal="pressed" from="Playmat/SwitchSides" to="." method="_on_SwitchSides_pressed"]
 [connection signal="value_changed" from="BoardScroller" to="." method="_on_VScrollBar_value_changed"]

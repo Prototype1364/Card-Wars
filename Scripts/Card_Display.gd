@@ -15,12 +15,12 @@ func GetCardData():
 	else:
 		SelectedCard = self.get_parent().get_parent().get_node("Playmat/CardSpots/NonHands/" + GameData.FocusedCardParentName).get_node(GameData.FocusedCardName)
 
-func LookAtCard(FrameData, ArtData, AttackData, CostData, HealthData):
+func LookAtCard(FrameData, ArtData, NameData, AttackData, CostData, HealthData):
 	self.GetCardData()
 	self.visible = true
 	
 	if SelectedCard != null:
-		if SelectedCard.get_node("Frame").texture_normal != load("res://Assets/Cards/Frame/Small_Advance_Tech_Card.png"):
+		if FrameData != "Special":
 			var Frame_Texture = load("res://Assets/Cards/Frame/Large_Frame_" + FrameData + ".png")
 			var Cost_Texture = load("res://Assets/Cards/Cost/Large/Large_Cost_" + FrameData + "_" + str(CostData) + ".png")
 			var Text_Outline_Color
@@ -35,19 +35,25 @@ func LookAtCard(FrameData, ArtData, AttackData, CostData, HealthData):
 			elif FrameData == "Tech":
 				Text_Outline_Color = Color("1f8742")
 			
-			self.get_node("Frame").texture = Frame_Texture
-			self.get_node("SummonContainer/SummonCounters").texture = Cost_Texture
-			self.get_node("Text").set("custom_colors/font_outline_modulate", Text_Outline_Color)
-			self.get_node("Damage").set("custom_colors/font_outline_modulate", Text_Outline_Color)
-			self.get_node("Health").set("custom_colors/font_outline_modulate", Text_Outline_Color)
-		else:
+			if FrameData != "Special": # Card is NOT Advance Tech card
+				self.get_node("Frame").texture = Frame_Texture
+				self.get_node("CostContainer/Cost").texture = Cost_Texture
+				self.get_node("NameContainer/Name").set("custom_colors/font_outline_modulate", Text_Outline_Color)
+				self.get_node("Description").set("custom_colors/font_outline_modulate", Text_Outline_Color)
+				self.get_node("Attack").set("custom_colors/font_outline_modulate", Text_Outline_Color)
+				self.get_node("Health").set("custom_colors/font_outline_modulate", Text_Outline_Color)
+		else: # Card is Advance Tech card
 			self.get_node("Frame").texture = load("res://Assets/Cards/Frame/Large_Advance_Tech_Card.png")
 		
 		# Gets info from selected card and transfer it to big card proportions.
 		# ImageContainer/CardImage of BigCard scene MUST REMAIN as a TEXTURE_BUTTON node type as it allows for auto-expansion of image proportions, thus cutting Eric's card art work in half.
-		self.get_node("ImageContainer/CardImage").texture = ArtData
-		self.get_node("Text").text = SelectedCard.Short_Description
-		self.get_node("Damage").text = str(AttackData)
+		self.get_node("ArtContainer/Art").texture = ArtData
+		self.get_node("NameContainer/Name").text = NameData
+		if SelectedCard.Short_Description == null:
+			self.get_node("Description").text = "This card has no Short Description."
+		else:
+			self.get_node("Description").text = SelectedCard.Short_Description
+		self.get_node("Attack").text = str(AttackData)
 		self.get_node("Health").text = str(HealthData)
 
 func NotLookingAtCard():

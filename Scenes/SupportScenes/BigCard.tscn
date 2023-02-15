@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Resources/Fonts/MTCORSVA.TTF" type="DynamicFontData" id=1]
 [ext_resource path="res://Scripts/Card_Display.gd" type="Script" id=2]
+[ext_resource path="res://Resources/Themes/Card_Text_72.tres" type="Theme" id=4]
 
 [sub_resource type="DynamicFont" id=1]
 size = 45
@@ -22,19 +23,30 @@ margin_right = -1290.0
 margin_bottom = -135.0
 script = ExtResource( 2 )
 
-[node name="Frame" type="Sprite" parent="."]
-centered = false
+[node name="Frame" type="TextureRect" parent="."]
 
-[node name="SummonContainer" type="Control" parent="."]
+[node name="NameContainer" type="Control" parent="."]
+margin_left = 55.0
+margin_top = 27.0
+margin_right = 574.0
+margin_bottom = 147.0
+
+[node name="Name" type="Label" parent="NameContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 4 )
+valign = 1
+clip_text = true
+
+[node name="CostContainer" type="Control" parent="."]
 margin_left = 215.0
 margin_top = 768.0
 margin_right = 415.0
 margin_bottom = 918.0
 
-[node name="SummonCounters" type="Sprite" parent="SummonContainer"]
-centered = false
+[node name="Cost" type="TextureRect" parent="CostContainer"]
 
-[node name="Text" type="Label" parent="."]
+[node name="Description" type="Label" parent="."]
 margin_left = 56.0
 margin_top = 596.0
 margin_right = 575.0
@@ -45,7 +57,7 @@ custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
 custom_fonts/font = SubResource( 1 )
 autowrap = true
 
-[node name="Damage" type="Label" parent="."]
+[node name="Attack" type="Label" parent="."]
 margin_left = 51.0
 margin_top = 791.0
 margin_right = 141.0
@@ -69,14 +81,14 @@ custom_fonts/font = SubResource( 2 )
 align = 1
 valign = 1
 
-[node name="ImageContainer" type="Control" parent="."]
+[node name="ArtContainer" type="Control" parent="."]
 margin_left = 55.0
 margin_top = 150.0
 margin_right = 575.0
 margin_bottom = 590.0
 rect_min_size = Vector2( 520, 440 )
 
-[node name="CardImage" type="TextureRect" parent="ImageContainer"]
+[node name="Art" type="TextureRect" parent="ArtContainer"]
 margin_right = 520.0
 margin_bottom = 440.0
 rect_min_size = Vector2( 520, 440 )
