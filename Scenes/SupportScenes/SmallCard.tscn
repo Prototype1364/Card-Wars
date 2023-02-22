@@ -27,6 +27,8 @@ rect_min_size = Vector2( 120, 180 )
 script = ExtResource( 2 )
 
 [node name="Frame" type="TextureRect" parent="."]
+margin_right = 120.0
+margin_bottom = 180.0
 rect_min_size = Vector2( 120, 180 )
 texture = ExtResource( 3 )
 
@@ -73,8 +75,7 @@ expand = true
 
 [node name="TokenContainer" type="Control" parent="."]
 margin_left = -20.0
-margin_top = 1.0
-margin_bottom = 181.0
+margin_bottom = 180.0
 
 [node name="FocusSensor" type="Button" parent="."]
 margin_right = 120.0
@@ -85,9 +86,8 @@ action_mode = 0
 flat = true
 
 [node name="Action_Button_Container" type="VBoxContainer" parent="."]
-margin_top = -20.0
 margin_right = 120.0
-grow_vertical = 0
+margin_bottom = 40.0
 rect_min_size = Vector2( 120, 20 )
 custom_constants/separation = 0
 
@@ -100,21 +100,24 @@ clip_text = true
 
 [node name="Set" type="Button" parent="Action_Button_Container"]
 visible = false
+margin_top = 20.0
 margin_right = 120.0
-margin_bottom = 20.0
+margin_bottom = 40.0
 text = "Set"
 
 [node name="Attack" type="Button" parent="Action_Button_Container"]
 visible = false
+margin_top = 40.0
 margin_right = 120.0
-margin_bottom = 20.0
+margin_bottom = 60.0
 rect_min_size = Vector2( 120, 20 )
 text = "Attack"
 
 [node name="Target" type="Button" parent="Action_Button_Container"]
 visible = false
+margin_top = 60.0
 margin_right = 120.0
-margin_bottom = 20.0
+margin_bottom = 80.0
 text = "Target"
 
 [connection signal="focus_entered" from="FocusSensor" to="." method="_on_FocusSensor_focus_entered"]

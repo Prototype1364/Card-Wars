@@ -10,6 +10,7 @@ func _ready():
 	var _HV2 = SignalBus.connect("Play_Card", self, "Play_Card")
 	var _HV3 = SignalBus.connect("Activate_Set_Card", self, "Activate_Set_Card")
 	var _HV4 = SignalBus.connect("Check_For_Targets", self, "Check_For_Targets")
+	var _HV5 = SignalBus.connect("Discard_Card", self, "Discard_Card")
 	set_focus_mode(true)
 	
 	Setup_Game()
@@ -157,7 +158,7 @@ func Add_Tokens():
 		if player.Backrow[i].Type == "Trap":
 			player.Backrow[i].Tokens += 1
 
-func Reposition_Field_Cards(Side_To_Set_For):
+func Reposition_Field_Cards(Side_To_Set_For): # Bugged when trying to reposition to empty slot.
 	var MoveFrom # Grabs the parent of the selected scene instance.
 	var MoveTo # Reparents the selected scene instance only if said parent has no children (i.e. cannot multistack in Fighter slot).
 	var CardMoved # From GameData singleton, indicates the specific instance of the SmallCard scene that has been selected.
@@ -405,9 +406,40 @@ func Resolve_Battle_Damage():
 			else:
 				print(GameData.Target.Name + " survived with " + str(GameData.Target.Health) + " HP")
 
-func Discard_From_Hand():
-	pass
-	Conduct_End_Phase()
+func Discard_Card(Side_To_Set_For):
+	var Chosen_Card # Indicates the card object that is being played.
+	var MoveFrom # Grabs the origin parent of the selected scene instance.
+	var MoveTo # Grabs the destination parent of the selected scene instance.
+	var CardMoved # From GameData singleton, indicates the specific instance of the SmallCard scene that has been selected.
+	
+	# ID Card Discarded
+	if GameData.CardFrom == Side_To_Set_For + "Hand":
+		Chosen_Card = self.get_node("Playmat/CardSpots/" + Side_To_Set_For + "HandScroller/" + Side_To_Set_For + "Hand/" + GameData.CardMoved)
+	
+	# Prep variables to reposition cards on field & scene tree
+	MoveFrom = self.get_node("Playmat/CardSpots/" + Side_To_Set_For + "HandScroller/" + Side_To_Set_For + "Hand")
+	MoveTo = self.get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "MedBay")
+	CardMoved = MoveFrom.get_node(GameData.CardMoved)
+	
+	# Fixes bug regarding auto-updating of rect_pos of selected scene when moving from slot to slot.
+	CardMoved.rect_position.x = 0
+	CardMoved.rect_position.y = 0
+	
+	# Updates children for parents in From & To locations
+	MoveFrom.remove_child(CardMoved)
+	MoveTo.add_child(CardMoved)
+	
+	# Matches focuses of child to new parent.
+	var Moved = MoveTo.get_node(GameData.CardMoved)
+	Set_Focus_Neighbors("Field",Side_To_Set_For,Moved)
+	Set_Focus_Neighbors("Hand",Side_To_Set_For,Moved)
+	
+	# Resets GameData variables for next movement.
+	Reset_Reposition_Card_Variables()
+	
+	# Retry Conducting End Phase
+	if GameData.Current_Step == "Discard":
+		Conduct_End_Phase()
 
 func Conduct_Opening_Phase():
 	# Opening Phase (Start -> Draw -> Roll)
@@ -445,6 +477,7 @@ func Conduct_End_Phase():
 	
 	# Discard Step (Hand Limit = 5)
 	if get_node("Playmat/CardSpots/" + Side_To_Set_For + "HandScroller/" + Side_To_Set_For + "Hand").get_child_count() > 5:
+		print("Please discard a card")
 		return
 	
 	# Reload Step
@@ -467,6 +500,7 @@ func Conduct_End_Phase():
 	Update_Game_State("Step")
 	if len(player.Deck) == 0 or player.LP <= 0:
 		GameData.Victor = enemy.Name
+		print("VICTORY")
 		return
 	
 	# End Step
@@ -569,15 +603,6 @@ func Setup_Game():
 	Conduct_Opening_Phase()
 	Conduct_Standby_Phase()
 
-func main():
-	# Battle Phase (Selection -> Target -> Damage -> Repeat)
-	Update_Game_State("Phase")
-	
-	# End Phase (Discard -> Reload -> Effect -> Victory -> End)
-	Conduct_End_Phase()
-	Update_Game_State("Turn")
-	Update_Game_State("Phase")
-
 
 func _on_Playmat_gui_input(event):
 	if event is InputEventMouseButton:
@@ -617,9 +642,6 @@ func _on_Card_Slot_pressed(slot_name):
 		if "Hand" in GameData.CardFrom and GameData.Current_Step == "Summon/Set":
 			GameData.CardTo = slot_name
 			SignalBus.emit_signal("Play_Card", GameData.CardFrom.left(1))
-		elif "Hand" in GameData.CardFrom and GameData.Current_Step == "Discard":
-			GameData.CardTo = slot_name
-			SignalBus.emit_signal("Discard_Card", GameData.CardFrom.left(1))
 
 func _on_Next_Step_pressed():
 	Update_Game_State("Step")

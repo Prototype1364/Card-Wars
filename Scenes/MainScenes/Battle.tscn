@@ -27,8 +27,10 @@ rect_pivot_offset = Vector2( 446, 621 )
 [node name="BHandScroller" type="ScrollContainer" parent="Playmat/CardSpots"]
 margin_left = 33.0
 margin_top = -220.0
-margin_right = 868.0
+margin_right = 863.0
 margin_bottom = -20.0
+grow_vertical = 0
+rect_min_size = Vector2( 830, 200 )
 rect_rotation = 180.0
 rect_pivot_offset = Vector2( 417, 100 )
 rect_clip_content = false
@@ -36,6 +38,7 @@ follow_focus = true
 scroll_vertical_enabled = false
 
 [node name="BHand" type="HBoxContainer" parent="Playmat/CardSpots/BHandScroller"]
+grow_vertical = 0
 rect_pivot_offset = Vector2( 317, 100 )
 focus_neighbour_top = NodePath("../../NonHands/BBackrow1")
 focus_neighbour_bottom = NodePath("../../NonHands/BFighter")
@@ -45,11 +48,14 @@ margin_left = 33.0
 margin_top = 1258.0
 margin_right = 863.0
 margin_bottom = 1458.0
+grow_vertical = 0
+rect_min_size = Vector2( 835, 200 )
 rect_clip_content = false
 follow_focus = true
 scroll_vertical_enabled = false
 
 [node name="WHand" type="HBoxContainer" parent="Playmat/CardSpots/WHandScroller"]
+grow_vertical = 0
 rect_pivot_offset = Vector2( 317, 100 )
 focus_neighbour_top = NodePath("../../NonHands/WBackrow1")
 focus_neighbour_bottom = NodePath("../../NonHands/WFighter")

@@ -5,7 +5,7 @@
 [ext_resource path="res://Resources/Themes/Card_Text_72.tres" type="Theme" id=4]
 
 [sub_resource type="DynamicFont" id=1]
-size = 45
+size = 35
 outline_size = 1
 outline_color = Color( 0.490196, 0.490196, 0.490196, 1 )
 font_data = ExtResource( 1 )
@@ -51,6 +51,7 @@ margin_left = 56.0
 margin_top = 596.0
 margin_right = 575.0
 margin_bottom = 790.0
+rect_min_size = Vector2( 519, 194 )
 rect_pivot_offset = Vector2( 35, 45 )
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )

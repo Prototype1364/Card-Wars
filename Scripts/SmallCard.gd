@@ -125,6 +125,8 @@ func _on_FocusSensor_pressed():
 	elif GameData.Current_Step == "Discard":
 		GameData.CardFrom = self.get_parent().name
 		GameData.CardMoved = self.name
+		if "Hand" in GameData.CardFrom:
+			SignalBus.emit_signal("Discard_Card", GameData.CardFrom.left(1))
 
 
 func _on_Summon_Set_pressed():
