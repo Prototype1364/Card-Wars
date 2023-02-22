@@ -95,7 +95,7 @@ custom_constants/separation = 0
 visible = false
 margin_right = 120.0
 margin_bottom = 20.0
-text = "Summon/Activate"
+text = "Summon"
 clip_text = true
 
 [node name="Set" type="Button" parent="Action_Button_Container"]
@@ -115,6 +115,7 @@ text = "Attack"
 visible = false
 margin_right = 120.0
 margin_bottom = 20.0
+text = "Target"
 
 [connection signal="focus_entered" from="FocusSensor" to="." method="_on_FocusSensor_focus_entered"]
 [connection signal="focus_exited" from="FocusSensor" to="." method="_on_FocusSensor_focus_exited"]

@@ -9,7 +9,7 @@ var Attribute
 var Description
 var Short_Description
 var Attack
-var Attack_Bonus
+var ATK_Bonus
 var Cost
 var Cost_Path
 var Health
@@ -48,7 +48,7 @@ func Set_Card_Variables():
 	Description = player.Deck[-1].Description
 	Short_Description = player.Deck[-1].Short_Description
 	Attack = player.Deck[-1].Attack
-	Attack_Bonus = player.Deck[-1].ATK_Bonus
+	ATK_Bonus = player.Deck[-1].ATK_Bonus
 	Cost = player.Deck[-1].Cost
 	if player.Deck[-1].Type != "Special":
 		Cost_Path = load("res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png")
@@ -122,6 +122,9 @@ func _on_FocusSensor_pressed():
 		$Action_Button_Container/Attack.visible = true
 	elif GameData.Current_Step == "Target":
 		$Action_Button_Container/Target.visible = true
+	elif GameData.Current_Step == "Discard":
+		GameData.CardFrom = self.get_parent().name
+		GameData.CardMoved = self.name
 
 
 func _on_Summon_Set_pressed():

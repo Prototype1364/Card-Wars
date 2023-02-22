@@ -1,5 +1,7 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=8 format=2]
 
+[ext_resource path="res://Scenes/SupportScenes/Battle_HUD_GameState.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/SupportScenes/Battle_HUD_Life_Crests.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Scenes/SupportScenes/BigCard.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Assets/Playmat/BoardImage.png" type="Texture" id=4]
 [ext_resource path="res://Assets/Playmat/Large Empty Slot.png" type="Texture" id=5]
@@ -29,6 +31,7 @@ margin_right = 868.0
 margin_bottom = -20.0
 rect_rotation = 180.0
 rect_pivot_offset = Vector2( 417, 100 )
+rect_clip_content = false
 follow_focus = true
 scroll_vertical_enabled = false
 
@@ -42,6 +45,7 @@ margin_left = 33.0
 margin_top = 1258.0
 margin_right = 863.0
 margin_bottom = 1458.0
+rect_clip_content = false
 follow_focus = true
 scroll_vertical_enabled = false
 
@@ -514,6 +518,7 @@ texture_normal = ExtResource( 6 )
 expand = true
 
 [node name="BoardScroller" type="VScrollBar" parent="."]
+visible = false
 margin_left = 1908.0
 margin_right = 1920.0
 margin_bottom = 1080.0
@@ -533,6 +538,23 @@ texture = ExtResource( 5 )
 
 [node name="BigCard" parent="CardExaminer" instance=ExtResource( 3 )]
 
+[node name="Battle_HUD_White" parent="." instance=ExtResource( 2 )]
+margin_left = 1058.0
+margin_top = 1009.0
+margin_right = 1798.0
+margin_bottom = 1080.0
+
+[node name="Battle_HUD_Black" parent="." instance=ExtResource( 2 )]
+margin_left = 1058.0
+margin_right = 1798.0
+margin_bottom = 71.0
+
+[node name="Battle_HUD_GameState" parent="." instance=ExtResource( 1 )]
+margin_left = 15.0
+margin_right = 755.0
+margin_bottom = 71.0
+
+[connection signal="gui_input" from="Playmat" to="." method="_on_Playmat_gui_input"]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WFighter" to="." method="_on_Card_Slot_pressed" binds= [ "WFighter" ]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WEquipTrap" to="." method="_on_Card_Slot_pressed" binds= [ "WEquipTrap" ]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WEquipMagic" to="." method="_on_Card_Slot_pressed" binds= [ "WEquipMagic" ]]
@@ -567,4 +589,3 @@ texture = ExtResource( 5 )
 [connection signal="pressed" from="Playmat/Turn_Controls/Next_Phase" to="." method="_on_Next_Phase_pressed"]
 [connection signal="pressed" from="Playmat/Turn_Controls/End_Turn" to="." method="_on_End_Turn_pressed"]
 [connection signal="pressed" from="Playmat/SwitchSides" to="." method="_on_SwitchSides_pressed"]
-[connection signal="value_changed" from="BoardScroller" to="." method="_on_VScrollBar_value_changed"]

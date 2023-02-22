@@ -374,13 +374,40 @@ func Activate_Set_Card(Side_To_Set_For, Chosen_Card):
 
 func Check_For_Targets():
 	var player = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
-	var Side_To_Set_For = "W" if GameData.Current_Turn == "Player" else "B"
+	var Side_To_Set_For = "B" if GameData.Current_Turn == "Player" else "W"
 	
 	if get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "Fighter").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "R1").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "R2").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "R3").get_child_count() > 0:
-		Update_Game_State("Step")
+		pass
 	else: # No Valid Targets. Attack will be Direct Attack
 		GameData.Target = player
-		GameData.Current_Step = "Damage"
+	Update_Game_State("Step")
+
+func Resolve_Battle_Damage():
+	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
+	
+	if GameData.Attacker != null: # Ensures no error is thrown when func is called with empty player field.
+		if GameData.Target == enemy:
+			enemy.LP -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus)
+			if enemy.LP <= 0:
+				GameData.Victor = player.Name
+		else:
+			if GameData.Target.Invincible == false:
+				GameData.Target.Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus)
+			
+			# Capture Step
+			if GameData.Target.Health <= 0:
+				GameData.Current_Step = "Capture"
+				GameData.Cards_Captured_This_Turn.append(GameData.Target)
+				# Move captured card to player MedBay (NOT COMPLETED).
+				print(GameData.Target.Name + "was captured.")
+				enemy.Current_Fighter = "None"
+			else:
+				print(GameData.Target.Name + " survived with " + str(GameData.Target.Health) + " HP")
+
+func Discard_From_Hand():
+	pass
+	Conduct_End_Phase()
 
 func Conduct_Opening_Phase():
 	# Opening Phase (Start -> Draw -> Roll)
@@ -407,44 +434,18 @@ func Conduct_Main_Phase():
 	pass
 
 func Conduct_Battle_Phase():
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
-	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
-	
-	if GameData.Turn_Counter > 1:
-		# Selection Step
-		GameData.Current_Step = "Selection"
-		Resolve_Card_Effects()
-		
-		# Target Step
-		GameData.Current_Step = "Target"
-		
-		# Damage Step
-		GameData.Current_Step = "Damage"
-		if GameData.Target == enemy:
-			enemy.LP -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus)
-			if enemy.LP <= 0:
-				GameData.Victor = player.Name
-		else:
-			if GameData.Target.Invincible == false:
-				GameData.Target.Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus)
-			
-			# Capture Step
-			if GameData.Target.Health <= 0:
-				GameData.Current_Step = "Capture"
-				GameData.Cards_Captured_This_Turn.append(GameData.Target)
-				# Move captured card to player MedBay (NOT COMPLETED).
-				pass
-				enemy.Current_Fighter = "None"
+	# Battle Phase (Selection -> Target -> Damage -> Capture -> Repeat)
+	# NOTE: Func skipped entirely due to all steps being handled by other funcs (Except Repeat step which may require some thought to implement)
+	pass
 
 func Conduct_End_Phase():
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
+	var Side_To_Set_For = "W" if GameData.Current_Turn == "Player" else "B"
 	
 	# Discard Step (Hand Limit = 5)
-	if GameData.Current_Turn == "Player" and $Playmat/CardSpots/WHandScroller/WHand.get_child_count() > 5:
-		pass
-	if GameData.Current_Turn == "Enemy" and $Playmat/CardSpots/BHandScroller/BHand.get_child_count() > 5:
-		pass
+	if get_node("Playmat/CardSpots/" + Side_To_Set_For + "HandScroller/" + Side_To_Set_For + "Hand").get_child_count() > 5:
+		return
 	
 	# Reload Step
 	Update_Game_State("Step")
@@ -490,6 +491,7 @@ func Update_Game_State(State_To_Change):
 				GameData.Current_Step = "Target"
 			elif GameData.Current_Step == "Target":
 				GameData.Current_Step = "Damage"
+				Resolve_Battle_Damage()
 			elif GameData.Current_Step == "Damage":
 				GameData.Current_Step = "Capture"
 			elif GameData.Current_Step == "Capture":
@@ -569,7 +571,6 @@ func Setup_Game():
 
 func main():
 	# Battle Phase (Selection -> Target -> Damage -> Repeat)
-	Conduct_Battle_Phase()
 	Update_Game_State("Phase")
 	
 	# End Phase (Discard -> Reload -> Effect -> Victory -> End)
@@ -578,8 +579,13 @@ func main():
 	Update_Game_State("Phase")
 
 
-func _on_VScrollBar_value_changed(value):
-	$Playmat.rect_position.y = 0 - value
+func _on_Playmat_gui_input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == BUTTON_WHEEL_UP:
+			$BoardScroller.value -= 30
+		elif event.button_index == BUTTON_WHEEL_DOWN:
+			$BoardScroller.value += 30
+		$Playmat.rect_position.y = 0 - $BoardScroller.value
 
 func _on_SwitchSides_pressed():
 	if $Playmat.flip_v == true:
@@ -611,6 +617,9 @@ func _on_Card_Slot_pressed(slot_name):
 		if "Hand" in GameData.CardFrom and GameData.Current_Step == "Summon/Set":
 			GameData.CardTo = slot_name
 			SignalBus.emit_signal("Play_Card", GameData.CardFrom.left(1))
+		elif "Hand" in GameData.CardFrom and GameData.Current_Step == "Discard":
+			GameData.CardTo = slot_name
+			SignalBus.emit_signal("Discard_Card", GameData.CardFrom.left(1))
 
 func _on_Next_Step_pressed():
 	Update_Game_State("Step")
