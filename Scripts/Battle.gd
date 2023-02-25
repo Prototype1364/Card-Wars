@@ -1,5 +1,11 @@
 extends Control
 
+const PHASES = ["Opening Phase", "Standby Phase", "Main Phase", "Battle Phase", "End Phase"]
+const PHASE_THRESHOLDS = [2, 4, 7, 12, 17]
+const STEPS = ["Start", "Draw", "Roll", "Effect", "Token", "Reposition", "Summon/Set", "Flip", "Selection", "Target", "Damage", "Capture", "Repeat", "Discard", "Reload", "Effect", "Victory", "End"]
+const EFFECT_STEPS = ["Effect", "Selection", "Capture", "Discard"] # Discard may/may not end up being an Effect Step. You just added it, just in case (also Summon/Set should be added to check for Event-effects like Mordred's).
+const FUNC_STEPS = ["Damage"]
+
 var BoardImage = preload("res://Assets/Playmat/BoardImage.png")
 var BoardImageReverse = preload("res://Assets/Playmat/BoardImageReverse.png")
 var Card_Drawn = preload("res://Scenes/SupportScenes/SmallCard.tscn")
@@ -11,6 +17,7 @@ func _ready():
 	var _HV3 = SignalBus.connect("Activate_Set_Card", self, "Activate_Set_Card")
 	var _HV4 = SignalBus.connect("Check_For_Targets", self, "Check_For_Targets")
 	var _HV5 = SignalBus.connect("Discard_Card", self, "Discard_Card")
+	var _HV6 = SignalBus.connect("Update_GameState", self, "Update_Game_State")
 	set_focus_mode(true)
 	
 	Setup_Game()
@@ -82,9 +89,13 @@ func Shuffle_Decks():
 func Choose_Starting_Player():
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
-	#var random_number = rng.randi_range(1,2)
-	var random_number = 1 # Only here for testing purposes. Uncomment out line above to replace this line when testing concludes.
+	var random_number = rng.randi_range(1,2)
 	GameData.Current_Turn = "Player" if random_number == 1 else "Enemy"
+	
+	# Flip field (if Black goes first)
+	if random_number == 2:
+		_on_SwitchSides_pressed()
+		$HUD_GameState.Update_Data()
 
 func Set_Turn_Player():
 	if GameData.Turn_Counter == 1: # Ensures that the program doesn't switch the Turn_Player on the first Opening Phase of the Game.
@@ -120,7 +131,12 @@ func Dice_Roll():
 	# Add Summon Crests to appropriate Crest Pool
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	player.Summon_Crests += roll_result
-	print("You rolled a " + str(roll_result) + ". The crests have been added to your inventory. You now have " + str(player.Summon_Crests) + ".")
+	
+	# Update HUD
+	if GameData.Current_Turn == "Player":
+		$HUD_W.Update_Data(player)
+	else:
+		$HUD_B.Update_Data(player)
 
 func Set_Hero_Card_Effect_Status():
 	# Populate lists for both players (List Comprehension is apparently not a thing in Godot)
@@ -142,23 +158,46 @@ func Set_Hero_Card_Effect_Status():
 			Heroes_On_Field_Enemy[i].Effect_Active = true
 
 func Resolve_Card_Effects():
-	var Passcode = 12345678
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Available_Zones = get_node("Playmat/CardSpots/NonHands").get_children() + get_node("Playmat/CardSpots/" + Side + "HandScroller/").get_children()
+	var Zones_To_Check = []
+	var Passcode
 	var string_prefix = "c"
-	var func_name = string_prefix + str(Passcode)
-
-	CardEffects.call(func_name)
+	var func_name
+	
+	# Populate Zones_To_Check Array
+	for i in Available_Zones.size():
+		if Available_Zones[i].name.left(1) == Side or Side + "Hand" in Available_Zones[i].name:
+			if "Deck" in Available_Zones[i].name or "Banished" in Available_Zones[i].name:
+				pass
+			else:
+				Zones_To_Check.append(Available_Zones[i])
+	
+	# Resolve Card Effects
+	for zone in range(len(Zones_To_Check)): # Zone loop enables you to check all zones with just a single Item (card) loop.
+		for item in range(len(Zones_To_Check[zone].get_children())):
+			Passcode = Zones_To_Check[zone].get_child(item).Passcode
+			if Zones_To_Check[zone].get_child(item).Type != "Normal": # Eliminates the need to have blank funcs for Normal cards in Card_Effects Singleton to avoid crashing game
+				var Card_To_Check = Zones_To_Check[zone].get_child(item)
+				func_name = string_prefix + str(Passcode)
+				CardEffects.call(func_name, Card_To_Check)
 
 func Add_Tokens():
 	# Token Step
 	GameData.Current_Step = "Token"
 	
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	
-	for i in range(len(player.Backrow)):
-		if player.Backrow[i].Type == "Trap":
-			player.Backrow[i].Tokens += 1
+	for i in range(1,4): # Range is exclusive. I.E. it runs 3 times, from 1 to 3, excluding 4.
+		var Current_Card
+		if get_node("Playmat/CardSpots/NonHands/" + Side + "Backrow" + str(i)).get_child_count() > 0:
+			Current_Card = get_node("Playmat/CardSpots/NonHands/" + Side + "Backrow" + str(i)).get_child(0) # Index 0 used as Backrow slots can only hold 1 card at a time
+		if Current_Card != null:
+			if Current_Card.Type == "Trap":
+				Current_Card.Tokens += 1
+				Current_Card.Update_Data()
 
-func Reposition_Field_Cards(Side_To_Set_For): # Bugged when trying to reposition to empty slot.
+func Reposition_Field_Cards(Side):
 	var MoveFrom # Grabs the parent of the selected scene instance.
 	var MoveTo # Reparents the selected scene instance only if said parent has no children (i.e. cannot multistack in Fighter slot).
 	var CardMoved # From GameData singleton, indicates the specific instance of the SmallCard scene that has been selected.
@@ -173,18 +212,18 @@ func Reposition_Field_Cards(Side_To_Set_For): # Bugged when trying to reposition
 		else:
 			MoveWithoutSwitching = false
 	# Sets MoveFrom/To variable values for repositioning.
-	if GameData.CardFrom == Side_To_Set_For + "Hand":
-		MoveFrom = self.get_node("Playmat/CardSpots/" + Side_To_Set_For + "HandScroller/" + Side_To_Set_For + "Hand")
+	if GameData.CardFrom == Side + "Hand":
+		MoveFrom = self.get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
 	else:
 		MoveFrom = self.get_node("Playmat/CardSpots/NonHands/" + GameData.CardFrom)
-	if GameData.CardTo == Side_To_Set_For + "Hand":
-		MoveTo = self.get_node("Playmat/CardSpots/" + Side_To_Set_For + "HandScroller/" + Side_To_Set_For + "Hand")
+	if GameData.CardTo == Side + "Hand":
+		MoveTo = self.get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
 	else:
 		MoveTo = self.get_node("Playmat/CardSpots/NonHands/" + GameData.CardTo)
 	CardMoved = MoveFrom.get_node(GameData.CardMoved)
 	
 	# Ensures cards are not switched around from within the Hand.
-	if GameData.CardSwitched == Side_To_Set_For + "Hand":
+	if GameData.CardSwitched == Side + "Hand":
 		return
 	# Ensures that card switching behavior only happens when switching (as opposed to merely moving) cards.
 	if GameData.CardSwitched != "":
@@ -205,15 +244,15 @@ func Reposition_Field_Cards(Side_To_Set_For): # Bugged when trying to reposition
 	
 	# Set Focus Neighbour values for repositioned card(s).
 	var Moved = MoveTo.get_node(GameData.CardMoved)
-	Set_Focus_Neighbors("Field",Side_To_Set_For,Moved)
+	Set_Focus_Neighbors("Field",Side,Moved)
 	if GameData.CardSwitched != "":
 		Moved = MoveFrom.get_node(GameData.CardSwitched)
-		Set_Focus_Neighbors("Field",Side_To_Set_For,Moved)
+		Set_Focus_Neighbors("Field",Side,Moved)
 	
 	# Resets variables to avoid game crashing if you try to switch multiple times in a single turn.
 	Reset_Reposition_Card_Variables()
 
-func Play_Card(Side_To_Set_For):
+func Play_Card(Side):
 	var Chosen_Card # Indicates the card object that is being played.
 	var MoveFrom # Grabs the origin parent of the selected scene instance.
 	var MoveTo # Grabs the destination parent of the selected scene instance.
@@ -221,12 +260,12 @@ func Play_Card(Side_To_Set_For):
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	
 	# Ensure card played is from Turn Player's Hand.
-	if (Side_To_Set_For == "W" and GameData.Current_Turn == "Enemy") or (Side_To_Set_For == "B" and GameData.Current_Turn == "Player"):
+	if (Side == "W" and GameData.Current_Turn == "Enemy") or (Side == "B" and GameData.Current_Turn == "Player"):
 		return
 	
 	# ID Card Played
-	if GameData.CardFrom == Side_To_Set_For + "Hand":
-		Chosen_Card = self.get_node("Playmat/CardSpots/" + Side_To_Set_For + "HandScroller/" + Side_To_Set_For + "Hand/" + GameData.CardMoved)
+	if GameData.CardFrom == Side + "Hand":
+		Chosen_Card = self.get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand/" + GameData.CardMoved)
 	
 	# Prep variables to reposition cards on field & scene tree
 	if GameData.CardFrom == "BHand":
@@ -239,16 +278,18 @@ func Play_Card(Side_To_Set_For):
 		MoveTo = self.get_node("Playmat/CardSpots/WHandScroller/WHand")
 	else:
 		MoveTo = self.get_node("Playmat/CardSpots/NonHands/" + GameData.CardTo)
+	
 	CardMoved = MoveFrom.get_node(GameData.CardMoved)
 	
-	# Fixes bug regarding auto-updating of rect_pos of selected scene when moving from slot to slot.
-	CardMoved.rect_position.x = 0
-	CardMoved.rect_position.y = 0
-	
 	# Ensures that card Cost is Affordable & that it's being summoned to a valid card slot
-	if Valid_Destination(Side_To_Set_For, MoveTo, Chosen_Card) and Summon_Affordable(player, Chosen_Card):
-		# Deducts summoned card's Cost from appropriate Summon Crest pool
+	if Valid_Destination(Side, MoveTo, Chosen_Card) and Summon_Affordable(player, Chosen_Card):
+		# Fixes bug regarding auto-updating of rect_pos of selected scene when moving from slot to slot.
+		CardMoved.rect_position.x = 0
+		CardMoved.rect_position.y = 0
+		
+		# Deducts summoned card's Cost from appropriate Summon Crest pool & Updates HUD
 		player.Summon_Crests -= Chosen_Card.Cost
+		get_node("HUD_" + Side).Update_Data(player)
 		
 		# Updates children for parents in From & To locations (if destination is valid for Card Type).
 		MoveFrom.remove_child(CardMoved)
@@ -256,17 +297,18 @@ func Play_Card(Side_To_Set_For):
 		
 		# Matches focuses of child to new parent.
 		var Moved = MoveTo.get_node(GameData.CardMoved)
-		Set_Focus_Neighbors("Field",Side_To_Set_For,Moved)
-		Set_Focus_Neighbors("Hand",Side_To_Set_For,Moved)
+		Set_Focus_Neighbors("Field",Side,Moved)
+		Set_Focus_Neighbors("Hand",Side,Moved)
 		
 		# Activate Summon Effects (Currently no way to Set cards)
 		if Chosen_Card.Type == "Hero" or (Chosen_Card.Type == "Magic" and Chosen_Card.Is_Set == false):
 			Chosen_Card.Effect_Active = true
 			Activate_Summon_Effects(Chosen_Card)
-			if Chosen_Card.Type == "Magic":
+			# Ensures that card summoned to Equip slot is not immediately sent to Graveyard.
+			if Chosen_Card.Type == "Magic" and not ("Equip" in Chosen_Card.get_parent().name):
 				# Sends activated Magic card to Graveyard
 				MoveFrom = MoveTo
-				MoveTo = self.get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "Graveyard")
+				MoveTo = self.get_node("Playmat/CardSpots/NonHands/" + Side + "Graveyard")
 				MoveFrom.remove_child(CardMoved)
 				MoveTo.add_child(CardMoved)
 				# Resets Effect_Active status to ensure card doesn't activate from Graveyard
@@ -283,18 +325,18 @@ func Summon_Affordable(Dueler, Chosen_Card):
 	else:
 		return false
 
-func Valid_Destination(Side_To_Set_For, Destination, Chosen_Card):
-	if (Destination.name == Side_To_Set_For + "Fighter") and (Chosen_Card.Type == "Normal" or Chosen_Card.Type == "Hero"):
+func Valid_Destination(Side, Destination, Chosen_Card):
+	if (Destination.name == Side + "Fighter") and (Chosen_Card.Type == "Normal" or Chosen_Card.Type == "Hero"):
 		return true
-	elif Destination.name == Side_To_Set_For + "EquipTrap" and (Chosen_Card.Type == "Trap"):
+	elif Destination.name == Side + "EquipTrap" and (Chosen_Card.Type == "Trap"):
 		return true
-	elif Destination.name == Side_To_Set_For + "EquipMagic" and (Chosen_Card.Type == "Magic"):
+	elif Destination.name == Side + "EquipMagic" and (Chosen_Card.Type == "Magic"):
 		return true
-	elif (Destination.name == Side_To_Set_For + "R1" or Destination.name == Side_To_Set_For + "R2" or Destination.name == Side_To_Set_For + "R3") and (Chosen_Card.Type == "Normal" or Chosen_Card.Type == "Hero"):
+	elif (Destination.name == Side + "R1" or Destination.name == Side + "R2" or Destination.name == Side + "R3") and (Chosen_Card.Type == "Normal" or Chosen_Card.Type == "Hero"):
 		return true
-	elif (Destination.name == Side_To_Set_For + "Backrow1" or Destination.name == Side_To_Set_For + "Backrow2" or Destination.name == Side_To_Set_For + "Backrow3") and (Chosen_Card.Type == "Magic" or Chosen_Card.Type == "Trap"):
+	elif (Destination.name == Side + "Backrow1" or Destination.name == Side + "Backrow2" or Destination.name == Side + "Backrow3") and (Chosen_Card.Type == "Magic" or Chosen_Card.Type == "Trap"):
 		return true
-	elif Destination.name == Side_To_Set_For + "TechZone" and Chosen_Card.Type == "Tech":
+	elif Destination.name == Side + "TechZone" and Chosen_Card.Type == "Tech":
 		return true
 	else:
 		return false
@@ -305,9 +347,9 @@ func Reset_Reposition_Card_Variables():
 	GameData.CardTo = ""
 	GameData.CardSwitched = ""
 
-func Set_Focus_Neighbors(Focus_To_Set, Side_To_Set_For, Node_To_Set_For):
+func Set_Focus_Neighbors(Focus_To_Set, Side, Node_To_Set_For):
 	if Focus_To_Set == "Hand":
-		var Hand_Node = get_node("Playmat/CardSpots/" + Side_To_Set_For + "HandScroller/" + Side_To_Set_For + "Hand")
+		var Hand_Node = get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
 		var Hand = Hand_Node.get_children()
 		
 		for i in len(Hand):
@@ -331,7 +373,7 @@ func Set_Focus_Neighbors(Focus_To_Set, Side_To_Set_For, Node_To_Set_For):
 		
 		# Changes bottom focus of MainDeck to first card in Hand.
 		if len(Hand) > 0:
-			self.get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "MainDeck").focus_neighbour_bottom = Hand.front().get_path()
+			self.get_node("Playmat/CardSpots/NonHands/" + Side + "MainDeck").focus_neighbour_bottom = Hand.front().get_path()
 	elif Focus_To_Set == "Field":
 		Node_To_Set_For.focus_neighbour_left = Node_To_Set_For.get_parent().focus_neighbour_left
 		Node_To_Set_For.focus_neighbour_right = Node_To_Set_For.get_parent().focus_neighbour_right
@@ -341,27 +383,30 @@ func Set_Focus_Neighbors(Focus_To_Set, Side_To_Set_For, Node_To_Set_For):
 		Node_To_Set_For.focus_next = Node_To_Set_For.get_parent().focus_next
 
 func Activate_Summon_Effects(Chosen_Card):
-	pass
+	var string_prefix = "c"
+	var func_name
+	
+	func_name = string_prefix + str(Chosen_Card.Passcode)
+	CardEffects.call(func_name, Chosen_Card)
 
-func Activate_Set_Card(Side_To_Set_For, Chosen_Card):
+func Activate_Set_Card(Side, Chosen_Card):
 	# Flip Step
 	GameData.Current_Step = "Flip"
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	
 	# Resolves card effect if card is activatable
 	if Chosen_Card.Type != "Trap" or (Chosen_Card.Type == "Trap" and Chosen_Card.Tokens > 0):
 		var string_prefix = "c"
 		var func_name = string_prefix + str(Chosen_Card.Passcode)
-		CardEffects.call(func_name)
+		CardEffects.call(func_name, Chosen_Card)
 		Chosen_Card.Is_Set = false
 		# Resets Effect_Active status to ensure card effect isn't triggered from Graveyard.
 		Chosen_Card.Effect_Active = false
 		
 		# Replaces current Equip card with activated card
 		if Chosen_Card.Attribute == "Equip":
-			var EquipSlot = get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "Equip" + Chosen_Card.Type)
-			var MoveTo = get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "Graveyard")
+			var EquipSlot = get_node("Playmat/CardSpots/NonHands/" + Side + "Equip" + Chosen_Card.Type)
 			var MoveFrom = get_node("Playmat/CardSpots/NonHands/" + GameData.CardFrom)
+			var MoveTo = get_node("Playmat/CardSpots/NonHands/" + Side + "Graveyard")
 			var New_Equip_Card
 			New_Equip_Card = MoveFrom.get_node(GameData.CardMoved)
 			
@@ -372,12 +417,29 @@ func Activate_Set_Card(Side_To_Set_For, Chosen_Card):
 				MoveTo.add_child(Old_Equip_Card)
 			MoveFrom.remove_child(New_Equip_Card)
 			EquipSlot.add_child(New_Equip_Card)
+		else: # Moves activated card to appropriate Graveyard
+			var MoveFrom = get_node("Playmat/CardSpots/NonHands/" + GameData.CardFrom)
+			var MoveTo = get_node("Playmat/CardSpots/NonHands/" + Side + "Graveyard")
+			MoveFrom.remove_child(Chosen_Card)
+			MoveTo.add_child(Chosen_Card)
+
+func Set_Attacks_To_Launch():
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	
+	# Adds Attack for Fighter, if present
+	if get_node("Playmat/CardSpots/NonHands/" + Side + "Fighter").get_child_count() > 0:
+		GameData.Attacks_To_Launch += 1
+	# Adds Attacks for each Reinforcer who can attack from Reinforcement Zone
+	for i in range(1, 4):
+		if get_node("Playmat/CardSpots/NonHands/" + Side + "R" + str(i)).get_child_count() > 0:
+			if get_node("Playmat/CardSpots/NonHands/" + Side + "R" + str(i)).get_child(0).Attack_As_Reinforcement:
+				GameData.Attacks_To_Launch += 1
 
 func Check_For_Targets():
 	var player = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
-	var Side_To_Set_For = "B" if GameData.Current_Turn == "Player" else "W"
+	var Side = "B" if GameData.Current_Turn == "Player" else "W"
 	
-	if get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "Fighter").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "R1").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "R2").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "R3").get_child_count() > 0:
+	if get_node("Playmat/CardSpots/NonHands/" + Side + "Fighter").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R1").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R2").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R3").get_child_count() > 0:
 		pass
 	else: # No Valid Targets. Attack will be Direct Attack
 		GameData.Target = player
@@ -386,39 +448,55 @@ func Check_For_Targets():
 func Resolve_Battle_Damage():
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
+	var Side = "B" if GameData.Current_Turn == "Player" else "W"
 	
 	if GameData.Attacker != null: # Ensures no error is thrown when func is called with empty player field.
+		GameData.Attacks_To_Launch -= 1
 		if GameData.Target == enemy:
 			enemy.LP -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus)
+			# Update HUD
+			get_node("HUD_" + Side).Update_Data(enemy)
 			if enemy.LP <= 0:
 				GameData.Victor = player.Name
 		else:
 			if GameData.Target.Invincible == false:
 				GameData.Target.Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus)
+				GameData.Target.Update_Data()
 			
 			# Capture Step
 			if GameData.Target.Health <= 0:
 				GameData.Current_Step = "Capture"
-				GameData.Cards_Captured_This_Turn.append(GameData.Target)
-				# Move captured card to player MedBay (NOT COMPLETED).
-				print(GameData.Target.Name + "was captured.")
-				enemy.Current_Fighter = "None"
-			else:
-				print(GameData.Target.Name + " survived with " + str(GameData.Target.Health) + " HP")
+				Capture_Card(GameData.Target, GameData.Target.get_parent())
+				Update_Game_State("Step")
 
-func Discard_Card(Side_To_Set_For):
-	var Chosen_Card # Indicates the card object that is being played.
+func Capture_Card(Card_Captured, slot_name):
+	var targeted_player = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
+	var Destination_MedBay = $Playmat/CardSpots/NonHands/WMedBay if GameData.Current_Turn == "Player" else $Playmat/CardSpots/NonHands/BMedBay
+	GameData.Current_Step = "Capture"
+	GameData.Cards_Captured_This_Turn.append(Card_Captured)
+	
+	# Move captured card to appropriate MedBay
+	slot_name.remove_child(Card_Captured)
+	Destination_MedBay.add_child(Card_Captured)
+	
+	# Reset ATK_Bonus, Health, and Health_Bonus values to appropriate amounts & Update HUD
+	Card_Captured.ATK_Bonus = 0
+	Card_Captured.Health = Card_Captured.Revival_Health
+	Card_Captured.Health_Bonus = 0
+	Card_Captured.Update_Data()
+	
+	# Update Current_Fighter value (if applicable)
+	if "Fighter" in slot_name:
+		targeted_player.Current_Fighter = "None"
+
+func Discard_Card(Side):
 	var MoveFrom # Grabs the origin parent of the selected scene instance.
 	var MoveTo # Grabs the destination parent of the selected scene instance.
 	var CardMoved # From GameData singleton, indicates the specific instance of the SmallCard scene that has been selected.
 	
-	# ID Card Discarded
-	if GameData.CardFrom == Side_To_Set_For + "Hand":
-		Chosen_Card = self.get_node("Playmat/CardSpots/" + Side_To_Set_For + "HandScroller/" + Side_To_Set_For + "Hand/" + GameData.CardMoved)
-	
 	# Prep variables to reposition cards on field & scene tree
-	MoveFrom = self.get_node("Playmat/CardSpots/" + Side_To_Set_For + "HandScroller/" + Side_To_Set_For + "Hand")
-	MoveTo = self.get_node("Playmat/CardSpots/NonHands/" + Side_To_Set_For + "MedBay")
+	MoveFrom = self.get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
+	MoveTo = self.get_node("Playmat/CardSpots/NonHands/" + Side + "MedBay")
 	CardMoved = MoveFrom.get_node(GameData.CardMoved)
 	
 	# Fixes bug regarding auto-updating of rect_pos of selected scene when moving from slot to slot.
@@ -431,8 +509,8 @@ func Discard_Card(Side_To_Set_For):
 	
 	# Matches focuses of child to new parent.
 	var Moved = MoveTo.get_node(GameData.CardMoved)
-	Set_Focus_Neighbors("Field",Side_To_Set_For,Moved)
-	Set_Focus_Neighbors("Hand",Side_To_Set_For,Moved)
+	Set_Focus_Neighbors("Field",Side,Moved)
+	Set_Focus_Neighbors("Hand",Side,Moved)
 	
 	# Resets GameData variables for next movement.
 	Reset_Reposition_Card_Variables()
@@ -452,7 +530,6 @@ func Conduct_Opening_Phase():
 func Conduct_Standby_Phase():
 	# Standby Phase (Effect -> Token)
 	Set_Hero_Card_Effect_Status() # Sets the Effect_Active of all Periodic-style Hero cards on the turn player's field == True
-	Resolve_Card_Effects()
 	Update_Game_State("Step")
 	Add_Tokens()
 	Update_Game_State("Phase")
@@ -471,13 +548,13 @@ func Conduct_Battle_Phase():
 	pass
 
 func Conduct_End_Phase():
+	# End Phase (Discard -> Reload -> Effect -> Victory -> End)
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	var Side_To_Set_For = "W" if GameData.Current_Turn == "Player" else "B"
 	
 	# Discard Step (Hand Limit = 5)
 	if get_node("Playmat/CardSpots/" + Side_To_Set_For + "HandScroller/" + Side_To_Set_For + "Hand").get_child_count() > 5:
-		print("Please discard a card")
 		return
 	
 	# Reload Step
@@ -507,77 +584,73 @@ func Conduct_End_Phase():
 	Update_Game_State("Step")
 
 func Update_Game_State(State_To_Change):
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Repositionable_Cards = get_node("Playmat/CardSpots/NonHands/" + Side + "Fighter").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R1").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R2").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R3").get_child_count()
+	
 	if State_To_Change == "Step":
-		if GameData.Current_Phase == "Opening Phase":
-			if GameData.Current_Step == "Start":
-				GameData.Current_Step = "Draw"
-			elif GameData.Current_Step == "Draw":
-				GameData.Current_Step = "Roll"
-		elif GameData.Current_Phase == "Standby Phase":
-			GameData.Current_Step = "Token"
-		elif GameData.Current_Phase == "Main Phase":
-			if GameData.Current_Step == "Reposition":
-				GameData.Current_Step = "Summon/Set"
-			elif GameData.Current_Step == "Summon/Set":
-				GameData.Current_Step = "Flip"
-		elif GameData.Current_Phase == "Battle Phase":
-			if GameData.Current_Step == "Selection":
-				GameData.Current_Step = "Target"
-			elif GameData.Current_Step == "Target":
-				GameData.Current_Step = "Damage"
-				Resolve_Battle_Damage()
-			elif GameData.Current_Step == "Damage":
-				GameData.Current_Step = "Capture"
-			elif GameData.Current_Step == "Capture":
-				GameData.Current_Step = "Repeat"
-		elif GameData.Current_Phase == "End Phase":
-			if GameData.Current_Step == "Discard":
-				GameData.Current_Step = "Reload"
-			elif GameData.Current_Step == "Reload":
-				GameData.Current_Step = "Effect"
-			elif GameData.Current_Step == "Effect":
-				GameData.Current_Step = "Victory"
-			elif GameData.Current_Step == "Victory":
-				GameData.Current_Step = "End"
+		# Call required funcs at appropriate Steps (and contain step values within bounds of current Phase)
+		if STEPS.find(GameData.Current_Step) == 10: # Current Step is Damage Step
+			Resolve_Battle_Damage()
+		if STEPS.find(GameData.Current_Step) == 13 and get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > 5: # Ensures cards are discarded when appropriate
+			return
+		if GameData.Current_Step in EFFECT_STEPS: # Ensures that Card Effects are resolved when appropriate
+			Resolve_Card_Effects()
+			if GameData.Current_Step == "Selection": # Ensures that Attacks to Launch is set at start of each Battle Phase
+				Set_Attacks_To_Launch()
+		
+		# Update Step value
+		if STEPS.find(GameData.Current_Step) + 1 > len(STEPS): # Resets index to start of New Turn.
+			GameData.Current_Step = STEPS[0]
+		elif STEPS.find(GameData.Current_Step) in PHASE_THRESHOLDS: # Ensures that you can't advance to a Step that belongs to a different Phase
+			return
+		elif STEPS.find(GameData.Current_Step) == 3 and GameData.Current_Phase == "End Phase": # Fixes bug where Step state would reset to Standby Phases' Effect Step (instead of End Phases' Effect Step)
+			GameData.Current_Step = STEPS[16]
+		else:
+			GameData.Current_Step = STEPS[STEPS.find(GameData.Current_Step) + 1]
+			if STEPS.find(GameData.Current_Step) == 12 and GameData.Attacks_To_Launch == 0: # Repeat step (and, by extention, the Battle Phase) is complete as there are no more attacks to launch. Will end turn automatically if no Discards are required
+				Update_Game_State("Turn")
 	
-	elif State_To_Change == "Phase":
-		if GameData.Current_Phase == "Start of Game" or GameData.Current_Phase == "End Phase":
-			GameData.Current_Phase = "Opening Phase"
-			GameData.Current_Step = "Start"
-		elif GameData.Current_Phase == "Opening Phase":
-			GameData.Current_Phase = "Standby Phase"
-			GameData.Current_Step = "Effect"
-		elif GameData.Current_Phase == "Standby Phase":
-			GameData.Current_Phase = "Main Phase"
-			GameData.Current_Step = "Reposition"
-		elif GameData.Current_Phase == "Main Phase":
-			if GameData.Turn_Counter > 1: # Skips Battle Phase on first turn of Battle
-				GameData.Current_Phase = "Battle Phase"
-				GameData.Current_Step = "Selection"
-				Resolve_Card_Effects()
-			else:
-				GameData.Current_Phase = "End Phase"
-				GameData.Current_Step = "Discard"
-		elif GameData.Current_Phase == "Battle Phase":
-			GameData.Current_Phase = "End Phase"
-			GameData.Current_Step = "Discard"
+	# Update Phase value
+	if State_To_Change == "Phase":
+		if PHASES.find(GameData.Current_Phase) + 1 >= len(PHASES): # Resets index to start of New Turn.
+			return
+		elif PHASES.find(GameData.Current_Phase) == 1 and Repositionable_Cards == 0: # Skips Reposition Step on first turn of game
+			GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 1]
+			GameData.Current_Step = STEPS[6]
+		elif GameData.Turn_Counter == 1 and PHASES.find(GameData.Current_Phase) == 2: # Skips Battle Phase on first turn of game
+			GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 2]
+			GameData.Current_Step = STEPS[13]
+		else:
+			GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 1]
+			GameData.Current_Step = STEPS[PHASE_THRESHOLDS[PHASES.find(GameData.Current_Phase) - 1] + 1]
 	
+	# Update Turn value
 	elif State_To_Change == "Turn":
-		GameData.Cards_Captured_This_Turn.clear()
-		GameData.Turn_Counter += 1
-		print("\n")
-		GameData.Current_Phase = "Opening Phase"
-		GameData.Current_Step = "Start"
-		Set_Turn_Player()
-		# Opening & Standby Phases called due to currently requiring no user input
-		Conduct_Opening_Phase()
-		Conduct_Standby_Phase()
-	
-	if GameData.Current_Step != "End":
-		Display_Game_State()
+		# Complete all incomplete Phases/Steps for remainder of Turn
+		while GameData.Current_Phase != "End Phase":
+			if STEPS.find(GameData.Current_Step) in PHASE_THRESHOLDS:
+				Update_Game_State("Phase")
+			else:
+				Update_Game_State("Step")
+		
+		# Check if Discard Required to avoid exceeding Hand Size Limit
+		if get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() <= 5:
+			Conduct_End_Phase()
+			GameData.Cards_Captured_This_Turn.clear()
+			GameData.Turn_Counter += 1
+			GameData.Current_Phase = PHASES[0]
+			GameData.Current_Step = STEPS[0]
+			Set_Turn_Player()
 
-func Display_Game_State(): # Equivalent to Print_Duel_State func in Prototype version.
-	print(GameData.Current_Phase + "-" + GameData.Current_Step)
+			# Flip Field
+			_on_SwitchSides_pressed()
+
+			# Opening & Standby Phases called due to currently requiring no user input
+			Conduct_Opening_Phase()
+			Conduct_Standby_Phase()
+
+	# Update HUD
+	$HUD_GameState.Update_Data()
 
 func Setup_Game():
 	# Populates & Shuffles Player/Enemy Decks
@@ -590,11 +663,10 @@ func Setup_Game():
 	Choose_Starting_Player()
 	
 	# Draw Opening Hands
-	Draw_Card(GameData.Current_Turn, 5)
+	Draw_Card(GameData.Current_Turn, 35)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
 	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
-	Update_Game_State("Phase")
 	
 	# Set Turn Player
 	Set_Turn_Player()
@@ -639,9 +711,14 @@ func _on_Card_Slot_pressed(slot_name):
 		GameData.CardCounter += 1
 		TechZone.add_child(InstanceCard)
 	else:
-		if "Hand" in GameData.CardFrom and GameData.Current_Step == "Summon/Set":
+		if "Hand" in GameData.CardFrom and GameData.Current_Step == "Summon/Set" and GameData.Summon_Mode != "":
+			GameData.Summon_Mode = ""
 			GameData.CardTo = slot_name
 			SignalBus.emit_signal("Play_Card", GameData.CardFrom.left(1))
+		elif GameData.Current_Step == "Reposition":
+			if GameData.CardFrom != "":
+				GameData.CardTo = slot_name
+				SignalBus.emit_signal("Reposition_Field_Cards", GameData.CardTo.left(1))
 
 func _on_Next_Step_pressed():
 	Update_Game_State("Step")

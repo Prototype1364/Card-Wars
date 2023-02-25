@@ -17,3 +17,5 @@ signal Activate_Set_Card
 signal Check_For_Targets
 
 signal Discard_Card
+
+signal Update_GameState

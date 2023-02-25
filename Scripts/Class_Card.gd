@@ -14,6 +14,7 @@ var ATK_Bonus # Used to keep track of Equip card bonuses specifically.
 var Cost
 var Health
 var Health_Bonus # Used to keep track of Equip card bonuses specifically.
+var Revival_Health # HP that a card resets to upon Capture.
 var Special_Edition_Text
 var Rarity
 var Passcode
@@ -42,6 +43,7 @@ func _init(Card_Frame, Card_Art, Card_Name, Card_Type, Card_EffectType, Card_Att
 	Cost = Card_Cost
 	Health = Card_Health
 	Health_Bonus = Card_Health_Bonus
+	Revival_Health = Card_Health
 	Special_Edition_Text = Card_Special_Edition_Text
 	Rarity = Card_Rarity
 	Passcode = Card_Passcode

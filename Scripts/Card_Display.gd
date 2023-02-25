@@ -20,7 +20,7 @@ func LookAtCard(FrameData, ArtData, NameData, AttackData, CostData, HealthData):
 	self.visible = true
 	
 	if SelectedCard != null:
-		if FrameData != "Special":
+		if FrameData != "Special": # Card is NOT Advance Tech card
 			var Frame_Texture = load("res://Assets/Cards/Frame/Large_Frame_" + FrameData + ".png")
 			var Cost_Texture = load("res://Assets/Cards/Cost/Large/Large_Cost_" + FrameData + "_" + str(CostData) + ".png")
 			var Text_Outline_Color
@@ -35,26 +35,33 @@ func LookAtCard(FrameData, ArtData, NameData, AttackData, CostData, HealthData):
 			elif FrameData == "Tech":
 				Text_Outline_Color = Color("1f8742")
 			
-			if FrameData != "Special": # Card is NOT Advance Tech card
-				self.get_node("Frame").texture = Frame_Texture
-				self.get_node("CostContainer/Cost").texture = Cost_Texture
-				self.get_node("NameContainer/Name").set("custom_colors/font_outline_modulate", Text_Outline_Color)
-				self.get_node("Description").set("custom_colors/font_outline_modulate", Text_Outline_Color)
-				self.get_node("Attack").set("custom_colors/font_outline_modulate", Text_Outline_Color)
-				self.get_node("Health").set("custom_colors/font_outline_modulate", Text_Outline_Color)
+			$Frame.texture = Frame_Texture
+			$CostContainer/Cost.texture = Cost_Texture
+			$NameContainer/Name.text = NameData
+			$NameContainer/Name.set("custom_colors/font_outline_modulate", Text_Outline_Color)
+			$Description.set("custom_colors/font_outline_modulate", Text_Outline_Color)
+			$Attack.set("custom_colors/font_outline_modulate", Text_Outline_Color)
+			$Health.set("custom_colors/font_outline_modulate", Text_Outline_Color)
+			if SelectedCard.Short_Description == null:
+				$Description.text = "This card has no Short Description."
+			else:
+				$Description.text = SelectedCard.Short_Description
+			if SelectedCard.Type == "Normal" or SelectedCard.Type == "Hero":
+				$Attack.text = str(max(AttackData, 0))
+				$Health.text = str(max(HealthData, 0))
+			else:
+				$Attack.text = ""
+				$Health.text = ""
 		else: # Card is Advance Tech card
-			self.get_node("Frame").texture = load("res://Assets/Cards/Frame/Large_Advance_Tech_Card.png")
+			$Frame.texture = load("res://Assets/Cards/Frame/Large_Advance_Tech_Card.png")
+			$CostContainer/Cost.texture = null
+			$NameContainer/Name.text = ""
+			$Description.text = ""
+			$Attack.text = ""
+			$Health.text = ""
 		
-		# Gets info from selected card and transfer it to big card proportions.
 		# ImageContainer/CardImage of BigCard scene MUST REMAIN as a TEXTURE_BUTTON node type as it allows for auto-expansion of image proportions, thus cutting Eric's card art work in half.
-		self.get_node("ArtContainer/Art").texture = ArtData
-		self.get_node("NameContainer/Name").text = NameData
-		if SelectedCard.Short_Description == null:
-			self.get_node("Description").text = "This card has no Short Description."
-		else:
-			self.get_node("Description").text = SelectedCard.Short_Description
-		self.get_node("Attack").text = str(AttackData)
-		self.get_node("Health").text = str(HealthData)
+		$ArtContainer/Art.texture = ArtData
 
 func NotLookingAtCard():
 	self.visible = false
