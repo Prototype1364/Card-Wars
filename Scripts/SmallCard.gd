@@ -120,7 +120,10 @@ func _on_FocusSensor_focus_exited():
 	self.defocusing()
 
 func _on_FocusSensor_pressed():
-	if GameData.Current_Step == "Reposition":
+	if GameData.Yield_Mode == true:
+		GameData.ChosenCard = self
+		SignalBus.emit_signal("Card_Effect_Selection_Yield_Release", self)
+	elif GameData.Current_Step == "Reposition":
 		if GameData.CardFrom == "":
 			GameData.CardFrom = self.get_parent().name
 			GameData.CardMoved = self.name

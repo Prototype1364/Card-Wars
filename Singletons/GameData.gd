@@ -15,8 +15,8 @@ var Cards_Captured_This_Turn = []
 var Attacks_To_Launch = 0
 var Attacker
 var Target
-var Player = Duelist.new("Player",100,50,0,0,0,0,0,0,0,0,[],[],[],[],[],[],[],[],[],[],"None")
-var Enemy = Duelist.new("Enemy",100,50,0,0,0,0,0,0,0,0,[],[],[],[],[],[],[],[],[],[],"None")
+var Player = Duelist.new("Player",100,0,0,0,0,0,0,0,0,0,[],[],[],[],[],[],[],[],[],[],"None")
+var Enemy = Duelist.new("Enemy",100,0,0,0,0,0,0,0,0,0,[],[],[],[],[],[],[],[],[],[],"None")
 
 # Focus Card variables
 var FocusedCardName = ""
@@ -28,6 +28,10 @@ var CardFrom = ""
 var CardTo = ""
 var CardMoved = ""
 var CardSwitched = ""
+
+# Card Effect Resolution variables
+var Yield_Mode = false
+var ChosenCard
 
 # Variable used to name Card nodes
 var CardCounter = 0

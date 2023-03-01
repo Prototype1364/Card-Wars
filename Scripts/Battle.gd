@@ -614,7 +614,7 @@ func Update_Game_State(State_To_Change):
 	if State_To_Change == "Phase":
 		if PHASES.find(GameData.Current_Phase) + 1 >= len(PHASES): # Resets index to start of New Turn.
 			return
-		elif PHASES.find(GameData.Current_Phase) == 1 and Repositionable_Cards == 0: # Skips Reposition Step on first turn of game
+		elif PHASES.find(GameData.Current_Phase) == 1 and Repositionable_Cards == 0: # Skips Reposition Step when there are no cards to Reposition
 			GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 1]
 			GameData.Current_Step = STEPS[6]
 		elif GameData.Turn_Counter == 1 and PHASES.find(GameData.Current_Phase) == 2: # Skips Battle Phase on first turn of game
@@ -622,6 +622,7 @@ func Update_Game_State(State_To_Change):
 			GameData.Current_Step = STEPS[13]
 		else:
 			GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 1]
+			print("Phase Conversion: " + str(STEPS[PHASE_THRESHOLDS[PHASES.find(GameData.Current_Phase) - 1] + 1]))
 			GameData.Current_Step = STEPS[PHASE_THRESHOLDS[PHASES.find(GameData.Current_Phase) - 1] + 1]
 	
 	# Update Turn value
@@ -651,6 +652,9 @@ func Update_Game_State(State_To_Change):
 
 	# Update HUD
 	$HUD_GameState.Update_Data()
+	
+	# Print DEBUG
+	print(GameData.Current_Phase + " - " + GameData.Current_Step)
 
 func Setup_Game():
 	# Populates & Shuffles Player/Enemy Decks
@@ -663,7 +667,7 @@ func Setup_Game():
 	Choose_Starting_Player()
 	
 	# Draw Opening Hands
-	Draw_Card(GameData.Current_Turn, 35)
+	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
 	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"

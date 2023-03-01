@@ -1,5 +1,7 @@
 extends Node
 
+var Has_Yielded = false
+
 func _ready():
 	pass
 
@@ -32,26 +34,33 @@ func Get_Field_Card_Data(Zone):
 				Reinforcers.append(Reinforcer_Path_Opponent.get_child(0))
 		return Reinforcers
 
+func Check_Yield_Status():
+	if Has_Yielded == false:
+		Has_Yielded = true
+		return true
+	else:
+		return false
+
 func c42489363(card): # Activate Tech (Special)
-	print(card.Name)
+	pass
 
 func c61978912(card): # King Arthur (Hero)
-	print(card.Name)
+	pass
 
 func c26432104(card): # Merlin (Hero)
-	print(card.Name)
+	pass
 
 func c79248843(card): # Knight of the Round Table (Hero)
-	print(card.Name)
+	pass
 
 func c28269385(card): # Morgan le Fay (Hero)
-	print(card.Name)
+	pass
 
 func c67892655(card): # Lancelot (Hero)
-	print(card.Name)
+	pass
 
 func c22716806(card): # Mordred (Hero)
-	print(card.Name)
+	pass
 
 func c15178943(card): # Sword (Magic/Equip)
 	var Fighter = Get_Field_Card_Data("Fighter")
@@ -89,76 +98,91 @@ func c53003369(card): # Excalibur (Magic/Equip)
 					Reinforcers_Opponent[i].Update_Data()
 
 func c13925137(card): # Morale Boost (Magic/Equip)
-	print(card.Name)
+	if "EquipMagic" in card.get_parent().name and card.Effect_Active:
+		GameData.Yield_Mode = true
+		card.Effect_Active = false
+	
+		# Check if card selected is first selection
+		if Check_Yield_Status():
+			yield(SignalBus, "Card_Effect_Selection_Yield_Release")
+			Has_Yielded = false
+			
+			# Resolve card's Effect
+			GameData.ChosenCard.Attack += 1
+			GameData.ChosenCard.Update_Data()
+			
+			# Reset GameData variables for next card effect
+			GameData.Yield_Mode = false
+			GameData.ChosenCard = null
 
 func c17369913(card): # Last Stand (Magic/Equip)
-	print(card.Name)
+	pass
 
 func c42151268(card): # Blade Song (Magic)
-	print(card.Name)
+	pass
 
 func c39573503(card): # Runetouched (Magic)
-	print(card.Name)
+	pass
 
 func c74496062(card): # Miraculous Recovery (Magic)
-	print(card.Name)
+	pass
 
 func c73282505(card): # Heart of the Underdog (Trap)
-	print(card.Name)
+	pass
 
 func c58494934(card): # Disable (Trap/Equip)
-	print(card.Name)
+	pass
 
 func c82697165(card): # The Wheel (Tech)
-	print(card.Name)
+	pass
 
 func c50316560(card): # Hades (Hero)
-	print(card.Name)
+	pass
 
 func c72430176(card): # Zeus (Hero)
-	print(card.Name)
+	pass
 
 func c25486317(card): # Ares (Hero)
-	print(card.Name)
+	pass
 
 func c47338587(card): # Aphrodite (Hero)
-	print(card.Name)
+	pass
 
 func c93958804(card): # Hephaestus (Hero)
-	print(card.Name)
+	pass
 
 func c34658370(card): # Poseidon (Hero)
-	print(card.Name)
+	pass
 
 func c31289091(card): # Hera (Hero)
-	print(card.Name)
+	pass
 
 func c80932559(card): # Demeter (Hero)
-	print(card.Name)
+	pass
 
 func c96427990(card): # Athena (Hero)
-	print(card.Name)
+	pass
 
 func c86042533(card): # Artemis (Hero)
-	print(card.Name)
+	pass
 
 func c97850313(card): # Hermes (Hero)
-	print(card.Name)
+	pass
 
 func c15996549(card): # Hestia (Hero)
-	print(card.Name)
+	pass
 
 func c17171263(card): # Dionysus (Hero)
-	print(card.Name)
+	pass
 
 func c68754341(card): # Prayer (Magic)
-	print(card.Name)
+	pass
 
 func c68535761(card): # Ressurection (Magic)
-	print(card.Name)
+	pass
 
 func c83893341(card): # Deep Pit (Trap)
-	print(card.Name)
+	pass
 
 func c30093650(card): # Fire (Tech)
-	print(card.Name)
+	pass

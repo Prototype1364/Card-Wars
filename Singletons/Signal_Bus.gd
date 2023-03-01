@@ -19,3 +19,5 @@ signal Check_For_Targets
 signal Discard_Card
 
 signal Update_GameState
+
+signal Card_Effect_Selection_Yield_Release
