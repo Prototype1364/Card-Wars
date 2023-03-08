@@ -105,7 +105,7 @@ func Set_Turn_Player():
 
 func Draw_Card(Turn_Player, Cards_To_Draw = 1):
 	# Draw Step
-	GameData.Current_Step = "Draw"
+#	GameData.Current_Step = "Draw"
 	
 	# Draw card to appropriate Hand.
 	for _i in range(Cards_To_Draw):
@@ -121,7 +121,7 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1):
 
 func Dice_Roll():
 	# Roll Step
-	GameData.Current_Step = "Roll"
+#	GameData.Current_Step = "Roll"
 	
 	# Get Result of Dice Roll
 	var rng = RandomNumberGenerator.new()
@@ -184,7 +184,7 @@ func Resolve_Card_Effects():
 
 func Add_Tokens():
 	# Token Step
-	GameData.Current_Step = "Token"
+#	GameData.Current_Step = "Token"
 	
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	
@@ -443,7 +443,10 @@ func Check_For_Targets():
 		pass
 	else: # No Valid Targets. Attack will be Direct Attack
 		GameData.Target = player
-	Update_Game_State("Step")
+	GameData.Current_Step = "Target"
+	
+	# Update HUD
+	$HUD_GameState.Update_Data()
 
 func Resolve_Battle_Damage():
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
@@ -467,12 +470,14 @@ func Resolve_Battle_Damage():
 			if GameData.Target.Health <= 0:
 				GameData.Current_Step = "Capture"
 				Capture_Card(GameData.Target, GameData.Target.get_parent())
-				Update_Game_State("Step")
+			
+			# Update HUD
+			$HUD_GameState.Update_Data()
 
 func Capture_Card(Card_Captured, slot_name):
 	var targeted_player = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	var Destination_MedBay = $Playmat/CardSpots/NonHands/WMedBay if GameData.Current_Turn == "Player" else $Playmat/CardSpots/NonHands/BMedBay
-	GameData.Current_Step = "Capture"
+#	GameData.Current_Step = "Capture"
 	GameData.Cards_Captured_This_Turn.append(Card_Captured)
 	
 	# Move captured card to appropriate MedBay
@@ -551,14 +556,12 @@ func Conduct_End_Phase():
 	# End Phase (Discard -> Reload -> Effect -> Victory -> End)
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
-	var Side_To_Set_For = "W" if GameData.Current_Turn == "Player" else "B"
 	
-	# Discard Step (Hand Limit = 5)
-	if get_node("Playmat/CardSpots/" + Side_To_Set_For + "HandScroller/" + Side_To_Set_For + "Hand").get_child_count() > 5:
-		return
+	# Discard Step (Hand Limit = 5 [logic handled in Update_Game_Turn() func])
+	Resolve_Card_Effects() # May/may not be needed depending on if Discard step remains an EFFECT step.
 	
 	# Reload Step
-	Update_Game_State("Step")
+	GameData.Current_Step = "Reload"
 	if len(player.Deck) == 0:
 		if len(player.MedicalBay) > 0:
 			# Move cards from player's MedBay to Deck
@@ -570,91 +573,108 @@ func Conduct_End_Phase():
 			player.Deck.shuffle()
 	
 	# Effect Step
-	Update_Game_State("Step")
+	GameData.Current_Step = "Effect"
 	Resolve_Card_Effects()
 	
+	
 	# Victory Step
-	Update_Game_State("Step")
+	GameData.Current_Step = "Victory"
 	if len(player.Deck) == 0 or player.LP <= 0:
 		GameData.Victor = enemy.Name
 		print("VICTORY")
 		return
 	
 	# End Step
-	Update_Game_State("Step")
+	GameData.Current_Step = "End"
 
 func Update_Game_State(State_To_Change):
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Repositionable_Cards = get_node("Playmat/CardSpots/NonHands/" + Side + "Fighter").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R1").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R2").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R3").get_child_count()
-	
 	if State_To_Change == "Step":
-		# Call required funcs at appropriate Steps (and contain step values within bounds of current Phase)
-		if STEPS.find(GameData.Current_Step) == 10: # Current Step is Damage Step
-			Resolve_Battle_Damage()
-		if STEPS.find(GameData.Current_Step) == 13 and get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > 5: # Ensures cards are discarded when appropriate
-			return
-		if GameData.Current_Step in EFFECT_STEPS: # Ensures that Card Effects are resolved when appropriate
-			Resolve_Card_Effects()
-			if GameData.Current_Step == "Selection": # Ensures that Attacks to Launch is set at start of each Battle Phase
-				Set_Attacks_To_Launch()
-		
-		# Update Step value
-		if STEPS.find(GameData.Current_Step) + 1 > len(STEPS): # Resets index to start of New Turn.
-			GameData.Current_Step = STEPS[0]
-		elif STEPS.find(GameData.Current_Step) in PHASE_THRESHOLDS: # Ensures that you can't advance to a Step that belongs to a different Phase
-			return
-		elif STEPS.find(GameData.Current_Step) == 3 and GameData.Current_Phase == "End Phase": # Fixes bug where Step state would reset to Standby Phases' Effect Step (instead of End Phases' Effect Step)
-			GameData.Current_Step = STEPS[16]
-		else:
-			GameData.Current_Step = STEPS[STEPS.find(GameData.Current_Step) + 1]
-			if STEPS.find(GameData.Current_Step) == 12 and GameData.Attacks_To_Launch == 0: # Repeat step (and, by extention, the Battle Phase) is complete as there are no more attacks to launch. Will end turn automatically if no Discards are required
-				Update_Game_State("Turn")
-	
-	# Update Phase value
-	if State_To_Change == "Phase":
-		if PHASES.find(GameData.Current_Phase) + 1 >= len(PHASES): # Resets index to start of New Turn.
-			return
-		elif PHASES.find(GameData.Current_Phase) == 1 and Repositionable_Cards == 0: # Skips Reposition Step when there are no cards to Reposition
-			GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 1]
-			GameData.Current_Step = STEPS[6]
-		elif GameData.Turn_Counter == 1 and PHASES.find(GameData.Current_Phase) == 2: # Skips Battle Phase on first turn of game
-			GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 2]
-			GameData.Current_Step = STEPS[13]
-		else:
-			GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 1]
-			print("Phase Conversion: " + str(STEPS[PHASE_THRESHOLDS[PHASES.find(GameData.Current_Phase) - 1] + 1]))
-			GameData.Current_Step = STEPS[PHASE_THRESHOLDS[PHASES.find(GameData.Current_Phase) - 1] + 1]
-	
-	# Update Turn value
+		Update_Game_Step()
+	elif State_To_Change == "Phase":
+		Update_Game_Phase()
 	elif State_To_Change == "Turn":
-		# Complete all incomplete Phases/Steps for remainder of Turn
-		while GameData.Current_Phase != "End Phase":
-			if STEPS.find(GameData.Current_Step) in PHASE_THRESHOLDS:
-				Update_Game_State("Phase")
-			else:
-				Update_Game_State("Step")
-		
-		# Check if Discard Required to avoid exceeding Hand Size Limit
-		if get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() <= 5:
-			Conduct_End_Phase()
-			GameData.Cards_Captured_This_Turn.clear()
-			GameData.Turn_Counter += 1
-			GameData.Current_Phase = PHASES[0]
-			GameData.Current_Step = STEPS[0]
-			Set_Turn_Player()
-
-			# Flip Field
-			_on_SwitchSides_pressed()
-
-			# Opening & Standby Phases called due to currently requiring no user input
-			Conduct_Opening_Phase()
-			Conduct_Standby_Phase()
+		Update_Game_Turn()
 
 	# Update HUD
 	$HUD_GameState.Update_Data()
 	
 	# Print DEBUG
 	print(GameData.Current_Phase + " - " + GameData.Current_Step)
+
+func Update_Game_Step():
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	
+	# Call required funcs at appropriate Steps (and contain step values within bounds of current Phase)
+	if STEPS.find(GameData.Current_Step) == 10: # Current Step is Damage Step
+		Resolve_Battle_Damage()
+	if STEPS.find(GameData.Current_Step) == 13 and get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > 5: # Ensures cards are discarded when appropriate
+		return
+	if GameData.Current_Step in EFFECT_STEPS: # Ensures that Card Effects are resolved when appropriate
+		Resolve_Card_Effects()
+	
+	# Update Step value
+	if STEPS.find(GameData.Current_Step) + 1 > len(STEPS): # Resets index to start of New Turn.
+		GameData.Current_Step = STEPS[0]
+	elif STEPS.find(GameData.Current_Step) in PHASE_THRESHOLDS: # Ensures that you can't advance to a Step that belongs to a different Phase
+		return
+	elif STEPS.find(GameData.Current_Step) == 3 and GameData.Current_Phase == "End Phase": # Fixes bug where Step state would reset to Standby Phases' Effect Step (instead of End Phases' Effect Step)
+		GameData.Current_Step = STEPS[16]
+	elif STEPS.find(GameData.Current_Step) == 11 and GameData.Attacks_To_Launch == 0:
+		GameData.Current_Phase = PHASES[4]
+		GameData.Current_Step = STEPS[13]
+	else:
+		GameData.Current_Step = STEPS[STEPS.find(GameData.Current_Step) + 1]
+
+func Update_Game_Phase():
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Repositionable_Cards = get_node("Playmat/CardSpots/NonHands/" + Side + "Fighter").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R1").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R2").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R3").get_child_count()
+	
+	if PHASES.find(GameData.Current_Phase) + 1 >= len(PHASES): # Ensures game doesn't crash when trying to advance to a non-existent Phase.
+		return
+	elif PHASES.find(GameData.Current_Phase) == 1 and Repositionable_Cards == 0: # Skips Reposition Step when there are no cards to Reposition
+		GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 1]
+		GameData.Current_Step = STEPS[6]
+	elif GameData.Turn_Counter == 1 and PHASES.find(GameData.Current_Phase) == 2: # Skips Battle Phase on first turn of game
+		GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 2]
+		GameData.Current_Step = STEPS[13]
+	else:
+		GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 1]
+		print("Phase Conversion: " + str(STEPS[PHASE_THRESHOLDS[PHASES.find(GameData.Current_Phase) - 1] + 1]))
+		GameData.Current_Step = STEPS[PHASE_THRESHOLDS[PHASES.find(GameData.Current_Phase) - 1] + 1]
+	
+	# Ensures that Attacks to Launch is set at start of each Battle Phase
+	if GameData.Current_Phase == "Battle Phase":
+		Set_Attacks_To_Launch()
+
+func Update_Game_Turn():
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	
+	# Complete all incomplete Phases/Steps for remainder of Turn
+	while GameData.Current_Phase != "End Phase":
+		if STEPS.find(GameData.Current_Step) in PHASE_THRESHOLDS:
+			Update_Game_Phase()
+		else:
+			Update_Game_Step()
+	
+	# Check if Discard Required to avoid exceeding Hand Size Limit
+	if get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() <= 5:
+		Conduct_End_Phase()
+		if GameData.Victor == null:
+			GameData.Cards_Captured_This_Turn.clear()
+			GameData.Turn_Counter += 1
+			GameData.Current_Phase = PHASES[0]
+			GameData.Current_Step = STEPS[0]
+			GameData.Attacks_To_Launch = 0
+			print(GameData.Current_Phase + " - " + GameData.Current_Step)
+			Set_Turn_Player()
+			# Flip Field
+			_on_SwitchSides_pressed()
+
+			# Opening & Standby Phases called due to currently requiring no user input
+			Conduct_Opening_Phase()
+			Conduct_Standby_Phase()
+		else: # Eventually this'll call a Show_Victory_Screen() func.
+			pass
 
 func Setup_Game():
 	# Populates & Shuffles Player/Enemy Decks
