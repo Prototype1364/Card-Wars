@@ -453,7 +453,7 @@ func Resolve_Battle_Damage():
 	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	var Side = "B" if GameData.Current_Turn == "Player" else "W"
 	
-	if GameData.Attacker != null: # Ensures no error is thrown when func is called with empty player field.
+	if GameData.Attacker != null and GameData.Target != null: # Ensures no error is thrown when func is called with empty player field.
 		GameData.Attacks_To_Launch -= 1
 		if GameData.Target == enemy:
 			enemy.LP -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus)
@@ -477,7 +477,6 @@ func Resolve_Battle_Damage():
 func Capture_Card(Card_Captured, slot_name):
 	var targeted_player = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	var Destination_MedBay = $Playmat/CardSpots/NonHands/WMedBay if GameData.Current_Turn == "Player" else $Playmat/CardSpots/NonHands/BMedBay
-#	GameData.Current_Step = "Capture"
 	GameData.Cards_Captured_This_Turn.append(Card_Captured)
 	
 	# Move captured card to appropriate MedBay
@@ -665,7 +664,8 @@ func Update_Game_Turn():
 			GameData.Current_Phase = PHASES[0]
 			GameData.Current_Step = STEPS[0]
 			GameData.Attacks_To_Launch = 0
-			print(GameData.Current_Phase + " - " + GameData.Current_Step)
+			GameData.Attacker = null
+			GameData.Target = null
 			Set_Turn_Player()
 			# Flip Field
 			_on_SwitchSides_pressed()
