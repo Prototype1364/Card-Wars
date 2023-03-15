@@ -104,9 +104,6 @@ func Set_Turn_Player():
 		GameData.Current_Turn = "Player" if GameData.Current_Turn == "Enemy" else "Enemy"
 
 func Draw_Card(Turn_Player, Cards_To_Draw = 1):
-	# Draw Step
-#	GameData.Current_Step = "Draw"
-	
 	# Draw card to appropriate Hand.
 	for _i in range(Cards_To_Draw):
 		var player = GameData.Player if Turn_Player == "Player" else GameData.Enemy
@@ -202,15 +199,26 @@ func Reposition_Field_Cards(Side):
 	var MoveTo # Reparents the selected scene instance only if said parent has no children (i.e. cannot multistack in Fighter slot).
 	var CardMoved # From GameData singleton, indicates the specific instance of the SmallCard scene that has been selected.
 	var CardSwitched # Indicates the card instance that got switched out of its spot (i.e. the one that was replaced by the CardMoved).
-	var MoveWithoutSwitching = true
+	var Non_Hand_Path = "Playmat/CardSpots/NonHands"
+	var Card_To_Check
+	var Slots_To_Avoid = ["Banished", "Graveyard", "MedBay", "Hand", "TechZone"]
 	
-	# Ensures that cards are not switched out of the MedBay, Graveyard, or Banished piles.
-	if ("Banished" in GameData.CardTo or "Graveyard" in GameData.CardTo or "MedBay" in GameData.CardTo) or ("Banished" in GameData.CardFrom or "Graveyard" in GameData.CardFrom or "MedBay" in GameData.CardFrom):
-		if "Banished" in GameData.CardFrom or "Graveyard" in GameData.CardFrom or "MedBay" in GameData.CardFrom:
+	# Ensures Godot doesn't crash when unable to assign variable value
+	if not "Hand" in GameData.CardFrom:
+		Card_To_Check = get_node(Non_Hand_Path + "/" + GameData.CardFrom).get_child(0)
+	else:
+		Reset_Reposition_Card_Variables()
+		return
+	
+	# Ensures that cards are not switched into/out of ineligible slots.
+	for slot in range(len(Slots_To_Avoid)):
+		if Slots_To_Avoid[slot] in GameData.CardTo or Slots_To_Avoid[slot] in GameData.CardFrom:
 			Reset_Reposition_Card_Variables()
 			return
-		else:
-			MoveWithoutSwitching = false
+	if "Equip" in GameData.CardTo:
+		if ("Magic" in GameData.CardTo and (Card_To_Check.Attribute != "Equip" or Card_To_Check.Type != "Magic")) or ("Trap" in GameData.CardTo and (Card_To_Check.Attribute != "Equip" or Card_To_Check.Type != "Trap")):
+			Reset_Reposition_Card_Variables()
+			return
 	# Sets MoveFrom/To variable values for repositioning.
 	if GameData.CardFrom == Side + "Hand":
 		MoveFrom = self.get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
@@ -237,7 +245,7 @@ func Reposition_Field_Cards(Side):
 			CardSwitched.rect_position.x = 0
 			CardSwitched.rect_position.y = 0
 		MoveFrom.remove_child(CardMoved)
-		if MoveWithoutSwitching == true and CardSwitched != null: # Ensures switching only happens when performing a valid switch.
+		if CardSwitched != null: # Ensures switching only happens when performing a valid switch.
 			MoveTo.remove_child(CardSwitched)
 			MoveFrom.add_child(CardSwitched)
 		MoveTo.add_child(CardMoved)
@@ -475,6 +483,7 @@ func Resolve_Battle_Damage():
 			$HUD_GameState.Update_Data()
 
 func Capture_Card(Card_Captured, slot_name):
+	var attacking_player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var targeted_player = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	var Destination_MedBay = $Playmat/CardSpots/NonHands/WMedBay if GameData.Current_Turn == "Player" else $Playmat/CardSpots/NonHands/BMedBay
 	GameData.Cards_Captured_This_Turn.append(Card_Captured)
@@ -482,6 +491,9 @@ func Capture_Card(Card_Captured, slot_name):
 	# Move captured card to appropriate MedBay
 	slot_name.remove_child(Card_Captured)
 	Destination_MedBay.add_child(Card_Captured)
+	
+	# Update Duelist's MedicalBay Array
+	attacking_player.MedicalBay.append(Card_Captured)
 	
 	# Reset ATK_Bonus, Health, and Health_Bonus values to appropriate amounts & Update HUD
 	Card_Captured.ATK_Bonus = 0
@@ -497,6 +509,7 @@ func Discard_Card(Side):
 	var MoveFrom # Grabs the origin parent of the selected scene instance.
 	var MoveTo # Grabs the destination parent of the selected scene instance.
 	var CardMoved # From GameData singleton, indicates the specific instance of the SmallCard scene that has been selected.
+	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	
 	# Prep variables to reposition cards on field & scene tree
 	MoveFrom = self.get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
@@ -516,10 +529,15 @@ func Discard_Card(Side):
 	Set_Focus_Neighbors("Field",Side,Moved)
 	Set_Focus_Neighbors("Hand",Side,Moved)
 	
+	# Update Duelist's MedicalBay Array
+	player.MedicalBay.append(CardMoved)
+	
 	# Resets GameData variables for next movement.
 	Reset_Reposition_Card_Variables()
 	
 	# Retry Conducting End Phase
+	while get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > 5:
+		return
 	if GameData.Current_Step == "Discard":
 		Conduct_End_Phase()
 
@@ -555,18 +573,26 @@ func Conduct_End_Phase():
 	# End Phase (Discard -> Reload -> Effect -> Victory -> End)
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
-	
+	var Side = "W" if player == GameData.Player else "B"
 	# Discard Step (Hand Limit = 5 [logic handled in Update_Game_Turn() func])
 	Resolve_Card_Effects() # May/may not be needed depending on if Discard step remains an EFFECT step.
 	
 	# Reload Step
 	GameData.Current_Step = "Reload"
+	# Update HUD
+	$HUD_GameState.Update_Data()
 	if len(player.Deck) == 0:
 		if len(player.MedicalBay) > 0:
 			# Move cards from player's MedBay to Deck
 			for i in range(len(player.MedicalBay)):
 				player.Deck.append(player.MedicalBay[i])
 			player.MedicalBay.clear()
+			
+			# Update Node Tree
+			var MedBay = get_node("Playmat/CardSpots/NonHands/" + Side + "MedBay")
+			for i in MedBay.get_children():
+				MedBay.remove_child(i)
+			
 			# Reshuffle player's Deck
 			randomize()
 			player.Deck.shuffle()
@@ -667,14 +693,22 @@ func Update_Game_Turn():
 			GameData.Attacker = null
 			GameData.Target = null
 			Set_Turn_Player()
-			# Flip Field
+			# Flip Field & HUDs
 			_on_SwitchSides_pressed()
+			Flip_HUDs()
 
 			# Opening & Standby Phases called due to currently requiring no user input
 			Conduct_Opening_Phase()
 			Conduct_Standby_Phase()
 		else: # Eventually this'll call a Show_Victory_Screen() func.
 			pass
+
+func Flip_HUDs():
+	var HUD_W = $HUD_W.rect_position
+	var HUD_B = $HUD_B.rect_position
+	
+	$HUD_W.rect_position = HUD_B
+	$HUD_B.rect_position = HUD_W
 
 func Setup_Game():
 	# Populates & Shuffles Player/Enemy Decks
@@ -687,10 +721,12 @@ func Setup_Game():
 	Choose_Starting_Player()
 	
 	# Draw Opening Hands
-	Draw_Card(GameData.Current_Turn, 5)
+	GameData.Current_Step = "Draw"
+	Draw_Card(GameData.Current_Turn, 42)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
 	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
+	GameData.Current_Step = "Start"
 	
 	# Set Turn Player
 	Set_Turn_Player()
@@ -719,14 +755,21 @@ func _on_SwitchSides_pressed():
 	$Playmat.get_node("CardSpots").rect_rotation += 180
 
 func _on_Card_Slot_pressed(slot_name):
-	if "MainDeck" in slot_name:
-		Reset_Reposition_Card_Variables()
-		var Hand = self.get_node("Playmat/CardSpots/" + slot_name.left(1) + "HandScroller/" + slot_name.left(1) + "Hand")
-		var InstanceCard = Card_Drawn.instance()
-		InstanceCard.name = "Card" + str(GameData.CardCounter)
-		GameData.CardCounter += 1
-		Hand.add_child(InstanceCard)
-		Set_Focus_Neighbors("Hand", slot_name.left(1), InstanceCard)
+	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Hand = self.get_node("Playmat/CardSpots/" + slot_name.left(1) + "HandScroller/" + slot_name.left(1) + "Hand")
+	
+	Reset_Reposition_Card_Variables()
+	
+	if "MainDeck" in slot_name and GameData.Current_Step == "Draw":
+		if player.Deck[-1].get_class() == "Control":
+			Hand.add_child(player.Deck[-1])
+		else:
+			var InstanceCard = Card_Drawn.instance()
+			InstanceCard.name = "Card" + str(GameData.CardCounter)
+			GameData.CardCounter += 1
+			Hand.add_child(InstanceCard)
+			Set_Focus_Neighbors("Hand", slot_name.left(1), InstanceCard)
 	elif "TechDeck" in slot_name:
 		Reset_Reposition_Card_Variables()
 		var TechZone = self.get_node("Playmat/CardSpots/NonHands/" + slot_name.left(5) + "Zone")
