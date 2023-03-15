@@ -410,6 +410,12 @@ func Activate_Set_Card(Side, Chosen_Card):
 		# Resets Effect_Active status to ensure card effect isn't triggered from Graveyard.
 		Chosen_Card.Effect_Active = false
 		
+		# Reset Tokens & Visuals
+		Chosen_Card.Tokens = 0
+		var TokenContainer = Chosen_Card.get_node("TokenContainer/VBoxContainer")
+		for i in TokenContainer.get_children():
+			TokenContainer.remove_child(i)
+		
 		# Replaces current Equip card with activated card
 		if Chosen_Card.Attribute == "Equip":
 			var EquipSlot = get_node("Playmat/CardSpots/NonHands/" + Side + "Equip" + Chosen_Card.Type)
@@ -759,12 +765,11 @@ func _on_Card_Slot_pressed(slot_name):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Hand = self.get_node("Playmat/CardSpots/" + slot_name.left(1) + "HandScroller/" + slot_name.left(1) + "Hand")
 	
-	Reset_Reposition_Card_Variables()
-	
 	if "MainDeck" in slot_name and GameData.Current_Step == "Draw":
 		if player.Deck[-1].get_class() == "Control":
 			Hand.add_child(player.Deck[-1])
 		else:
+			Reset_Reposition_Card_Variables()
 			var InstanceCard = Card_Drawn.instance()
 			InstanceCard.name = "Card" + str(GameData.CardCounter)
 			GameData.CardCounter += 1

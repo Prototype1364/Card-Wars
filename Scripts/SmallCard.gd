@@ -135,10 +135,11 @@ func _on_FocusSensor_pressed():
 		$Action_Button_Container/Summon.visible = true
 		$Action_Button_Container/Set.visible = true
 	elif GameData.Current_Step == "Flip":
-		$Action_Button_Container/Summon.text = "Flip"
-		$Action_Button_Container/Summon.visible = true
-		GameData.CardFrom = self.get_parent().name
-		GameData.CardMoved = self.name
+		if "Backrow" in self.get_parent().name:
+			$Action_Button_Container/Summon.text = "Flip"
+			$Action_Button_Container/Summon.visible = true
+			GameData.CardFrom = self.get_parent().name
+			GameData.CardMoved = self.name
 	elif GameData.Current_Step == "Selection":
 		$Action_Button_Container/Attack.visible = true
 	elif GameData.Current_Step == "Target":
