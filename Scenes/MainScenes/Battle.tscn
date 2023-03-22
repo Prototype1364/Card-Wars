@@ -488,6 +488,15 @@ focus_next = NodePath("../BTechZone")
 focus_previous = NodePath("../BEquipMagic")
 flat = true
 
+[node name="WMainDeckCardCount" type="Label" parent="Playmat/CardSpots"]
+margin_left = 781.0
+margin_top = 1212.0
+margin_right = 821.0
+margin_bottom = 1226.0
+text = "0"
+align = 1
+valign = 1
+
 [node name="Turn_Controls" type="VBoxContainer" parent="Playmat"]
 margin_left = 845.0
 margin_top = 925.0

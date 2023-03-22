@@ -141,9 +141,13 @@ func _on_FocusSensor_pressed():
 			GameData.CardFrom = self.get_parent().name
 			GameData.CardMoved = self.name
 	elif GameData.Current_Step == "Selection":
-		$Action_Button_Container/Attack.visible = true
+		var Parent_Name = self.get_parent().name
+		if ("Fighter" in Parent_Name or (Attack_As_Reinforcement and ("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name))) and ((Parent_Name.left(1) == "W" and GameData.Current_Turn == "Player") or Parent_Name.left(1) == "B" and GameData.Current_Turn == "Enemy"):
+			$Action_Button_Container/Attack.visible = true
 	elif GameData.Current_Step == "Target":
-		$Action_Button_Container/Target.visible = true
+		var Parent_Name = self.get_parent().name
+		if "Fighter" in Parent_Name and ((Parent_Name.left(1) == "W" and GameData.Current_Turn != "Player") or Parent_Name.left(1) == "B" and GameData.Current_Turn != "Enemy"):
+			$Action_Button_Container/Target.visible = true
 	elif GameData.Current_Step == "Discard":
 		GameData.CardFrom = self.get_parent().name
 		GameData.CardMoved = self.name

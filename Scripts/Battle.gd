@@ -95,6 +95,7 @@ func Choose_Starting_Player():
 	# Flip field (if Black goes first)
 	if random_number == 2:
 		_on_SwitchSides_pressed()
+		Flip_HUDs()
 		$HUD_GameState.Update_Data()
 
 func Set_Turn_Player():
@@ -219,6 +220,15 @@ func Reposition_Field_Cards(Side):
 		if ("Magic" in GameData.CardTo and (Card_To_Check.Attribute != "Equip" or Card_To_Check.Type != "Magic")) or ("Trap" in GameData.CardTo and (Card_To_Check.Attribute != "Equip" or Card_To_Check.Type != "Trap")):
 			Reset_Reposition_Card_Variables()
 			return
+	elif "Fighter" in GameData.CardTo or "R1" in GameData.CardTo or "R2" in GameData.CardTo or "R3" in GameData.CardTo:
+		if Card_To_Check.Type != "Normal" and Card_To_Check.Type != "Hero":
+			Reset_Reposition_Card_Variables()
+			return
+	elif "Backrow" in GameData.CardTo:
+		if Card_To_Check.Type != "Magic" and Card_To_Check.Type != "Trap":
+			Reset_Reposition_Card_Variables()
+			return
+	
 	# Sets MoveFrom/To variable values for repositioning.
 	if GameData.CardFrom == Side + "Hand":
 		MoveFrom = self.get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
@@ -274,6 +284,11 @@ func Play_Card(Side):
 	# ID Card Played
 	if GameData.CardFrom == Side + "Hand":
 		Chosen_Card = self.get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand/" + GameData.CardMoved)
+	
+	# Ensures that non-equip cards are not played in equip slots.
+	if Chosen_Card.Attribute != "Equip" and "Equip" in GameData.CardTo:
+		Reset_Reposition_Card_Variables()
+		return
 	
 	# Prep variables to reposition cards on field & scene tree
 	if GameData.CardFrom == "BHand":
@@ -613,6 +628,7 @@ func Conduct_End_Phase():
 	if len(player.Deck) == 0 or player.LP <= 0:
 		GameData.Victor = enemy.Name
 		print("VICTORY")
+		print(enemy.Name + " wins!")
 		return
 	
 	# End Step
@@ -762,7 +778,6 @@ func _on_SwitchSides_pressed():
 
 func _on_Card_Slot_pressed(slot_name):
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Hand = self.get_node("Playmat/CardSpots/" + slot_name.left(1) + "HandScroller/" + slot_name.left(1) + "Hand")
 	
 	if "MainDeck" in slot_name and GameData.Current_Step == "Draw":
