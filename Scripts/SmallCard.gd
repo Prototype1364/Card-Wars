@@ -120,60 +120,97 @@ func _on_FocusSensor_focus_exited():
 	self.defocusing()
 
 func _on_FocusSensor_pressed():
+	var Parent_Name = self.get_parent().name
+	
+	# Allows you to choose a card to receive effect benefits/penalties
 	if GameData.Yield_Mode == true:
 		GameData.ChosenCard = self
 		SignalBus.emit_signal("Card_Effect_Selection_Yield_Release", self)
-	elif GameData.Current_Step == "Reposition":
+	
+	# Allows repositioning of cards on field
+	if ("Fighter" in Parent_Name or "R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name) and GameData.Current_Step == "Main":
 		if GameData.CardFrom == "":
-			GameData.CardFrom = self.get_parent().name
+			GameData.CardFrom = Parent_Name
 			GameData.CardMoved = self.name
 		elif GameData.CardFrom != "":
-			GameData.CardTo = self.get_parent().name
+			GameData.CardTo = Parent_Name
 			GameData.CardSwitched = self.name
 			SignalBus.emit_signal("Reposition_Field_Cards", GameData.CardTo.left(1))
-	elif GameData.Current_Step == "Summon/Set" and "Hand" in self.get_parent().name:
-		$Action_Button_Container/Summon.visible = true
-		$Action_Button_Container/Set.visible = true
-	elif GameData.Current_Step == "Flip":
-		if "Backrow" in self.get_parent().name:
-			$Action_Button_Container/Summon.text = "Flip"
-			$Action_Button_Container/Summon.visible = true
-			GameData.CardFrom = self.get_parent().name
+	
+	# Allows you to Summon/Set cards to field
+	elif "Hand" in Parent_Name and GameData.Current_Step == "Main":
+		# Allows you to skip pressing Summon/Set buttons when playing Normal/Hero card
+		if self.Type == "Normal" or self.Type == "Hero":
+			GameData.Summon_Mode = "Summon"
+			GameData.CardFrom = Parent_Name
 			GameData.CardMoved = self.name
+		else:
+			$Action_Button_Container/Summon.visible = true
+			$Action_Button_Container/Set.visible = true
+	
+	# Allows Flip summoning of cards from backrow
+	elif "Backrow" in Parent_Name and GameData.Current_Step == "Main":
+		$Action_Button_Container/Summon.text = "Flip"
+		$Action_Button_Container/Summon.visible = true
+		GameData.CardFrom = Parent_Name
+		GameData.CardMoved = self.name
+	
+	# Allows for selection of Attacker
 	elif GameData.Current_Step == "Selection":
-		var Parent_Name = self.get_parent().name
 		if ("Fighter" in Parent_Name or (Attack_As_Reinforcement and ("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name))) and ((Parent_Name.left(1) == "W" and GameData.Current_Turn == "Player") or Parent_Name.left(1) == "B" and GameData.Current_Turn == "Enemy"):
-			$Action_Button_Container/Attack.visible = true
+			GameData.Attacker = self
+			SignalBus.emit_signal("Check_For_Targets")
+			if GameData.Target == GameData.Player or GameData.Target == GameData.Enemy:
+				# Signal emitted twice to ensure that Damage Step is conducted following successful Target selection
+				SignalBus.emit_signal("Update_GameState", "Step")
+				SignalBus.emit_signal("Update_GameState", "Step")
+				if GameData.Attacks_To_Launch == 0:
+					# Move to End Phase (no captures will happen following direct attack)
+					SignalBus.emit_signal("Update_GameState", "Phase")
+					# Attempt to End Turn (works if no discards are necessary)
+					SignalBus.emit_signal("Update_GameState", "Turn")
+				else:
+					# Move to Repeat Step to prep for next attack
+					SignalBus.emit_signal("Update_GameState", "Step")
+	
+	# Allows for selection of Target
 	elif GameData.Current_Step == "Target":
-		var Parent_Name = self.get_parent().name
 		if "Fighter" in Parent_Name and ((Parent_Name.left(1) == "W" and GameData.Current_Turn != "Player") or Parent_Name.left(1) == "B" and GameData.Current_Turn != "Enemy"):
 			$Action_Button_Container/Target.visible = true
+	
+	# Allows for selection of cards to discard from hand
 	elif GameData.Current_Step == "Discard":
-		GameData.CardFrom = self.get_parent().name
+		GameData.CardFrom = Parent_Name
 		GameData.CardMoved = self.name
 		if "Hand" in GameData.CardFrom:
 			SignalBus.emit_signal("Discard_Card", GameData.CardFrom.left(1))
 
 func _on_Summon_Set_pressed(Mode):
-	if "Hand" in self.get_parent().name and Mode == "Summon":
+	var Battle_Scene = load("res://Scenes/MainScenes/Battle.tscn").instance()
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Parent_Name = self.get_parent().name
+	
+	if "Hand" in Parent_Name and Mode == "Summon":
 		GameData.Summon_Mode = "Summon"
-	elif GameData.Current_Step == "Flip" and Mode == "Summon":
+		# Automatically move Equip card to appropriate Equip slot
+		if self.Attribute == "Equip":
+			var slot_name = Side + "Equip" + self.Type
+			GameData.CardFrom = Parent_Name
+			GameData.CardMoved = self.name
+			Battle_Scene._on_Card_Slot_pressed(slot_name)
+	
+	elif "Backrow" in Parent_Name and Mode == "Summon":
 		$Action_Button_Container/Summon.text = "Summon"
-		var Side = "W" if GameData.Current_Turn == "Player" else "B"
 		SignalBus.emit_signal("Activate_Set_Card", Side, self)
-	elif "Hand" in self.get_parent().name and Mode == "Set":
+	
+	elif "Hand" in Parent_Name and Mode == "Set":
 		GameData.Summon_Mode = "Set"
 		self.Is_Set = true
 	
-	GameData.CardFrom = self.get_parent().name
+	GameData.CardFrom = Parent_Name
 	GameData.CardMoved = self.name
 	$Action_Button_Container/Summon.visible = false
 	$Action_Button_Container/Set.visible = false
-
-func _on_Attacker_Selection_pressed():
-	GameData.Attacker = self
-	$Action_Button_Container/Attack.visible = false
-	SignalBus.emit_signal("Check_For_Targets")
 
 func _on_Target_pressed():
 	GameData.Target = self
@@ -182,13 +219,22 @@ func _on_Target_pressed():
 	SignalBus.emit_signal("Update_GameState", "Step")
 	SignalBus.emit_signal("Update_GameState", "Step")
 	
-	# Checks if Target was captured. If not, move to Repeat Step (this happens automatically when card IS captured)
+	# If NO Capture happened, advance GameState (advance to Repeat Step happens automatically when card IS captured)
 	if GameData.Current_Step == "Capture":
-		SignalBus.emit_signal("Update_GameState", "Step")
+		if GameData.Attacks_To_Launch == 0:
+			# Move to End Phase (no captures will happen following direct attack)
+			SignalBus.emit_signal("Update_GameState", "Phase")
+			# Attempt to End Turn (works if no discards are necessary)
+			SignalBus.emit_signal("Update_GameState", "Turn")
+		else:
+			# Move to Repeat Step to prep for next attack
+			SignalBus.emit_signal("Update_GameState", "Step")
+	elif GameData.Current_Step == "Discard":
+		# Attempt to End Turn
+		SignalBus.emit_signal("Update_GameState", "Turn")
 
 func _on_Hide_Action_Buttons_pressed(_event):
 	if Input.is_action_pressed("Cancel"):
 		$Action_Button_Container/Summon.visible = false
 		$Action_Button_Container/Set.visible = false
-		$Action_Button_Container/Attack.visible = false
 		$Action_Button_Container/Target.visible = false

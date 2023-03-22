@@ -108,14 +108,6 @@ margin_right = 120.0
 margin_bottom = 40.0
 text = "Set"
 
-[node name="Attack" type="Button" parent="Action_Button_Container"]
-visible = false
-margin_top = 40.0
-margin_right = 120.0
-margin_bottom = 60.0
-rect_min_size = Vector2( 120, 20 )
-text = "Attack"
-
 [node name="Target" type="Button" parent="Action_Button_Container"]
 visible = false
 margin_top = 60.0
@@ -131,5 +123,4 @@ text = "Target"
 [connection signal="pressed" from="FocusSensor" to="." method="_on_FocusSensor_pressed"]
 [connection signal="pressed" from="Action_Button_Container/Summon" to="." method="_on_Summon_Set_pressed" binds= [ "Summon" ]]
 [connection signal="pressed" from="Action_Button_Container/Set" to="." method="_on_Summon_Set_pressed" binds= [ "Set" ]]
-[connection signal="pressed" from="Action_Button_Container/Attack" to="." method="_on_Attacker_Selection_pressed"]
 [connection signal="pressed" from="Action_Button_Container/Target" to="." method="_on_Target_pressed"]

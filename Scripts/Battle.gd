@@ -1,8 +1,8 @@
 extends Control
 
 const PHASES = ["Opening Phase", "Standby Phase", "Main Phase", "Battle Phase", "End Phase"]
-const PHASE_THRESHOLDS = [2, 4, 7, 12, 17]
-const STEPS = ["Start", "Draw", "Roll", "Effect", "Token", "Reposition", "Summon/Set", "Flip", "Selection", "Target", "Damage", "Capture", "Repeat", "Discard", "Reload", "Effect", "Victory", "End"]
+const PHASE_THRESHOLDS = [2, 4, 5, 10, 15]
+const STEPS = ["Start", "Draw", "Roll", "Effect", "Token", "Main", "Selection", "Target", "Damage", "Capture", "Repeat", "Discard", "Reload", "Effect", "Victory", "End"]
 const EFFECT_STEPS = ["Effect", "Selection", "Capture", "Discard"] # Discard may/may not end up being an Effect Step. You just added it, just in case (also Summon/Set should be added to check for Event-effects like Mordred's).
 const FUNC_STEPS = ["Damage"]
 
@@ -315,6 +315,10 @@ func Play_Card(Side):
 		get_node("HUD_" + Side).Update_Data(player)
 		
 		# Updates children for parents in From & To locations (if destination is valid for Card Type).
+		"""-------------------------------------------------------------------------------------
+		BUGGED: Currently Equip card slots are not cleared of children before repositioning newly played card in slot.
+		Therefore, it's possible to have more than 1 child in the slot of an Equip card.
+		-------------------------------------------------------------------------------------"""
 		MoveFrom.remove_child(CardMoved)
 		MoveTo.add_child(CardMoved)
 		
@@ -413,9 +417,6 @@ func Activate_Summon_Effects(Chosen_Card):
 	CardEffects.call(func_name, Chosen_Card)
 
 func Activate_Set_Card(Side, Chosen_Card):
-	# Flip Step
-	GameData.Current_Step = "Flip"
-	
 	# Resolves card effect if card is activatable
 	if Chosen_Card.Type != "Trap" or (Chosen_Card.Type == "Trap" and Chosen_Card.Tokens > 0):
 		var string_prefix = "c"
@@ -468,7 +469,8 @@ func Check_For_Targets():
 	var player = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	var Side = "B" if GameData.Current_Turn == "Player" else "W"
 	
-	if get_node("Playmat/CardSpots/NonHands/" + Side + "Fighter").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R1").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R2").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R3").get_child_count() > 0:
+	# Currently only checks for card in Fighter slot as Reinforcers are untargetable in current code base
+	if get_node("Playmat/CardSpots/NonHands/" + Side + "Fighter").get_child_count() > 0:
 		pass
 	else: # No Valid Targets. Attack will be Direct Attack
 		GameData.Target = player
@@ -556,11 +558,11 @@ func Discard_Card(Side):
 	# Resets GameData variables for next movement.
 	Reset_Reposition_Card_Variables()
 	
-	# Retry Conducting End Phase
+	# Retry to End Turn
 	while get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > 5:
 		return
 	if GameData.Current_Step == "Discard":
-		Conduct_End_Phase()
+		Update_Game_Turn()
 
 func Conduct_Opening_Phase():
 	# Opening Phase (Start -> Draw -> Roll)
@@ -652,9 +654,9 @@ func Update_Game_Step():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	
 	# Call required funcs at appropriate Steps (and contain step values within bounds of current Phase)
-	if STEPS.find(GameData.Current_Step) == 10: # Current Step is Damage Step
+	if STEPS.find(GameData.Current_Step) == 8: # Current Step is Damage Step
 		Resolve_Battle_Damage()
-	if STEPS.find(GameData.Current_Step) == 13 and get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > 5: # Ensures cards are discarded when appropriate
+	if STEPS.find(GameData.Current_Step) == 11 and get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > 5: # Ensures cards are discarded when appropriate
 		return
 	if GameData.Current_Step in EFFECT_STEPS: # Ensures that Card Effects are resolved when appropriate
 		Resolve_Card_Effects()
@@ -665,25 +667,19 @@ func Update_Game_Step():
 	elif STEPS.find(GameData.Current_Step) in PHASE_THRESHOLDS: # Ensures that you can't advance to a Step that belongs to a different Phase
 		return
 	elif STEPS.find(GameData.Current_Step) == 3 and GameData.Current_Phase == "End Phase": # Fixes bug where Step state would reset to Standby Phases' Effect Step (instead of End Phases' Effect Step)
-		GameData.Current_Step = STEPS[16]
-	elif STEPS.find(GameData.Current_Step) == 11 and GameData.Attacks_To_Launch == 0:
+		GameData.Current_Step = STEPS[14]
+	elif STEPS.find(GameData.Current_Step) == 9 and GameData.Attacks_To_Launch == 0:
 		GameData.Current_Phase = PHASES[4]
-		GameData.Current_Step = STEPS[13]
+		GameData.Current_Step = STEPS[11]
 	else:
 		GameData.Current_Step = STEPS[STEPS.find(GameData.Current_Step) + 1]
 
 func Update_Game_Phase():
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Repositionable_Cards = get_node("Playmat/CardSpots/NonHands/" + Side + "Fighter").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R1").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R2").get_child_count() + get_node("Playmat/CardSpots/NonHands/" + Side + "R3").get_child_count()
-	
 	if PHASES.find(GameData.Current_Phase) + 1 >= len(PHASES): # Ensures game doesn't crash when trying to advance to a non-existent Phase.
 		return
-	elif PHASES.find(GameData.Current_Phase) == 1 and Repositionable_Cards == 0: # Skips Reposition Step when there are no cards to Reposition
-		GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 1]
-		GameData.Current_Step = STEPS[6]
 	elif GameData.Turn_Counter == 1 and PHASES.find(GameData.Current_Phase) == 2: # Skips Battle Phase on first turn of game
 		GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 2]
-		GameData.Current_Step = STEPS[13]
+		GameData.Current_Step = STEPS[11]
 	else:
 		GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 1]
 		print("Phase Conversion: " + str(STEPS[PHASE_THRESHOLDS[PHASES.find(GameData.Current_Phase) - 1] + 1]))
@@ -744,7 +740,7 @@ func Setup_Game():
 	
 	# Draw Opening Hands
 	GameData.Current_Step = "Draw"
-	Draw_Card(GameData.Current_Turn, 5)
+	Draw_Card(GameData.Current_Turn, 8)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
 	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
@@ -798,11 +794,11 @@ func _on_Card_Slot_pressed(slot_name):
 		GameData.CardCounter += 1
 		TechZone.add_child(InstanceCard)
 	else:
-		if "Hand" in GameData.CardFrom and GameData.Current_Step == "Summon/Set" and GameData.Summon_Mode != "":
+		if "Hand" in GameData.CardFrom and GameData.Current_Step == "Main" and GameData.Summon_Mode != "":
 			GameData.Summon_Mode = ""
 			GameData.CardTo = slot_name
 			SignalBus.emit_signal("Play_Card", GameData.CardFrom.left(1))
-		elif GameData.Current_Step == "Reposition":
+		elif GameData.Current_Step == "Main":
 			if GameData.CardFrom != "":
 				GameData.CardTo = slot_name
 				SignalBus.emit_signal("Reposition_Field_Cards", GameData.CardTo.left(1))
