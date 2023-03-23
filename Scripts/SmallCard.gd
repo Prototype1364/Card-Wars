@@ -106,7 +106,7 @@ func Update_Data():
 func focusing():
 	GameData.FocusedCardName = self.name
 	GameData.FocusedCardParentName = self.get_parent().name
-	SignalBus.emit_signal("LookAtCard", Frame, Art, Name, Attack, Cost, Health)
+	SignalBus.emit_signal("LookAtCard", Frame, Art, Name, Attack, Cost, Health, Attribute)
 
 func defocusing():
 	GameData.FocusedCardName = ""

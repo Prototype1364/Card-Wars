@@ -116,6 +116,9 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1):
 			$Playmat/CardSpots/NonHands/BMainDeck.emit_signal("pressed")
 		# Removes drawn card from Deck
 		player.Deck.pop_back()
+	
+	#Update Deck Count GUIs
+	Update_Deck_Counts()
 
 func Dice_Roll():
 	# Roll Step
@@ -728,6 +731,12 @@ func Flip_HUDs():
 	$HUD_W.rect_position = HUD_B
 	$HUD_B.rect_position = HUD_W
 
+func Update_Deck_Counts():
+	get_node("Playmat/CardSpots/WMainDeckCardCount").text = str(GameData.Player.Deck.size())
+	get_node("Playmat/CardSpots/WTechDeckCardCount").text = str(GameData.Player.Tech_Deck.size())
+	get_node("Playmat/CardSpots/BMainDeckCardCount").text = str(GameData.Enemy.Deck.size())
+	get_node("Playmat/CardSpots/BTechDeckCardCount").text = str(GameData.Enemy.Tech_Deck.size())
+
 func Setup_Game():
 	# Populates & Shuffles Player/Enemy Decks
 	Create_Deck("Arthurian", "Player")
@@ -746,12 +755,24 @@ func Setup_Game():
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
 	GameData.Current_Step = "Start"
 	
+	#Update Deck Count GUIs
+	Update_Deck_Counts()
+	
 	# Set Turn Player
 	Set_Turn_Player()
 	
 	# Initiate First Turn (Opening & Standby Phase require no user input)
 	Conduct_Opening_Phase()
 	Conduct_Standby_Phase()
+
+
+func _input(event):
+	if event.is_action_pressed("next_phase"):
+		_on_Next_Phase_pressed()
+	if event.is_action_pressed("end_turn"):
+		_on_End_Turn_pressed()
+
+
 
 
 func _on_Playmat_gui_input(event):

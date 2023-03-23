@@ -1,8 +1,13 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Resources/Fonts/MTCORSVA.TTF" type="DynamicFontData" id=1]
 [ext_resource path="res://Scripts/Card_Display.gd" type="Script" id=2]
 [ext_resource path="res://Resources/Themes/Card_Text_72.tres" type="Theme" id=4]
+
+[sub_resource type="DynamicFont" id=3]
+size = 72
+outline_size = 1
+font_data = ExtResource( 1 )
 
 [sub_resource type="DynamicFont" id=1]
 size = 35
@@ -34,7 +39,10 @@ margin_bottom = 147.0
 [node name="Name" type="Label" parent="NameContainer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_right = -123.0
 theme = ExtResource( 4 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 3 )
 valign = 1
 clip_text = true
 
@@ -99,3 +107,10 @@ expand = true
 margin_left = -105.0
 margin_top = 1.0
 margin_bottom = 946.0
+
+[node name="Attribute" type="TextureRect" parent="."]
+margin_left = 484.0
+margin_top = 45.0
+margin_right = 569.0
+margin_bottom = 130.0
+expand = true
