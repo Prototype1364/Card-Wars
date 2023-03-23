@@ -15,7 +15,7 @@ func GetCardData():
 	else:
 		SelectedCard = self.get_parent().get_parent().get_node("Playmat/CardSpots/NonHands/" + GameData.FocusedCardParentName).get_node(GameData.FocusedCardName)
 
-func LookAtCard(FrameData, ArtData, NameData, AttackData, CostData, HealthData):
+func LookAtCard(FrameData, ArtData, NameData, AttackData, CostData, HealthData, AttributeData):
 	self.GetCardData()
 	self.visible = true
 	
@@ -23,6 +23,7 @@ func LookAtCard(FrameData, ArtData, NameData, AttackData, CostData, HealthData):
 		if FrameData != "Special": # Card is NOT Advance Tech card
 			var Frame_Texture = load("res://Assets/Cards/Frame/Large_Frame_" + FrameData + ".png")
 			var Cost_Texture = load("res://Assets/Cards/Cost/Large/Large_Cost_" + FrameData + "_" + str(CostData) + ".png")
+			var Attribute_Texture = load("res://Assets/Cards/Attribute/Attribute_" + AttributeData + ".png")
 			var Text_Outline_Color
 			if FrameData == "Normal":
 				Text_Outline_Color = Color("676767")
@@ -38,6 +39,7 @@ func LookAtCard(FrameData, ArtData, NameData, AttackData, CostData, HealthData):
 			$Frame.texture = Frame_Texture
 			$CostContainer/Cost.texture = Cost_Texture
 			$NameContainer/Name.text = NameData
+			$Attribute.texture = Attribute_Texture
 			$NameContainer/Name.set("custom_colors/font_outline_modulate", Text_Outline_Color)
 			$Description.set("custom_colors/font_outline_modulate", Text_Outline_Color)
 			$Attack.set("custom_colors/font_outline_modulate", Text_Outline_Color)
