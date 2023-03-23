@@ -120,6 +120,9 @@ func _on_FocusSensor_focus_exited():
 	self.defocusing()
 
 func _on_FocusSensor_pressed():
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Reposition_Zones = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
+	var Reinforcement_Zones = [Side + "R1", Side + "R2", Side + "R3"]
 	var Parent_Name = self.get_parent().name
 	
 	# Allows you to choose a card to receive effect benefits/penalties
@@ -127,8 +130,8 @@ func _on_FocusSensor_pressed():
 		GameData.ChosenCard = self
 		SignalBus.emit_signal("Card_Effect_Selection_Yield_Release", self)
 	
-	# Allows repositioning of cards on field
-	if ("Fighter" in Parent_Name or "R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name) and GameData.Current_Step == "Main":
+	# Allows repositioning of cards on field (Currently doesn't allow for Exchange-like card effect [i.e. swapping 1 card of yours for one card of the opponent's on the field])
+	if Reposition_Zones.has(Parent_Name) and GameData.Current_Step == "Main":
 		if GameData.CardFrom == "":
 			GameData.CardFrom = Parent_Name
 			GameData.CardMoved = self.name
@@ -157,7 +160,7 @@ func _on_FocusSensor_pressed():
 	
 	# Allows for selection of Attacker
 	elif GameData.Current_Step == "Selection":
-		if ("Fighter" in Parent_Name or (Attack_As_Reinforcement and ("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name))) and ((Parent_Name.left(1) == "W" and GameData.Current_Turn == "Player") or Parent_Name.left(1) == "B" and GameData.Current_Turn == "Enemy"):
+		if (Reposition_Zones[0] in Parent_Name or (Attack_As_Reinforcement == true and Reinforcement_Zones.has(Parent_Name))) and Parent_Name.left(1) == Side:
 			GameData.Attacker = self
 			SignalBus.emit_signal("Check_For_Targets")
 			if GameData.Target == GameData.Player or GameData.Target == GameData.Enemy:

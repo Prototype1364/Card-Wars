@@ -117,13 +117,10 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1):
 		# Removes drawn card from Deck
 		player.Deck.pop_back()
 	
-	#Update Deck Count GUIs
+	# Update Deck Count GUI
 	Update_Deck_Counts()
 
 func Dice_Roll():
-	# Roll Step
-#	GameData.Current_Step = "Roll"
-	
 	# Get Result of Dice Roll
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
@@ -184,9 +181,6 @@ func Resolve_Card_Effects():
 				CardEffects.call(func_name, Card_To_Check)
 
 func Add_Tokens():
-	# Token Step
-#	GameData.Current_Step = "Token"
-	
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	
 	for i in range(1,4): # Range is exclusive. I.E. it runs 3 times, from 1 to 3, excluding 4.
@@ -318,10 +312,13 @@ func Play_Card(Side):
 		get_node("HUD_" + Side).Update_Data(player)
 		
 		# Updates children for parents in From & To locations (if destination is valid for Card Type).
-		"""-------------------------------------------------------------------------------------
-		BUGGED: Currently Equip card slots are not cleared of children before repositioning newly played card in slot.
-		Therefore, it's possible to have more than 1 child in the slot of an Equip card.
-		-------------------------------------------------------------------------------------"""
+		var Equip_Slot = get_node("Playmat/CardSpots/NonHands/" + Side + "EquipMagic") if CardMoved.Type == "Magic" else get_node("Playmat/CardSpots/NonHands/" + Side + "EquipTrap")
+		var Graveyard = get_node("Playmat/CardSpots/NonHands/" + Side + "Graveyard")
+		if Equip_Slot.get_child_count() > 0:
+			var Old_Equip_Card = Equip_Slot.get_child(0)
+			Equip_Slot.remove_child(Old_Equip_Card)
+			Graveyard.add_child(Old_Equip_Card)
+		
 		MoveFrom.remove_child(CardMoved)
 		MoveTo.add_child(CardMoved)
 		
@@ -622,6 +619,9 @@ func Conduct_End_Phase():
 			# Reshuffle player's Deck
 			randomize()
 			player.Deck.shuffle()
+			
+			# Update Deck Count GUI
+			Update_Deck_Counts()
 	
 	# Effect Step
 	GameData.Current_Step = "Effect"
@@ -755,7 +755,7 @@ func Setup_Game():
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
 	GameData.Current_Step = "Start"
 	
-	#Update Deck Count GUIs
+	# Update Deck Count GUI
 	Update_Deck_Counts()
 	
 	# Set Turn Player
@@ -769,10 +769,18 @@ func Setup_Game():
 func _input(event):
 	if event.is_action_pressed("next_phase"):
 		_on_Next_Phase_pressed()
+		Fake_Click()
 	if event.is_action_pressed("end_turn"):
 		_on_End_Turn_pressed()
+		Fake_Click()
 
-
+func Fake_Click():
+	# Fakes a click input to remove green focus-boarder from card when Next Phase/Turn Control Buttons are triggered via InputMap key/button.
+	var fake_click = InputEventMouseButton.new()
+	fake_click.button_index = BUTTON_LEFT
+	fake_click.doubleclick = false
+	fake_click.pressed = true
+	get_tree().input_event(fake_click)
 
 
 func _on_Playmat_gui_input(event):

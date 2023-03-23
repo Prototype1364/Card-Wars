@@ -23,7 +23,9 @@ func LookAtCard(FrameData, ArtData, NameData, AttackData, CostData, HealthData, 
 		if FrameData != "Special": # Card is NOT Advance Tech card
 			var Frame_Texture = load("res://Assets/Cards/Frame/Large_Frame_" + FrameData + ".png")
 			var Cost_Texture = load("res://Assets/Cards/Cost/Large/Large_Cost_" + FrameData + "_" + str(CostData) + ".png")
-			var Attribute_Texture = load("res://Assets/Cards/Attribute/Attribute_" + AttributeData + ".png")
+			var Attribute_Texture
+			if SelectedCard.Type == "Normal" or SelectedCard.Type == "Hero":
+				Attribute_Texture = load("res://Assets/Cards/Attribute/Attribute_" + AttributeData + ".png")
 			var Text_Outline_Color
 			if FrameData == "Normal":
 				Text_Outline_Color = Color("676767")
@@ -39,7 +41,6 @@ func LookAtCard(FrameData, ArtData, NameData, AttackData, CostData, HealthData, 
 			$Frame.texture = Frame_Texture
 			$CostContainer/Cost.texture = Cost_Texture
 			$NameContainer/Name.text = NameData
-			$Attribute.texture = Attribute_Texture
 			$NameContainer/Name.set("custom_colors/font_outline_modulate", Text_Outline_Color)
 			$Description.set("custom_colors/font_outline_modulate", Text_Outline_Color)
 			$Attack.set("custom_colors/font_outline_modulate", Text_Outline_Color)
@@ -51,9 +52,11 @@ func LookAtCard(FrameData, ArtData, NameData, AttackData, CostData, HealthData, 
 			if SelectedCard.Type == "Normal" or SelectedCard.Type == "Hero":
 				$Attack.text = str(max(AttackData, 0))
 				$Health.text = str(max(HealthData, 0))
+				$Attribute.texture = Attribute_Texture
 			else:
 				$Attack.text = ""
 				$Health.text = ""
+				$Attribute.texture = null
 		else: # Card is Advance Tech card
 			$Frame.texture = load("res://Assets/Cards/Frame/Large_Advance_Tech_Card.png")
 			$CostContainer/Cost.texture = null
