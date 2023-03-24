@@ -16,8 +16,12 @@ signal Activate_Set_Card
 
 signal Check_For_Targets
 
+signal Capture_Card
+
 signal Discard_Card
 
 signal Update_GameState
 
 signal Card_Effect_Selection_Yield_Release
+
+signal Update_Duelist_HUD

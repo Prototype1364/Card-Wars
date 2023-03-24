@@ -64,6 +64,7 @@ func LookAtCard(FrameData, ArtData, NameData, AttackData, CostData, HealthData, 
 			$Description.text = ""
 			$Attack.text = ""
 			$Health.text = ""
+			$Attribute.texture = null
 		
 		# ImageContainer/CardImage of BigCard scene MUST REMAIN as a TEXTURE_BUTTON node type as it allows for auto-expansion of image proportions, thus cutting Eric's card art work in half.
 		$ArtContainer/Art.texture = ArtData

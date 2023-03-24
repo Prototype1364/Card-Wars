@@ -16,8 +16,9 @@ func _ready():
 	var _HV2 = SignalBus.connect("Play_Card", self, "Play_Card")
 	var _HV3 = SignalBus.connect("Activate_Set_Card", self, "Activate_Set_Card")
 	var _HV4 = SignalBus.connect("Check_For_Targets", self, "Check_For_Targets")
-	var _HV5 = SignalBus.connect("Discard_Card", self, "Discard_Card")
-	var _HV6 = SignalBus.connect("Update_GameState", self, "Update_Game_State")
+	var _HV5 = SignalBus.connect("Capture_Card", self, "Capture_Card")
+	var _HV6 = SignalBus.connect("Discard_Card", self, "Discard_Card")
+	var _HV7 = SignalBus.connect("Update_GameState", self, "Update_Game_State")
 	set_focus_mode(true)
 	
 	Setup_Game()
@@ -89,7 +90,8 @@ func Shuffle_Decks():
 func Choose_Starting_Player():
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
-	var random_number = rng.randi_range(1,2)
+#	var random_number = rng.randi_range(1,2)
+	var random_number = 2
 	GameData.Current_Turn = "Player" if random_number == 1 else "Enemy"
 	
 	# Flip field (if Black goes first)
@@ -165,7 +167,7 @@ func Resolve_Card_Effects():
 	
 	# Populate Zones_To_Check Array
 	for i in Available_Zones.size():
-		if Available_Zones[i].name.left(1) == Side or Side + "Hand" in Available_Zones[i].name:
+		if Available_Zones[i].name.left(1) == Side or Side + "Hand" in Available_Zones[i].name or "Backrow" in Available_Zones[i].name:
 			if "Deck" in Available_Zones[i].name or "Banished" in Available_Zones[i].name:
 				pass
 			else:
@@ -302,14 +304,23 @@ func Play_Card(Side):
 	CardMoved = MoveFrom.get_node(GameData.CardMoved)
 	
 	# Ensures that card Cost is Affordable & that it's being summoned to a valid card slot
-	if Valid_Destination(Side, MoveTo, Chosen_Card) and Summon_Affordable(player, Chosen_Card):
+	var Net_Cost
+	if Chosen_Card.Type == "Normal":
+		Net_Cost = Chosen_Card.Cost + player.Cost_Discount_Normal
+	elif Chosen_Card.Type == "Hero":
+		Net_Cost = Chosen_Card.Cost + player.Cost_Discount_Hero
+	elif Chosen_Card.Type == "Magic":
+		Net_Cost = Chosen_Card.Cost + player.Cost_Discount_Magic
+	elif Chosen_Card.Type == "Trap":
+		Net_Cost = Chosen_Card.Cost + player.Cost_Discount_Trap
+	
+	if Valid_Destination(Side, MoveTo, Chosen_Card) and Summon_Affordable(player, Net_Cost):
 		# Fixes bug regarding auto-updating of rect_pos of selected scene when moving from slot to slot.
 		CardMoved.rect_position.x = 0
 		CardMoved.rect_position.y = 0
 		
-		# Deducts summoned card's Cost from appropriate Summon Crest pool & Updates HUD
-		player.Summon_Crests -= Chosen_Card.Cost
-		get_node("HUD_" + Side).Update_Data(player)
+		# Deducts summoned card's Net_Cost from appropriate Summon Crest pool
+		player.Summon_Crests -= Net_Cost
 		
 		# Updates children for parents in From & To locations (if destination is valid for Card Type).
 		var Equip_Slot = get_node("Playmat/CardSpots/NonHands/" + Side + "EquipMagic") if CardMoved.Type == "Magic" else get_node("Playmat/CardSpots/NonHands/" + Side + "EquipTrap")
@@ -328,7 +339,7 @@ func Play_Card(Side):
 		Set_Focus_Neighbors("Hand",Side,Moved)
 		
 		# Activate Summon Effects (Currently no way to Set cards)
-		if Chosen_Card.Type == "Hero" or (Chosen_Card.Type == "Magic" and Chosen_Card.Is_Set == false):
+		if Chosen_Card.Type == "Hero" or (Chosen_Card.Type == "Magic" and Chosen_Card.Is_Set == false) or (Chosen_Card.Type == "Trap" and Chosen_Card.Attribute == "Equip" and Chosen_Card.Is_Set == false):
 			Chosen_Card.Effect_Active = true
 			Activate_Summon_Effects(Chosen_Card)
 			# Ensures that card summoned to Equip slot is not immediately sent to Graveyard.
@@ -340,14 +351,18 @@ func Play_Card(Side):
 				MoveTo.add_child(CardMoved)
 				# Resets Effect_Active status to ensure card doesn't activate from Graveyard
 				Chosen_Card.Effect_Active = false
-	else:
-		pass
+		
+		# Allows card effects that resolve during Summon/Set to occur (i.e. Deep Pit)
+		Resolve_Card_Effects()
 	
 	# Resets GameData variables for next movement.
 	Reset_Reposition_Card_Variables()
+	
+	# Updates Duelist HUD (Places at end of func so that summon effects resolve before update)
+	get_node("HUD_" + Side).Update_Data(player)
 
-func Summon_Affordable(Dueler, Chosen_Card):
-	if Chosen_Card.Cost <= Dueler.Summon_Crests:
+func Summon_Affordable(Dueler, Net_Cost):
+	if Net_Cost <= Dueler.Summon_Crests:
 		return true
 	else:
 		return false
@@ -505,10 +520,14 @@ func Resolve_Battle_Damage():
 			# Update HUD
 			$HUD_GameState.Update_Data()
 
-func Capture_Card(Card_Captured, slot_name):
+func Capture_Card(Card_Captured, slot_name, Capture_Type = "Normal"):
 	var attacking_player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var targeted_player = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
-	var Destination_MedBay = $Playmat/CardSpots/NonHands/WMedBay if GameData.Current_Turn == "Player" else $Playmat/CardSpots/NonHands/BMedBay
+	var Destination_MedBay
+	if Capture_Type == "Normal":
+		Destination_MedBay = $Playmat/CardSpots/NonHands/WMedBay if GameData.Current_Turn == "Player" else $Playmat/CardSpots/NonHands/BMedBay
+	else:
+		Destination_MedBay = $Playmat/CardSpots/NonHands/BMedBay if GameData.Current_Turn == "Player" else $Playmat/CardSpots/NonHands/WMedBay
 	GameData.Cards_Captured_This_Turn.append(Card_Captured)
 	
 	# Move captured card to appropriate MedBay
@@ -749,7 +768,7 @@ func Setup_Game():
 	
 	# Draw Opening Hands
 	GameData.Current_Step = "Draw"
-	Draw_Card(GameData.Current_Turn, 5)
+	Draw_Card(GameData.Current_Turn, 42)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
 	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"

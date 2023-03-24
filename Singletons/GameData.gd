@@ -31,6 +31,8 @@ var CardSwitched = ""
 
 # Card Effect Resolution variables
 var Yield_Mode = false
+var Resolve_On_Opposing_Card = false
+var Auto_Spring_Traps = false
 var ChosenCard
 
 # Variable used to name Card nodes

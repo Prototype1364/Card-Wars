@@ -121,12 +121,19 @@ func _on_FocusSensor_focus_exited():
 
 func _on_FocusSensor_pressed():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 	var Reposition_Zones = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
+	var Reposition_Zones_Opp = [Side_Opp + "Fighter", Side_Opp + "R1", Side_Opp + "R2", Side_Opp + "R3"]
 	var Reinforcement_Zones = [Side + "R1", Side + "R2", Side + "R3"]
 	var Parent_Name = self.get_parent().name
 	
 	# Allows you to choose a card to receive effect benefits/penalties
-	if GameData.Yield_Mode == true:
+	# Bestow Benefits/Penalties on cards on YOUR side of the field
+	if GameData.Yield_Mode and Reposition_Zones.has(Parent_Name) and (Type == "Normal" or Type == "Hero"):
+		GameData.ChosenCard = self
+		SignalBus.emit_signal("Card_Effect_Selection_Yield_Release", self)
+	# Bestow Benefits/Penalties on cards on OPPONENT's side of the field
+	elif GameData.Yield_Mode and GameData.Resolve_On_Opposing_Card and Reposition_Zones_Opp.has(Parent_Name) and (Type == "Normal" or Type == "Hero"):
 		GameData.ChosenCard = self
 		SignalBus.emit_signal("Card_Effect_Selection_Yield_Release", self)
 	
@@ -160,7 +167,7 @@ func _on_FocusSensor_pressed():
 	
 	# Allows for selection of Attacker
 	elif GameData.Current_Step == "Selection":
-		if (Reposition_Zones[0] in Parent_Name or (Attack_As_Reinforcement == true and Reinforcement_Zones.has(Parent_Name))) and Parent_Name.left(1) == Side:
+		if (Reposition_Zones[0] in Parent_Name or (Attack_As_Reinforcement == true and Reinforcement_Zones.has(Parent_Name))) and Parent_Name.left(1) == Side and Paralysis == false:
 			GameData.Attacker = self
 			SignalBus.emit_signal("Check_For_Targets")
 			if GameData.Target == GameData.Player or GameData.Target == GameData.Enemy:
