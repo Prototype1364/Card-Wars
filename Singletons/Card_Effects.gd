@@ -3,7 +3,17 @@ extends Node
 var Has_Yielded = false
 
 func _ready():
-	pass
+	var _HV1 = SignalBus.connect("Card_Summoned", self, "c30093650")
+
+func On_Field(card):
+	var Parent_Name = card.get_parent().name
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Valid_Slots = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
+	
+	if Valid_Slots.has(Parent_Name):
+		return true
+	else:
+		return false
 
 func Get_Field_Card_Data(Zone):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
@@ -57,17 +67,16 @@ func Flip_Coin():
 func c42489363(card): # Activate Tech (Special)
 	pass
 
+
+"""--------------------------------- Arthurian Deck ---------------------------------"""
 func c61978912(card): # King Arthur (Hero)
 	pass
 
 func c26432104(card): # Merlin (Hero)
-	var Parent_Name = card.get_parent().name
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Valid_Slots = [Side + "R1", Side + "R2", Side + "R3"]
 	var Fighter = Get_Field_Card_Data("Fighter")
 	
 	if Fighter != null:
-		if Valid_Slots.has(Parent_Name) and GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect" and Fighter.Name == "King Arthur":
+		if (On_Field(card) and not "Fighter" in card.get_parent().name) and GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect" and Fighter.Name == "King Arthur":
 			# Roll two dice, if sum of rolls is >= 8 & Merlin is reinforcing King Arthur, grant King Arthur Invincibility
 			var Roll_1 = Dice_Roll()
 			var Roll_2 = Dice_Roll()
@@ -85,11 +94,7 @@ func c79248843(card): # Knight of the Round Table (Hero)
 	pass
 
 func c28269385(card): # Morgan le Fay (Hero)
-	var Parent_Name = card.get_parent().name
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Valid_Slots = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
-	
-	if Valid_Slots.has(Parent_Name) and GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect":
+	if On_Field(card) and GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect":
 		var Flip_Result = Flip_Coin()
 		
 		GameData.Yield_Mode = true
@@ -118,17 +123,13 @@ func c28269385(card): # Morgan le Fay (Hero)
 			GameData.ChosenCard = null
 
 func c67892655(card): # Lancelot (Hero)
-	var Parent_Name = card.get_parent().name
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Valid_Slots = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
 	var Field_Card_Names = []
 	
-	if Valid_Slots.has(Parent_Name) and GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect":
+	if On_Field(card) and GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect":
 		"""----------- Primary Effect -----------"""
 		# If Lancelot is on the field and rolls a 1/6, resolve effect... otherwise reset paralysis status
 		var Roll_Result = Dice_Roll()
 		if Roll_Result == 1 or Roll_Result == 6:
-			print("PARALYZED")
 			card.Paralysis = true
 			card.Attack += 3
 		else:
@@ -158,9 +159,9 @@ func c15178943(card): # Sword (Magic/Equip)
 	
 	if Fighter != null and card.Effect_Active:
 		if Fighter.Attribute == "Warrior":
+			card.Effect_Active = false
 			Fighter.ATK_Bonus += 3
 			Fighter.Update_Data()
-			card.Effect_Active = false
 
 func c53003369(card): # Excalibur (Magic/Equip)
 	if GameData.Current_Phase == "Main Phase" and (GameData.Current_Step == "Summon/Set" or GameData.Current_Step == "Flip") and card.Effect_Active:
@@ -211,11 +212,10 @@ func c17369913(card): # Last Stand (Magic/Equip)
 	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	
 	if "EquipMagic" in card.get_parent().name and card.Effect_Active:
+		card.Effect_Active = false
 		player.Field_ATK_Bonus += 5
 	elif card in GameData.Cards_Captured_This_Turn:
 		enemy.Field_ATK_Bonus -= 8
-	
-	card.Effect_Active = false
 
 func c42151268(card): # Blade Song (Magic)
 	pass
@@ -223,25 +223,18 @@ func c42151268(card): # Blade Song (Magic)
 func c39573503(card): # Runetouched (Magic)
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	if card.Effect_Active:
-		player.Cost_Discount_Magic -= 1
 		card.Effect_Active = false
+		player.Cost_Discount_Magic -= 1
 
 func c74496062(card): # Miraculous Recovery (Magic)
 	pass
 
 func c73282505(card): # Heart of the Underdog (Trap)
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Fighter_Path = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Fighter")
-	var Fighter
-	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
-	var Fighter_Opp_Path = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "Fighter")
-	var Fighter_Opp
+	var Fighter = Get_Field_Card_Data("Fighter")
+	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
 	
 	# Get Node of both Fighters for ATK stat comparison
-	if Fighter_Path.get_child_count() > 0 and Fighter_Opp_Path.get_child_count() > 0:
-		Fighter = Fighter_Path.get_child(0)
-		Fighter_Opp = Fighter_Opp_Path.get_child(0)
-	
+	if Fighter != null and Fighter_Opp != null:
 		# Compare ATK stats, resolving effect if valid
 		if (Fighter.Attack < Fighter_Opp.Attack and card.Tokens > 0) or (GameData.Auto_Spring_Traps and "Backrow" in card.get_parent().name):
 			Fighter.Attack += 7
@@ -257,58 +250,191 @@ func c58494934(card): # Disable (Trap/Equip)
 			Fighter_Opp.Paralysis = true
 
 func c82697165(card): # The Wheel (Tech)
-	pass
+	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	player.Cost_Discount_Normal -= 1
+	player.Cost_Discount_Hero -= 1
+	player.Cost_Discount_Magic -= 1
+	player.Cost_Discount_Trap -= 1
 
+
+"""--------------------------------- Olympian Deck ---------------------------------"""
 func c50316560(card): # Hades (Hero)
 	pass
 
 func c72430176(card): # Zeus (Hero)
-	pass
+	if On_Field(card):
+		"""----------- Primary Effect -----------"""
+		# Grant Multi_Strike when on field for first time
+		if card.Multi_Strike == false:
+			card.Multi_Strike = true
+		
+		"""----------- Secondary Effect -----------"""
+		# Collect data for allied cards on field
+		var Fighter = Get_Field_Card_Data("Fighter")
+		var Reinforcers = Get_Field_Card_Data("Reinforcers")
+		var Active_Attributes = []
+		
+		# Collect all active allied card Attributes (exluding Zeus)
+		if Fighter.Name != "Zeus":
+			Active_Attributes.append(Fighter.Attribute)
+		for i in Reinforcers:
+			if i.Name != "Zeus":
+				Active_Attributes.append(i.Attribute)
+		
+		# Give Zeus ability to Attack_As_Reinforcement when joined by another Olympian
+		if Active_Attributes.has("Olympian"):
+			card.Attack_As_Reinforcement = true
+		else:
+			card.Attack_As_Reinforcement = false
+		
+		"""----------- Tertiary Effect -----------"""
+		# Capture 1 random card from opponent's hand when Olympian is captured
+		if GameData.Current_Phase == "End Phase" and GameData.Current_Step == "Effect":
+			for i in GameData.Cards_Captured_This_Turn:
+				if i != card and i.Attribute == "Olympian":
+					var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
+					var Hand_Opp_Path = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/" + Side_Opp + "HandScroller/" + Side_Opp + "Hand")
+					var Hand_Cards = Hand_Opp_Path.get_child_count()
+					var rng = RandomNumberGenerator.new()
+					rng.randomize()
+					var roll_result = rng.randi_range(0,Hand_Cards - 1)
+					var Card_Captured
+					if Hand_Cards > 0:
+						Card_Captured = Hand_Opp_Path.get_child(roll_result)
+					if Card_Captured != null:
+						SignalBus.emit_signal("Capture_Card", Card_Captured, Card_Captured.get_parent(), "Normal")
 
 func c25486317(card): # Ares (Hero)
-	pass
+	# Ensures effect only triggers on Turns where Battle Phase isn't skipped (otherwise Ares would have his ATK reduced more than increased)
+	if GameData.Turn_Counter > 1:
+		var Reinforcers = Get_Field_Card_Data("Reinforcers")
+		
+		# When Ares is on the field, gain ATK equal to sum total of Reinforcers ATK during Battle Phase. Reverse effect during End Phase.
+		if On_Field(card) and GameData.Current_Phase == "Battle Phase" and GameData.Current_Step == "Selection":
+			for i in range(len(Reinforcers)):
+				card.Attack += Reinforcers[i].Attack
+		elif On_Field(card) and GameData.Current_Phase == "End Phase" and GameData.Current_Step == "Effect":
+			for i in range(len(Reinforcers)):
+				card.Attack -= Reinforcers[i].Attack
+		
+		# Update Card Visuals
+		card.Update_Data()
 
 func c47338587(card): # Aphrodite (Hero)
-	pass
+	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
+	
+	if On_Field(card) and Fighter_Opp != null and GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect":
+		Fighter_Opp.Attack -= 2
+		# Ensures that ATK never goes below zero (would cause attacks to heal target instead of damage them)
+		Fighter_Opp.Attack = max(0, Fighter_Opp.Attack)
+		Fighter_Opp.Update_Data()
 
 func c93958804(card): # Hephaestus (Hero)
-	pass
+	if On_Field(card) and GameData.Current_Phase == "Main" and card.Effect_Active:
+		card.Effect_Active = false
+		var Fighter = Get_Field_Card_Data("Fighter")
+		Fighter.ATK_Bonus += Fighter.ATK_Bonus
+		Fighter.Health_Bonus += Fighter.Health_Bonus
+		Fighter.Update_Data()
 
 func c34658370(card): # Poseidon (Hero)
-	pass
+	if On_Field(card) and card.Target_Reinforcer == false and card.Effect_Active:
+		card.Effect_Active = false
+		card.Target_Reinforcer == true
 
 func c31289091(card): # Hera (Hero)
-	pass
+	# Damage All Enemy Normal/Hero cards when Olympian is captured
+	if On_Field(card) and GameData.Current_Phase == "End Phase" and GameData.Current_Step == "Effect":
+		for i in GameData.Cards_Captured_This_Turn:
+			if i != card and i.Attribute == "Olympian":
+				# Set to Enemy if Turn == "Player" due to the fact that most captures occur during the other player's turn
+				var player = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
+				
+				# Get opposing Normal/Hero cards on field
+				var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
+				var Reinforcers_Opp = Get_Field_Card_Data("Reinforcers Opponent")
+				
+				# Resolve Battle Damage (and Capture Card if necessary)
+				Fighter_Opp.Health -= (card.Attack + card.ATK_Bonus + player.Field_ATK_Bonus)
+				Fighter_Opp.Update_Data()
+				if Fighter_Opp.Health <= 0:
+					SignalBus.emit_signal("Capture_Card", Fighter_Opp, Fighter_Opp.get_parent(), "Normal")
+				for reinforcer in Reinforcers_Opp:
+					reinforcer.Health -= (card.Attack + card.ATK_Bonus + player.Field_ATK_Bonus)
+					reinforcer.Update_Data()
+					if reinforcer.Health <= 0:
+						SignalBus.emit_signal("Capture_Card", reinforcer, reinforcer.get_parent(), "Normal")
 
 func c80932559(card): # Demeter (Hero)
-	pass
+	if On_Field(card) and GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect":
+		var Fighter = Get_Field_Card_Data("Fighter")
+		Fighter.Health += 1
+		Fighter.Update_Data()
 
 func c96427990(card): # Athena (Hero)
-	pass
+	# Disables Magic card effects when on field
+	if On_Field(card):
+		GameData.Muggle_Mode = true
+	else:
+		GameData.Muggle_Mode = false
 
 func c86042533(card): # Artemis (Hero)
-	pass
+	if On_Field(card) and GameData.Attacker == card and GameData.Target.Attribute == "Creature" and GameData.Current_Phase == "Battle Phase" and GameData.Current_Step == "Damage":
+		SignalBus.emit_signal("Capture_Card", GameData.Target, GameData.Target.get_parent(), "Normal")
 
 func c97850313(card): # Hermes (Hero)
-	pass
+	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	
+	if On_Field(card):
+		player.Relentless = true
+	else:
+		player.Relentless = false
 
 func c15996549(card): # Hestia (Hero)
-	pass
+	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var Tech_Deck = player.Tech_Deck
+	
+	# Summons 1 "Fire" Tech card to the Tech Zone when summoned
+	if On_Field(card) and GameData.Cards_Summoned_This_Turn.has(card) and card.Effect_Active:
+		card.Effect_Active = false
+		for i in range(len(Tech_Deck)):
+			var Card_Name = Tech_Deck[i].Name
+			if Card_Name == "Fire":
+				var Card_Drawn = preload("res://Scenes/SupportScenes/SmallCard.tscn")
+				var Side = "W" if GameData.Current_Turn == "Player" else "B"
+				var TechZone = self.get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "TechZone")
+				var InstanceCard = Card_Drawn.instance()
+				InstanceCard.name = "Card" + str(GameData.CardCounter)
+				GameData.CardCounter += 1
+				TechZone.add_child(InstanceCard)
+				InstanceCard.Set_Tech_Card_Variables(i)
+				return
 
 func c17171263(card): # Dionysus (Hero)
-	var Parent_Name = card.get_parent().name
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Valid_Slots = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
-	
-	if Valid_Slots.has(Parent_Name):
+	if On_Field(card):
 		GameData.Auto_Spring_Traps = true
 	else:
 		GameData.Auto_Spring_Traps = false
 
 func c68754341(card): # Prayer (Magic)
-	pass
+	var roll_result = Dice_Roll()
+	var Fighter = Get_Field_Card_Data("Fighter")
+	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
+	
+	if roll_result == 1:
+		Fighter_Opp.ATK_Bonus += 3
+	elif roll_result == 2:
+		Fighter.ATK_Bonus += 3
+	elif roll_result == 3:
+		Fighter_Opp.Health = Fighter_Opp.Revival_Health
+	elif roll_result == 4:
+		Fighter.Health = Fighter.Revival_Health
+	elif roll_result == 5:
+		Fighter.Paralysis = true
+	else:
+		Fighter.Invincible = true
 
-func c68535761(card): # Ressurection (Magic)
+func c68535761(card): # Resurrection (Magic)
 	pass
 
 func c83893341(card): # Deep Pit (Trap)
@@ -338,4 +464,8 @@ func c83893341(card): # Deep Pit (Trap)
 			card.Update_Data()
 
 func c30093650(card): # Fire (Tech)
-	pass
+	if "TechZone" in card.get_parent().name and GameData.Current_Phase == "Main Phase":
+		for Summoned_Card in GameData.Cards_Summoned_This_Turn:
+			if (Summoned_Card.Type == "Normal" or Summoned_Card.Type == "Hero") and Summoned_Card == GameData.Cards_Summoned_This_Turn[-1]:
+				Summoned_Card.Health += 5
+				Summoned_Card.Update_Data()

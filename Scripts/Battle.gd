@@ -3,7 +3,7 @@ extends Control
 const PHASES = ["Opening Phase", "Standby Phase", "Main Phase", "Battle Phase", "End Phase"]
 const PHASE_THRESHOLDS = [2, 4, 5, 10, 15]
 const STEPS = ["Start", "Draw", "Roll", "Effect", "Token", "Main", "Selection", "Target", "Damage", "Capture", "Repeat", "Discard", "Reload", "Effect", "Victory", "End"]
-const EFFECT_STEPS = ["Effect", "Selection", "Capture", "Discard"] # Discard may/may not end up being an Effect Step. You just added it, just in case (also Summon/Set should be added to check for Event-effects like Mordred's).
+const EFFECT_STEPS = ["Effect", "Selection", "Damage", "Capture", "Discard"] # Discard may/may not end up being an Effect Step. You just added it, just in case (also Summon/Set should be added to check for Event-effects like Mordred's).
 const FUNC_STEPS = ["Damage"]
 
 var BoardImage = preload("res://Assets/Playmat/BoardImage.png")
@@ -54,6 +54,7 @@ func Create_Deck(Deck_List, Current_Duelist):
 					false,
 					false,
 					false,
+					false,
 					Current_Duelist)
 					
 				# Ensures that Tech cards go into the Tech Deck.
@@ -72,7 +73,7 @@ func Create_Advance_Tech_Card():
 	var Created_Card
 	for card in GameData.CardData:
 		if card["Passcode"] == 42489363:
-			Created_Card = Card.new(card["CardType"], card["CardArt"], card["CardName"], card["CardType"], card["EffectType"], card["Attribute"], card["Description"], card["ShortDescription"], card["Attack"], 0, card["Cost"], card["Health"], 0, card["SpecialEditionText"], card["Rarity"], card["Passcode"], card["DeckCapacity"], 0, false, false, 1, false, false, false, false, "Game")
+			Created_Card = Card.new(card["CardType"], card["CardArt"], card["CardName"], card["CardType"], card["EffectType"], card["Attribute"], card["Description"], card["ShortDescription"], card["Attack"], 0, card["Cost"], card["Health"], 0, card["SpecialEditionText"], card["Rarity"], card["Passcode"], card["DeckCapacity"], 0, false, false, 1, false, false, false, false, false, "Game")
 	
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
@@ -90,8 +91,7 @@ func Shuffle_Decks():
 func Choose_Starting_Player():
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
-#	var random_number = rng.randi_range(1,2)
-	var random_number = 2
+	var random_number = rng.randi_range(1,2)
 	GameData.Current_Turn = "Player" if random_number == 1 else "Enemy"
 	
 	# Flip field (if Black goes first)
@@ -325,7 +325,7 @@ func Play_Card(Side):
 		# Updates children for parents in From & To locations (if destination is valid for Card Type).
 		var Equip_Slot = get_node("Playmat/CardSpots/NonHands/" + Side + "EquipMagic") if CardMoved.Type == "Magic" else get_node("Playmat/CardSpots/NonHands/" + Side + "EquipTrap")
 		var Graveyard = get_node("Playmat/CardSpots/NonHands/" + Side + "Graveyard")
-		if Equip_Slot.get_child_count() > 0:
+		if Equip_Slot.get_child_count() > 0 and CardMoved.Attribute == "Equip":
 			var Old_Equip_Card = Equip_Slot.get_child(0)
 			Equip_Slot.remove_child(Old_Equip_Card)
 			Graveyard.add_child(Old_Equip_Card)
@@ -339,7 +339,7 @@ func Play_Card(Side):
 		Set_Focus_Neighbors("Hand",Side,Moved)
 		
 		# Activate Summon Effects (Currently no way to Set cards)
-		if Chosen_Card.Type == "Hero" or (Chosen_Card.Type == "Magic" and Chosen_Card.Is_Set == false) or (Chosen_Card.Type == "Trap" and Chosen_Card.Attribute == "Equip" and Chosen_Card.Is_Set == false):
+		if Chosen_Card.Type == "Hero" or (Chosen_Card.Type == "Magic" and Chosen_Card.Is_Set == false and GameData.Muggle_Mode == false) or (Chosen_Card.Type == "Trap" and Chosen_Card.Attribute == "Equip" and Chosen_Card.Is_Set == false):
 			Chosen_Card.Effect_Active = true
 			Activate_Summon_Effects(Chosen_Card)
 			# Ensures that card summoned to Equip slot is not immediately sent to Graveyard.
@@ -351,6 +351,10 @@ func Play_Card(Side):
 				MoveTo.add_child(CardMoved)
 				# Resets Effect_Active status to ensure card doesn't activate from Graveyard
 				Chosen_Card.Effect_Active = false
+		
+		# Updates Card Summoned This Turn Array
+		GameData.Cards_Summoned_This_Turn.append(Chosen_Card)
+		SignalBus.emit_signal("Card_Summoned", Chosen_Card)
 		
 		# Allows card effects that resolve during Summon/Set to occur (i.e. Deep Pit)
 		Resolve_Card_Effects()
@@ -500,17 +504,22 @@ func Resolve_Battle_Damage():
 	var Side = "B" if GameData.Current_Turn == "Player" else "W"
 	
 	if GameData.Attacker != null and GameData.Target != null: # Ensures no error is thrown when func is called with empty player field.
+		var Relentless = 1
+		if "Fighter" in GameData.Attacker.get_parent().name and player.Relentless == true:
+			Relentless += 1
 		GameData.Attacks_To_Launch -= 1
 		if GameData.Target == enemy:
-			enemy.LP -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus)
-			# Update HUD
-			get_node("HUD_" + Side).Update_Data(enemy)
+			for _i in range(Relentless):
+				enemy.LP -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus)
+				# Update HUD
+				get_node("HUD_" + Side).Update_Data(enemy)
 			if enemy.LP <= 0:
 				GameData.Victor = player.Name
 		else:
 			if GameData.Target.Invincible == false:
-				GameData.Target.Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus)
-				GameData.Target.Update_Data()
+				for _i in range(Relentless):
+					GameData.Target.Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus)
+					GameData.Target.Update_Data()
 			
 			# Capture Step
 			if GameData.Target.Health <= 0:
@@ -529,6 +538,10 @@ func Capture_Card(Card_Captured, slot_name, Capture_Type = "Normal"):
 	else:
 		Destination_MedBay = $Playmat/CardSpots/NonHands/BMedBay if GameData.Current_Turn == "Player" else $Playmat/CardSpots/NonHands/WMedBay
 	GameData.Cards_Captured_This_Turn.append(Card_Captured)
+	
+	# Fixes bug regarding auto-updating of rect_pos of selected scene when moving from slot to slot.
+	Card_Captured.rect_position.x = 0
+	Card_Captured.rect_position.y = 0
 	
 	# Move captured card to appropriate MedBay
 	slot_name.remove_child(Card_Captured)
@@ -725,6 +738,7 @@ func Update_Game_Turn():
 	if get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() <= 5:
 		Conduct_End_Phase()
 		if GameData.Victor == null:
+			GameData.Cards_Summoned_This_Turn.clear()
 			GameData.Cards_Captured_This_Turn.clear()
 			GameData.Turn_Counter += 1
 			GameData.Current_Phase = PHASES[0]
@@ -768,7 +782,7 @@ func Setup_Game():
 	
 	# Draw Opening Hands
 	GameData.Current_Step = "Draw"
-	Draw_Card(GameData.Current_Turn, 42)
+	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
 	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"

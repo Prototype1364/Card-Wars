@@ -11,12 +11,13 @@ var Current_Phase = "Opening Phase"
 var Current_Step = "Start"
 const ATTRIBUTE_LIST = ["Creature","Cryptid","Explorer","Mythological","Olympian","Outlaw","Philosopher","Pirate","Politician","Ranged","Scientist","Spy","Support","Titan","Warrior","Wizard"] # A list of all Normal/Hero card Attributes in the game. Used to reset Summonable_Attributes variable value when "Immanuel Kant" leaves the field.
 var Summonable_Attributes = ATTRIBUTE_LIST # Used to resolve "Immanuel Kant" Hero card effect. Initially contains all Attributes in the game, but is lowered to 1 of the player's choice when Kant is on the field.
+var Cards_Summoned_This_Turn = []
 var Cards_Captured_This_Turn = []
 var Attacks_To_Launch = 0
 var Attacker
 var Target
-var Player = Duelist.new("Player",100,50,0,0,0,0,0,0,0,0,[],[],[],[],[],[],[],[],[],[],"None")
-var Enemy = Duelist.new("Enemy",100,50,0,0,0,0,0,0,0,0,[],[],[],[],[],[],[],[],[],[],"None")
+var Player = Duelist.new("Player",100,50,0,0,0,0,0,0,0,0,false,[],[],[],[],[],[],[],[],[],[],"None")
+var Enemy = Duelist.new("Enemy",100,50,0,0,0,0,0,0,0,0,false,[],[],[],[],[],[],[],[],[],[],"None")
 
 # Focus Card variables
 var FocusedCardName = ""
@@ -32,6 +33,7 @@ var CardSwitched = ""
 # Card Effect Resolution variables
 var Yield_Mode = false
 var Resolve_On_Opposing_Card = false
+var Muggle_Mode = false
 var Auto_Spring_Traps = false
 var ChosenCard
 

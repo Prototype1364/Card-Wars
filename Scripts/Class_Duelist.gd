@@ -12,6 +12,7 @@ var Cost_Discount_Normal
 var Cost_Discount_Hero
 var Cost_Discount_Magic
 var Cost_Discount_Trap
+var Relentless
 var Deck
 var Tech_Deck
 var Hand
@@ -24,7 +25,7 @@ var Banished
 var Tech_Zone
 var Current_Fighter
 
-func _init(Duelist_Name, Duelist_LP, Duelist_Summon_Crests, Duelist_Tokens, Duelist_Field_ATK_Bonus, Duelist_Field_Health_Bonus, Duelist_Summon_Crest_Roll_Bonus, Duelist_Cost_Discount_Normal, Duelist_Cost_Discount_Hero, Duelist_Cost_Discount_Magic, Duelist_Cost_Discount_Trap, Duelist_Deck, Duelist_Tech_Deck, Duelist_Hand, Duelist_Frontline, Duelist_Reinforcement, Duelist_Backrow, Duelist_MedicalBay, Duelist_Graveyard, Duelist_Banished, Duelist_Tech_Zone, Duelist_Current_Fighter):
+func _init(Duelist_Name, Duelist_LP, Duelist_Summon_Crests, Duelist_Tokens, Duelist_Field_ATK_Bonus, Duelist_Field_Health_Bonus, Duelist_Summon_Crest_Roll_Bonus, Duelist_Cost_Discount_Normal, Duelist_Cost_Discount_Hero, Duelist_Cost_Discount_Magic, Duelist_Cost_Discount_Trap, Duelist_Relentless, Duelist_Deck, Duelist_Tech_Deck, Duelist_Hand, Duelist_Frontline, Duelist_Reinforcement, Duelist_Backrow, Duelist_MedicalBay, Duelist_Graveyard, Duelist_Banished, Duelist_Tech_Zone, Duelist_Current_Fighter):
 	Name = Duelist_Name
 	LP = Duelist_LP
 	Summon_Crests = Duelist_Summon_Crests
@@ -36,6 +37,7 @@ func _init(Duelist_Name, Duelist_LP, Duelist_Summon_Crests, Duelist_Tokens, Duel
 	Cost_Discount_Hero = Duelist_Cost_Discount_Hero
 	Cost_Discount_Magic = Duelist_Cost_Discount_Magic
 	Cost_Discount_Trap = Duelist_Cost_Discount_Trap
+	Relentless = Duelist_Relentless
 	Deck = Duelist_Deck
 	Tech_Deck = Duelist_Tech_Deck
 	Hand = Duelist_Hand

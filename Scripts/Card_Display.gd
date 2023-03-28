@@ -22,7 +22,9 @@ func LookAtCard(FrameData, ArtData, NameData, AttackData, CostData, HealthData, 
 	if SelectedCard != null:
 		if FrameData != "Special": # Card is NOT Advance Tech card
 			var Frame_Texture = load("res://Assets/Cards/Frame/Large_Frame_" + FrameData + ".png")
-			var Cost_Texture = load("res://Assets/Cards/Cost/Large/Large_Cost_" + FrameData + "_" + str(CostData) + ".png")
+			var Cost_Texture
+			if FrameData != "Tech":
+				Cost_Texture = load("res://Assets/Cards/Cost/Large/Large_Cost_" + FrameData + "_" + str(CostData) + ".png")
 			var Attribute_Texture
 			if SelectedCard.Type == "Normal" or SelectedCard.Type == "Hero":
 				Attribute_Texture = load("res://Assets/Cards/Attribute/Attribute_" + AttributeData + ".png")

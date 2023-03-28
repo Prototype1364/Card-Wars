@@ -27,45 +27,85 @@ var Fusion_Level
 var Attack_As_Reinforcement
 var Invincible
 var Multi_Strike
+var Target_Reinforcer
 var Paralysis
 var Owner
 
 
-func _ready():
-	Set_Card_Variables()
+func _ready(Base = "Normal", Card_Index = -1):
+	if Base == "Normal":
+		Set_Card_Variables(Card_Index)
+		Update_Card_Visuals()
+		Update_Data()
+	elif Base == "Tech":
+		# Visuals & Data update funcs called in func below
+		Set_Tech_Card_Variables(Card_Index)
+
+func Set_Tech_Card_Variables(Card_Index):
+	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	Name = player.Tech_Deck[Card_Index].Name
+	Frame = player.Tech_Deck[Card_Index].Frame
+	Type = player.Tech_Deck[Card_Index].Type
+	Effect_Type = player.Tech_Deck[Card_Index].Effect_Type
+	Art = load(player.Tech_Deck[Card_Index].Art) if player.Tech_Deck[Card_Index].Art != "res://Assets/Cards/Art/Special_Activate_Technology.png" else null
+	Attribute = player.Tech_Deck[Card_Index].Attribute
+	Description = player.Tech_Deck[Card_Index].Description
+	Short_Description = player.Tech_Deck[Card_Index].Short_Description
+	Attack = player.Tech_Deck[Card_Index].Attack if player.Tech_Deck[Card_Index].Attack != null else ""
+	ATK_Bonus = player.Tech_Deck[Card_Index].ATK_Bonus
+	Cost = player.Tech_Deck[Card_Index].Cost
+	Cost_Path = null
+	Health = player.Tech_Deck[Card_Index].Health if player.Tech_Deck[Card_Index].Health != null else ""
+	Health_Bonus = player.Tech_Deck[Card_Index].Health_Bonus
+	Revival_Health = Health
+	Special_Edition_Text = player.Tech_Deck[Card_Index].Special_Edition_Text
+	Rarity = player.Tech_Deck[Card_Index].Rarity
+	Passcode = player.Tech_Deck[Card_Index].Passcode
+	Deck_Capacity = player.Tech_Deck[Card_Index].Deck_Capacity
+	Tokens = player.Tech_Deck[Card_Index].Tokens
+	Is_Set = player.Tech_Deck[Card_Index].Is_Set
+	Effect_Active = player.Tech_Deck[Card_Index].Effect_Active
+	Fusion_Level = player.Tech_Deck[Card_Index].Fusion_Level
+	Attack_As_Reinforcement = player.Tech_Deck[Card_Index].Attack_As_Reinforcement
+	Invincible = player.Tech_Deck[Card_Index].Invincible
+	Multi_Strike = player.Tech_Deck[Card_Index].Multi_Strike
+	Paralysis = player.Tech_Deck[Card_Index].Paralysis
+	Owner = player.Tech_Deck[Card_Index].Owner
+	
+	# Forces the correct values to be shown visually in Tech cards instantiated via Effect (i.e. from Hestia)
 	Update_Card_Visuals()
 	Update_Data()
 
-func Set_Card_Variables():
+func Set_Card_Variables(Card_Index):
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
-	Name = player.Deck[-1].Name
-	Frame = player.Deck[-1].Frame
-	Type = player.Deck[-1].Type
-	Effect_Type = player.Deck[-1].Effect_Type
-	Art = load(player.Deck[-1].Art) if player.Deck[-1].Art != "res://Assets/Cards/Art/Special_Activate_Technology.png" else null
-	Attribute = player.Deck[-1].Attribute
-	Description = player.Deck[-1].Description
-	Short_Description = player.Deck[-1].Short_Description
-	Attack = player.Deck[-1].Attack if player.Deck[-1].Attack != null else ""
-	ATK_Bonus = player.Deck[-1].ATK_Bonus
-	Cost = player.Deck[-1].Cost
-	Cost_Path = load("res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png") if player.Deck[-1].Type != "Special" else null
-	Health = player.Deck[-1].Health if player.Deck[-1].Health != null else ""
-	Health_Bonus = player.Deck[-1].Health_Bonus
+	Name = player.Deck[Card_Index].Name
+	Frame = player.Deck[Card_Index].Frame
+	Type = player.Deck[Card_Index].Type
+	Effect_Type = player.Deck[Card_Index].Effect_Type
+	Art = load(player.Deck[Card_Index].Art) if player.Deck[Card_Index].Art != "res://Assets/Cards/Art/Special_Activate_Technology.png" else null
+	Attribute = player.Deck[Card_Index].Attribute
+	Description = player.Deck[Card_Index].Description
+	Short_Description = player.Deck[Card_Index].Short_Description
+	Attack = player.Deck[Card_Index].Attack if player.Deck[Card_Index].Attack != null else ""
+	ATK_Bonus = player.Deck[Card_Index].ATK_Bonus
+	Cost = player.Deck[Card_Index].Cost
+	Cost_Path = load("res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png") if player.Deck[Card_Index].Type != "Special" else null
+	Health = player.Deck[Card_Index].Health if player.Deck[Card_Index].Health != null else ""
+	Health_Bonus = player.Deck[Card_Index].Health_Bonus
 	Revival_Health = Health
-	Special_Edition_Text = player.Deck[-1].Special_Edition_Text
-	Rarity = player.Deck[-1].Rarity
-	Passcode = player.Deck[-1].Passcode
-	Deck_Capacity = player.Deck[-1].Deck_Capacity
-	Tokens = player.Deck[-1].Tokens
-	Is_Set = player.Deck[-1].Is_Set
-	Effect_Active = player.Deck[-1].Effect_Active
-	Fusion_Level = player.Deck[-1].Fusion_Level
-	Attack_As_Reinforcement = player.Deck[-1].Attack_As_Reinforcement
-	Invincible = player.Deck[-1].Invincible
-	Multi_Strike = player.Deck[-1].Multi_Strike
-	Paralysis = player.Deck[-1].Paralysis
-	Owner = player.Deck[-1].Owner
+	Special_Edition_Text = player.Deck[Card_Index].Special_Edition_Text
+	Rarity = player.Deck[Card_Index].Rarity
+	Passcode = player.Deck[Card_Index].Passcode
+	Deck_Capacity = player.Deck[Card_Index].Deck_Capacity
+	Tokens = player.Deck[Card_Index].Tokens
+	Is_Set = player.Deck[Card_Index].Is_Set
+	Effect_Active = player.Deck[Card_Index].Effect_Active
+	Fusion_Level = player.Deck[Card_Index].Fusion_Level
+	Attack_As_Reinforcement = player.Deck[Card_Index].Attack_As_Reinforcement
+	Invincible = player.Deck[Card_Index].Invincible
+	Multi_Strike = player.Deck[Card_Index].Multi_Strike
+	Paralysis = player.Deck[Card_Index].Paralysis
+	Owner = player.Deck[Card_Index].Owner
 
 func Update_Card_Visuals():
 	if self.Frame != "Special":
@@ -185,7 +225,7 @@ func _on_FocusSensor_pressed():
 	
 	# Allows for selection of Target
 	elif GameData.Current_Step == "Target":
-		if "Fighter" in Parent_Name and ((Parent_Name.left(1) == "W" and GameData.Current_Turn != "Player") or Parent_Name.left(1) == "B" and GameData.Current_Turn != "Enemy"):
+		if ("Fighter" in Parent_Name and ((Parent_Name.left(1) == "W" and GameData.Current_Turn != "Player") or Parent_Name.left(1) == "B" and GameData.Current_Turn != "Enemy") or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name) and GameData.Attacker.Target_Reinforcer)):
 			$Action_Button_Container/Target.visible = true
 	
 	# Allows for selection of cards to discard from hand

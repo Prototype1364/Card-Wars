@@ -12,12 +12,12 @@ _global_script_classes=[ {
 "base": "Reference",
 "class": "Card",
 "language": "GDScript",
-"path": "res://Scripts/Class_Card.gd"
+"path": "res://Scripts/CLASS_Card.gd"
 }, {
 "base": "Reference",
 "class": "Duelist",
 "language": "GDScript",
-"path": "res://Scripts/Class_Duelist.gd"
+"path": "res://Scripts/CLASS_Duelist.gd"
 } ]
 _global_script_class_icons={
 "Card": "",
