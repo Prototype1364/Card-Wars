@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Scenes/SupportScenes/Battle_HUD_GameState.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scenes/SupportScenes/Battle_HUD_Duelist.tscn" type="PackedScene" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://Assets/Playmat/Switch Button.png" type="Texture" id=6]
 [ext_resource path="res://Scripts/Battle.gd" type="Script" id=7]
 [ext_resource path="res://Resources/Fonts/MTCORSVA.TTF" type="DynamicFontData" id=8]
+[ext_resource path="res://Scenes/SupportScenes/Pile_Scroller.tscn" type="PackedScene" id=9]
 
 [sub_resource type="DynamicFont" id=1]
 size = 45
@@ -612,6 +613,13 @@ margin_bottom = 71.0
 margin_left = 15.0
 margin_right = 755.0
 margin_bottom = 71.0
+
+[node name="Pile_Scroller" parent="." instance=ExtResource( 9 )]
+visible = false
+margin_left = 128.0
+margin_top = 439.0
+margin_right = 983.0
+margin_bottom = 659.0
 
 [connection signal="gui_input" from="Playmat" to="." method="_on_Playmat_gui_input"]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WFighter" to="." method="_on_Card_Slot_pressed" binds= [ "WFighter" ]]
