@@ -189,6 +189,11 @@ func _on_FocusSensor_pressed():
 	
 	# Allows you to Summon/Set cards to field
 	elif "Hand" in Parent_Name and GameData.Current_Step == "Main":
+		# Allows for Fusion Summoning (Knights of the Round Table)
+		if Passcode in GameData.FUSION_CARDS:
+			var Battle_Scene = load("res://Scenes/MainScenes/Battle.tscn").instance()
+			Battle_Scene.Activate_Summon_Effects(self)
+		
 		# Allows you to skip pressing Summon/Set buttons when playing Normal/Hero card
 		if self.Type == "Normal" or self.Type == "Hero":
 			GameData.Summon_Mode = "Summon"

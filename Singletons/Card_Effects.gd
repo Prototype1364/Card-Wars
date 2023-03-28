@@ -3,7 +3,8 @@ extends Node
 var Has_Yielded = false
 
 func _ready():
-	var _HV1 = SignalBus.connect("Card_Summoned", self, "c30093650")
+	var _HV1 = SignalBus.connect("Card_Summoned", self, "c30093650") # Fire (Tech)
+	var _HV2 = SignalBus.connect("Card_Summoned", self, "c22716806") # Mordred (Hero)
 
 func On_Field(card):
 	var Parent_Name = card.get_parent().name
@@ -91,7 +92,37 @@ func c26432104(card): # Merlin (Hero)
 			card.Update_Data()
 
 func c79248843(card): # Knight of the Round Table (Hero)
-	pass
+	var player = GameData.Player if GameData.Current_Turn == "W" else GameData.Enemy
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Parent_Node = card.get_parent()
+	var Parent_Name = card.get_parent().name
+	var Banish_Slot = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Banished")
+	var Knight_Of_The_Round_Table
+	
+	
+	# Summon IS Affordable and Valid
+	if GameData.Current_Phase == "Main Phase" and card.Cost + player.Cost_Discount_Hero <= player.Summon_Crests and "Hand" in Parent_Name:
+		var Fighter = Get_Field_Card_Data("Fighter")
+		var Reinforcers = Get_Field_Card_Data("Reinforcers")
+		
+		# Locate KOTRT on field for potential Fusion Summon
+		if Fighter != null:
+			if Fighter.Name == "Knight of the Round Table":
+				Knight_Of_The_Round_Table = Fighter
+			elif Reinforcers != null:
+				for Field_Card in Reinforcers:
+					if Field_Card.Name == "Knight of the Round Table":
+						Knight_Of_The_Round_Table = Field_Card
+		
+		# Update KOTRT Fusion Level
+		if Knight_Of_The_Round_Table != null:
+			print("TEST")
+			Knight_Of_The_Round_Table.Fusion_Level += 1
+			Knight_Of_The_Round_Table.Update_Data()
+			
+			# Banish summoned KOTRT
+			#Parent_Node.remove_child(card)
+			#Banish_Slot.add_child(card)
 
 func c28269385(card): # Morgan le Fay (Hero)
 	if On_Field(card) and GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect":
@@ -152,7 +183,47 @@ func c67892655(card): # Lancelot (Hero)
 		card.Update_Data()
 
 func c22716806(card): # Mordred (Hero)
-	pass
+	var Fighter = Get_Field_Card_Data("Fighter")
+	var Reinforcements = Get_Field_Card_Data("Reinforcers")
+	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
+	var Reinforcements_Opp = Get_Field_Card_Data("Reinforcers Opponent")
+	var Parent_Name = card.get_parent().name
+	var Controlled_By_Owner
+	
+	"""----------- Primary Effect -----------"""
+	# Capture self when on field during a turn where King Arthur is captured
+	if On_Field(card) and GameData.Current_Phase == "End Phase" and GameData.Current_Step == "Effect":
+		for i in GameData.Cards_Captured_This_Turn:
+			if i.Name == "King Arthur":
+				SignalBus.emit_signal("Capture_Card", card, card.get_parent(), "Normal")
+				return
+	
+	"""----------- Secondary Effect -----------"""
+	# Summon card to field when King Arthur is played by opponent
+	if "Hand" in Parent_Name:
+		for Summoned_Card in GameData.Cards_Summoned_This_Turn:
+			if Summoned_Card.Name == "King Arthur" and (Fighter_Opp.has(Summoned_Card) or Reinforcements_Opp.has(Summoned_Card)) and Summoned_Card == GameData.Cards_Summoned_This_Turn[-1]:
+				GameData.CardMoved = card
+				SignalBus.emit_signal("Play_Card", Parent_Name.left(1))
+	
+	"""----------- Tertiary Effect -----------"""
+	if (Parent_Name.left(1) == "W" and card.Owner == "Player") or (Parent_Name.left(1) == "B" and card.Owner == "Enemy"):
+		Controlled_By_Owner = true
+	else:
+		Controlled_By_Owner = false
+	
+	if Controlled_By_Owner == false:
+		if Fighter != card:
+			Fighter.Health -= 3
+			Fighter.Update_Data()
+			if Fighter.Health <= 0:
+				SignalBus.emit_signal("Capture_Card", Fighter, Fighter.get_parent(), "Normal")
+		for reinforcer in Reinforcements:
+			if reinforcer != card:
+				reinforcer.Health -= 3
+				reinforcer.Update_Data()
+				if reinforcer.Health <= 0:
+					SignalBus.emit_signal("Capture_Card", reinforcer, reinforcer.get_parent(), "Normal")
 
 func c15178943(card): # Sword (Magic/Equip)
 	var Fighter = Get_Field_Card_Data("Fighter")
@@ -340,7 +411,7 @@ func c93958804(card): # Hephaestus (Hero)
 func c34658370(card): # Poseidon (Hero)
 	if On_Field(card) and card.Target_Reinforcer == false and card.Effect_Active:
 		card.Effect_Active = false
-		card.Target_Reinforcer == true
+		card.Target_Reinforcer = true
 
 func c31289091(card): # Hera (Hero)
 	# Damage All Enemy Normal/Hero cards when Olympian is captured

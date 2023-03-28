@@ -11,6 +11,7 @@ var Current_Phase = "Opening Phase"
 var Current_Step = "Start"
 const ATTRIBUTE_LIST = ["Creature","Cryptid","Explorer","Mythological","Olympian","Outlaw","Philosopher","Pirate","Politician","Ranged","Scientist","Spy","Support","Titan","Warrior","Wizard"] # A list of all Normal/Hero card Attributes in the game. Used to reset Summonable_Attributes variable value when "Immanuel Kant" leaves the field.
 var Summonable_Attributes = ATTRIBUTE_LIST # Used to resolve "Immanuel Kant" Hero card effect. Initially contains all Attributes in the game, but is lowered to 1 of the player's choice when Kant is on the field.
+const FUSION_CARDS = [79248843]
 var Cards_Summoned_This_Turn = []
 var Cards_Captured_This_Turn = []
 var Attacks_To_Launch = 0

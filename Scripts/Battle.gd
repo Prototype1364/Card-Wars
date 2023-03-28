@@ -91,7 +91,8 @@ func Shuffle_Decks():
 func Choose_Starting_Player():
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
-	var random_number = rng.randi_range(1,2)
+#	var random_number = rng.randi_range(1,2)
+	var random_number = 1
 	GameData.Current_Turn = "Player" if random_number == 1 else "Enemy"
 	
 	# Flip field (if Black goes first)
@@ -782,7 +783,7 @@ func Setup_Game():
 	
 	# Draw Opening Hands
 	GameData.Current_Step = "Draw"
-	Draw_Card(GameData.Current_Turn, 5)
+	Draw_Card(GameData.Current_Turn, 42)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
 	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
