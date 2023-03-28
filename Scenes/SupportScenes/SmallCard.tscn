@@ -1,8 +1,7 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Resources/Fonts/MTCORSVA.TTF" type="DynamicFontData" id=1]
 [ext_resource path="res://Scripts/SmallCard.gd" type="Script" id=2]
-[ext_resource path="res://Assets/Cards/Frame/Small_Frame_Normal.png" type="Texture" id=3]
 
 [sub_resource type="DynamicFont" id=1]
 size = 47
@@ -30,7 +29,6 @@ script = ExtResource( 2 )
 margin_right = 120.0
 margin_bottom = 180.0
 rect_min_size = Vector2( 120, 180 )
-texture = ExtResource( 3 )
 
 [node name="CostContainer" type="Control" parent="."]
 margin_left = 10.0
