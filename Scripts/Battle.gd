@@ -342,6 +342,7 @@ func Play_Card(Side):
 		# Activate Summon Effects (Currently no way to Set cards)
 		if Chosen_Card.Type == "Hero" or (Chosen_Card.Type == "Magic" and Chosen_Card.Is_Set == false and GameData.Muggle_Mode == false) or (Chosen_Card.Type == "Trap" and Chosen_Card.Attribute == "Equip" and Chosen_Card.Is_Set == false):
 			Chosen_Card.Effect_Active = true
+			GameData.Current_Card_Effect_Step = "Activation"
 			Activate_Summon_Effects(Chosen_Card)
 			# Ensures that card summoned to Equip slot is not immediately sent to Graveyard.
 			if Chosen_Card.Type == "Magic" and not ("Equip" in Chosen_Card.get_parent().name):
@@ -358,7 +359,9 @@ func Play_Card(Side):
 		SignalBus.emit_signal("Card_Summoned", Chosen_Card)
 		
 		# Allows card effects that resolve during Summon/Set to occur (i.e. Deep Pit)
+		GameData.Current_Card_Effect_Step = "Resolving"
 		Resolve_Card_Effects()
+		GameData.Current_Card_Effect_Step = null
 	
 	# Resets GameData variables for next movement.
 	Reset_Reposition_Card_Variables()
