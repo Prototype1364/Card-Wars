@@ -552,8 +552,9 @@ func Capture_Card(Card_Captured, slot_name, Capture_Type = "Normal"):
 	attacking_player.MedicalBay.append(Card_Captured)
 	
 	# Reset ATK_Bonus, Health, and Health_Bonus values to appropriate amounts & Update HUD
+	Card_Captured.Attack = Card_Captured.Attack * Card_Captured.Fusion_Level
 	Card_Captured.ATK_Bonus = 0
-	Card_Captured.Health = Card_Captured.Revival_Health
+	Card_Captured.Health = Card_Captured.Revival_Health * Card_Captured.Fusion_Level
 	Card_Captured.Health_Bonus = 0
 	Card_Captured.Update_Data()
 	

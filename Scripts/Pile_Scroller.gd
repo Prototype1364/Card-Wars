@@ -6,19 +6,19 @@ var CardParent
 func _ready():
 	pass
 
-func Graveyard_Called(Side):
+func Graveyard_Called(Dueler):
 	Clear_Scroller()
-	Cards = Side.Graveyard
+	Cards = Dueler.Graveyard
 	Add_Cards()
 
-func Medical_Bay_Called(Side):
+func Medical_Bay_Called(Dueler=GameData.Player):
 	Clear_Scroller()
-	Cards = Side.MedicalBay
+	Cards = Dueler.MedicalBay
 	Add_Cards()
 
-func Banished_Called(Side):
+func Banished_Called(Dueler):
 	Clear_Scroller()
-	Cards = Side.Banished
+	Cards = Dueler.Banished
 	Add_Cards()
 
 

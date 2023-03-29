@@ -101,7 +101,7 @@ func c79248843(card): # Knight of the Round Table (Hero)
 	
 	
 	# Summon IS Affordable and Valid
-	if GameData.Current_Phase == "Main Phase" and card.Cost + player.Cost_Discount_Hero <= player.Summon_Crests and "Hand" in Parent_Name:
+	if GameData.Current_Phase == "Main Phase" and card.Cost + player.Cost_Discount_Hero <= player.Summon_Crests and not "Hand" in Parent_Name:
 		var Fighter = Get_Field_Card_Data("Fighter")
 		var Reinforcers = Get_Field_Card_Data("Reinforcers")
 		
@@ -114,15 +114,33 @@ func c79248843(card): # Knight of the Round Table (Hero)
 					if Field_Card.Name == "Knight of the Round Table":
 						Knight_Of_The_Round_Table = Field_Card
 		
-		# Update KOTRT Fusion Level
-		if Knight_Of_The_Round_Table != null:
-			print("TEST")
+		if Knight_Of_The_Round_Table != null and Knight_Of_The_Round_Table != card:
+			# Update KOTRT Fusion Level
 			Knight_Of_The_Round_Table.Fusion_Level += 1
+			Knight_Of_The_Round_Table.Attack += card.Attack
+			Knight_Of_The_Round_Table.Health += card.Health
 			Knight_Of_The_Round_Table.Update_Data()
 			
 			# Banish summoned KOTRT
-			#Parent_Node.remove_child(card)
-			#Banish_Slot.add_child(card)
+			Parent_Node.remove_child(card)
+			Banish_Slot.add_child(card)
+			
+	
+			
+			
+#			if not "Hand" in Parent_Name:
+#				pass
+			
+#			elif "Hand" in Parent_Name:
+#				GameData.Summon_Mode = "Fusion"
+#				GameData.CardMoved = card.name
+#				print("ENTERED")
+#				var Slot = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/WBanished")
+#				Slot.emit_signal("pressed")
+				
+				# Banish summoned KOTRT
+				#Parent_Node.remove_child(card)
+				#Banish_Slot.add_child(card)
 
 func c28269385(card): # Morgan le Fay (Hero)
 	if On_Field(card) and GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect":
