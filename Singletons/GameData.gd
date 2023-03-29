@@ -41,6 +41,9 @@ var ChosenCard
 # Variable used to name Card nodes
 var CardCounter = 0
 
+#Variable used to indicate which Card Effects are being used.
+var Current_Card_Effect_Step
+
 func _ready():
 	# Loads Card Pool Into Game.
 	var CardData_File = File.new()

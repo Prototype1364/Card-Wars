@@ -64,7 +64,6 @@ func Flip_Coin():
 	var flip_result = rng.randi_range(1,2)
 	return flip_result
 
-
 func c42489363(card): # Activate Tech (Special)
 	pass
 
@@ -99,21 +98,27 @@ func c79248843(card): # Knight of the Round Table (Hero)
 	var Banish_Slot = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Banished")
 	var Knight_Of_The_Round_Table
 	
+	var Fighter = Get_Field_Card_Data("Fighter")
+	var Reinforcers = Get_Field_Card_Data("Reinforcers")
+	
+	# Locate KOTRT on field for potential Fusion Summon
+	if Fighter != null:
+		if Fighter.Name == "Knight of the Round Table":
+			Knight_Of_The_Round_Table = Fighter
+	elif Reinforcers != null:
+		for Field_Card in Reinforcers:
+			if Field_Card.Name == "Knight of the Round Table":
+				Knight_Of_The_Round_Table = Field_Card
+	
+	
+	if GameData.Current_Phase == "Main Phase" and card.Cost + player.Cost_Discount_Hero <= player.Summon_Crests and GameData.Current_Card_Effect_Step == "Clicked":
+		if Knight_Of_The_Round_Table != null and Knight_Of_The_Round_Table != card:
+			var Battle_Scene = load("res://Scenes/MainScenes/Battle.tscn").instance()
+			Battle_Scene._on_Card_Slot_pressed("WR1")
+			
 	
 	# Summon IS Affordable and Valid
-	if GameData.Current_Phase == "Main Phase" and card.Cost + player.Cost_Discount_Hero <= player.Summon_Crests and not "Hand" in Parent_Name:
-		var Fighter = Get_Field_Card_Data("Fighter")
-		var Reinforcers = Get_Field_Card_Data("Reinforcers")
-		
-		# Locate KOTRT on field for potential Fusion Summon
-		if Fighter != null:
-			if Fighter.Name == "Knight of the Round Table":
-				Knight_Of_The_Round_Table = Fighter
-			elif Reinforcers != null:
-				for Field_Card in Reinforcers:
-					if Field_Card.Name == "Knight of the Round Table":
-						Knight_Of_The_Round_Table = Field_Card
-		
+	if GameData.Current_Phase == "Main Phase" and card.Cost + player.Cost_Discount_Hero <= player.Summon_Crests and GameData.Current_Card_Effect_Step == "Activation":
 		if Knight_Of_The_Round_Table != null and Knight_Of_The_Round_Table != card:
 			# Update KOTRT Fusion Level
 			Knight_Of_The_Round_Table.Fusion_Level += 1
@@ -121,12 +126,14 @@ func c79248843(card): # Knight of the Round Table (Hero)
 			Knight_Of_The_Round_Table.Health += card.Health
 			Knight_Of_The_Round_Table.Update_Data()
 			
-			# Banish summoned KOTRT
 			Parent_Node.remove_child(card)
 			Banish_Slot.add_child(card)
-			
+
+			# Banish summoned KOTRT
+#			Parent_Node.remove_child(card)
+#			Banish_Slot.add_child(card)
 	
-			
+#			and not "Hand" in Parent_Name 
 			
 #			if not "Hand" in Parent_Name:
 #				pass
