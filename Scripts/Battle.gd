@@ -204,10 +204,6 @@ func Reposition_Field_Cards(Side):
 	var Card_To_Check
 	var Slots_To_Avoid = ["Banished", "Graveyard", "MedBay", "Hand", "TechZone"]
 	
-	print(typeof(GameData.CardTo.left(1)))
-	print(typeof(GameData.Current_Turn))
-	print(typeof("B"))
-	
 	# Ensures Godot doesn't crash when unable to assign variable value
 	if not "Hand" in GameData.CardFrom:
 		Card_To_Check = get_node(Non_Hand_Path + "/" + str(GameData.CardFrom)).get_child(0)
