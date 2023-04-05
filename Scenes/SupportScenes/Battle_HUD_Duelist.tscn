@@ -1,0 +1,311 @@
+[gd_scene load_steps=11 format=3 uid="uid://dnao8q2vpkwj4"]
+
+[ext_resource type="Theme" uid="uid://duaqetqwypx5a" path="res://Resources/Themes/Card_Text_72.tres" id="1"]
+[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="2"]
+[ext_resource type="Texture2D" uid="uid://35ffupuh2sh1" path="res://Assets/Playmat/Playmat_HUD_Holder.png" id="3"]
+[ext_resource type="Script" path="res://Scripts/Battle_HUD_Duelist.gd" id="5"]
+
+[sub_resource type="FontFile" id="1"]
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+fallbacks = Array[Font]([ExtResource("2"), ExtResource("2")])
+face_index = null
+embolden = null
+transform = null
+cache/0/36/0/ascent = 0.0
+cache/0/36/0/descent = 0.0
+cache/0/36/0/underline_position = 0.0
+cache/0/36/0/underline_thickness = 0.0
+cache/0/36/0/scale = 1.0
+cache/0/36/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/30/0/ascent = 0.0
+cache/0/30/0/descent = 0.0
+cache/0/30/0/underline_position = 0.0
+cache/0/30/0/underline_thickness = 0.0
+cache/0/30/0/scale = 1.0
+cache/0/30/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/30/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/30/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[sub_resource type="FontFile" id="2"]
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+fallbacks = Array[Font]([ExtResource("2"), ExtResource("2")])
+face_index = null
+embolden = null
+transform = null
+cache/0/36/0/ascent = 0.0
+cache/0/36/0/descent = 0.0
+cache/0/36/0/underline_position = 0.0
+cache/0/36/0/underline_thickness = 0.0
+cache/0/36/0/scale = 1.0
+cache/0/36/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/30/0/ascent = 0.0
+cache/0/30/0/descent = 0.0
+cache/0/30/0/underline_position = 0.0
+cache/0/30/0/underline_thickness = 0.0
+cache/0/30/0/scale = 1.0
+cache/0/30/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/30/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/30/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[sub_resource type="FontFile" id="3"]
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+fallbacks = Array[Font]([ExtResource("2"), ExtResource("2")])
+face_index = null
+embolden = null
+transform = null
+cache/0/36/0/ascent = 0.0
+cache/0/36/0/descent = 0.0
+cache/0/36/0/underline_position = 0.0
+cache/0/36/0/underline_thickness = 0.0
+cache/0/36/0/scale = 1.0
+cache/0/36/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/2/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/2/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/2/0/ascent = 0.0
+cache/0/2/0/descent = 0.0
+cache/0/2/0/underline_position = 0.0
+cache/0/2/0/underline_thickness = 0.0
+cache/0/2/0/scale = 1.0
+cache/0/2/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/2/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/2/0/kerning_overrides/2/0 = Vector2(0, 0)
+cache/0/2/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/30/0/ascent = 0.0
+cache/0/30/0/descent = 0.0
+cache/0/30/0/underline_position = 0.0
+cache/0/30/0/underline_thickness = 0.0
+cache/0/30/0/scale = 1.0
+cache/0/30/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/30/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/30/0/kerning_overrides/2/0 = Vector2(0, 0)
+cache/0/30/0/kerning_overrides/30/0 = Vector2(0, 0)
+
+[sub_resource type="FontFile" id="4"]
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+fallbacks = Array[Font]([ExtResource("2"), ExtResource("2")])
+face_index = null
+embolden = null
+transform = null
+cache/0/36/0/ascent = 0.0
+cache/0/36/0/descent = 0.0
+cache/0/36/0/underline_position = 0.0
+cache/0/36/0/underline_thickness = 0.0
+cache/0/36/0/scale = 1.0
+cache/0/36/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/30/0/ascent = 0.0
+cache/0/30/0/descent = 0.0
+cache/0/30/0/underline_position = 0.0
+cache/0/30/0/underline_thickness = 0.0
+cache/0/30/0/scale = 1.0
+cache/0/30/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/30/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/30/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[sub_resource type="FontFile" id="5"]
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+fallbacks = Array[Font]([ExtResource("2"), ExtResource("2")])
+face_index = null
+embolden = null
+transform = null
+cache/0/36/0/ascent = 0.0
+cache/0/36/0/descent = 0.0
+cache/0/36/0/underline_position = 0.0
+cache/0/36/0/underline_thickness = 0.0
+cache/0/36/0/scale = 1.0
+cache/0/36/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/30/0/ascent = 0.0
+cache/0/30/0/descent = 0.0
+cache/0/30/0/underline_position = 0.0
+cache/0/30/0/underline_thickness = 0.0
+cache/0/30/0/scale = 1.0
+cache/0/30/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/30/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/30/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[sub_resource type="FontFile" id="6"]
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+fallbacks = Array[Font]([ExtResource("2"), ExtResource("2")])
+face_index = null
+embolden = null
+transform = null
+cache/0/36/0/ascent = 0.0
+cache/0/36/0/descent = 0.0
+cache/0/36/0/underline_position = 0.0
+cache/0/36/0/underline_thickness = 0.0
+cache/0/36/0/scale = 1.0
+cache/0/36/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/30/0/ascent = 0.0
+cache/0/30/0/descent = 0.0
+cache/0/30/0/underline_position = 0.0
+cache/0/30/0/underline_thickness = 0.0
+cache/0/30/0/scale = 1.0
+cache/0/30/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/30/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/30/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/30/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[node name="Battle_HUD" type="Control"]
+custom_minimum_size = Vector2(740, 71)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1180.0
+offset_bottom = -1009.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1")
+script = ExtResource("5")
+
+[node name="BG" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("3")
+
+[node name="LP" type="Label" parent="BG"]
+custom_minimum_size = Vector2(87, 34)
+layout_mode = 0
+offset_right = 87.0
+offset_bottom = 34.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_fonts/font = SubResource("1")
+theme_override_font_sizes/font_size = 30
+text = "LP: 100"
+
+[node name="Crests" type="Label" parent="BG"]
+layout_mode = 0
+offset_top = 37.0
+offset_right = 119.0
+offset_bottom = 71.0
+theme_override_colors/font_color = Color(0.913725, 0.690196, 0.160784, 1)
+theme_override_fonts/font = SubResource("2")
+theme_override_font_sizes/font_size = 30
+text = "Crests: 100"
+
+[node name="ATK_Bonus" type="Label" parent="BG"]
+layout_mode = 0
+offset_left = 150.0
+offset_right = 331.0
+offset_bottom = 34.0
+theme_override_colors/font_color = Color(0.913725, 0.690196, 0.160784, 1)
+theme_override_fonts/font = SubResource("3")
+theme_override_font_sizes/font_size = 30
+text = "ATK Bonus: +0"
+
+[node name="Health_Bonus" type="Label" parent="BG"]
+layout_mode = 0
+offset_left = 150.0
+offset_top = 37.0
+offset_right = 313.0
+offset_bottom = 71.0
+theme_override_colors/font_color = Color(0.913725, 0.690196, 0.160784, 1)
+theme_override_fonts/font = SubResource("4")
+theme_override_font_sizes/font_size = 30
+text = "HP Bonus: +0"
+
+[node name="Cost_Discount" type="Label" parent="BG"]
+custom_minimum_size = Vector2(324, 34)
+layout_mode = 0
+offset_left = 345.0
+offset_right = 669.0
+offset_bottom = 34.0
+theme_override_colors/font_color = Color(0.913725, 0.690196, 0.160784, 1)
+theme_override_fonts/font = SubResource("5")
+theme_override_font_sizes/font_size = 30
+text = "Cost Discounts: 0/0/0/0"
+
+[node name="Discount_Type" type="Label" parent="BG"]
+custom_minimum_size = Vector2(324, 34)
+layout_mode = 0
+offset_left = 345.0
+offset_top = 37.0
+offset_right = 624.0
+offset_bottom = 71.0
+theme_override_colors/font_color = Color(0.913725, 0.690196, 0.160784, 1)
+theme_override_fonts/font = SubResource("6")
+theme_override_font_sizes/font_size = 30
+text = "Normal/Hero/Magic/Trap"
+
+[node name="TokenScrollContainer" type="ScrollContainer" parent="BG"]
+custom_minimum_size = Vector2(50, 61)
+layout_mode = 0
+offset_left = 685.0
+offset_top = 5.0
+offset_right = 735.0
+offset_bottom = 66.0
+
+[node name="TokenContainer" type="HBoxContainer" parent="BG/TokenScrollContainer"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2

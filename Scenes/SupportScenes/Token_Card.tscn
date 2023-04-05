@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Assets/Playmat/Token.png" type="Texture2D" id=1]
+
+[node name="Token" type="TextureRect"]
+offset_right = 20.0
+offset_bottom = 20.0
+custom_minimum_size = Vector2( 20, 20 )
+texture = ExtResource( 1 )
+expand = true

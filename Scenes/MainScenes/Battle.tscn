@@ -1,0 +1,715 @@
+[gd_scene load_steps=11 format=3 uid="uid://68q4dnvhm7uq"]
+
+[ext_resource type="PackedScene" uid="uid://devk1wrlprsu3" path="res://Scenes/SupportScenes/Battle_HUD_GameState.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://dnao8q2vpkwj4" path="res://Scenes/SupportScenes/Battle_HUD_Duelist.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://340nlxwjl4l8" path="res://Scenes/SupportScenes/BigCard.tscn" id="3"]
+[ext_resource type="Texture2D" uid="uid://dooubax078kvf" path="res://Assets/Playmat/BoardImage.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://cb427o5cck4ub" path="res://Assets/Playmat/Large Empty Slot.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://cnsdmsj43x3t0" path="res://Assets/Playmat/Switch Button.png" id="6"]
+[ext_resource type="Script" path="res://Scripts/Battle.gd" id="7"]
+[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="8"]
+[ext_resource type="PackedScene" path="res://Scenes/SupportScenes/Pile_Scroller.tscn" id="9"]
+
+[sub_resource type="FontFile" id="1"]
+fallbacks = Array[Font]([ExtResource("8")])
+face_index = null
+embolden = null
+transform = null
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[node name="Battle" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("7")
+
+[node name="Playmat" type="TextureRect" parent="."]
+layout_mode = 0
+offset_top = -648.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("4")
+
+[node name="CardSpots" type="Control" parent="Playmat"]
+anchors_preset = 0
+offset_left = 974.0
+offset_top = 243.0
+offset_right = 1866.0
+offset_bottom = 1486.0
+pivot_offset = Vector2(446, 621)
+
+[node name="BHandScroller" type="ScrollContainer" parent="Playmat/CardSpots"]
+clip_contents = false
+custom_minimum_size = Vector2(830, 200)
+layout_mode = 0
+offset_left = 33.0
+offset_top = -220.0
+offset_right = 863.0
+offset_bottom = -20.0
+rotation = 3.14159
+pivot_offset = Vector2(417, 100)
+follow_focus = true
+
+[node name="BHand" type="HBoxContainer" parent="Playmat/CardSpots/BHandScroller"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../../NonHands/BBackrow1")
+focus_neighbor_bottom = NodePath("../../NonHands/BFighter")
+
+[node name="WHandScroller" type="ScrollContainer" parent="Playmat/CardSpots"]
+clip_contents = false
+custom_minimum_size = Vector2(835, 200)
+layout_mode = 0
+offset_left = 33.0
+offset_top = 1258.0
+offset_right = 863.0
+offset_bottom = 1458.0
+grow_vertical = 0
+follow_focus = true
+
+[node name="WHand" type="HBoxContainer" parent="Playmat/CardSpots/WHandScroller"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../../NonHands/WBackrow1")
+focus_neighbor_bottom = NodePath("../../NonHands/WFighter")
+
+[node name="NonHands" type="Control" parent="Playmat/CardSpots"]
+anchors_preset = 0
+offset_right = 892.0
+offset_bottom = 1238.0
+
+[node name="WFighter" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 386.0
+offset_top = 646.0
+offset_right = 506.0
+offset_bottom = 826.0
+focus_neighbor_left = NodePath("../WEquipTrap")
+focus_neighbor_top = NodePath("../BFighter")
+focus_neighbor_right = NodePath("../WEquipMagic")
+focus_neighbor_bottom = NodePath("../WR2")
+focus_next = NodePath("../WEquipMagic")
+focus_previous = NodePath("../WEquipTrap")
+flat = true
+
+[node name="WEquipTrap" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 242.0
+offset_top = 646.0
+offset_right = 362.0
+offset_bottom = 826.0
+focus_neighbor_left = NodePath("../WBanished")
+focus_neighbor_top = NodePath("../BEquipMagic")
+focus_neighbor_right = NodePath("../WFighter")
+focus_neighbor_bottom = NodePath("../WR1")
+focus_next = NodePath("../WFighter")
+focus_previous = NodePath("../WBanished")
+flat = true
+
+[node name="WEquipMagic" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 530.0
+offset_top = 646.0
+offset_right = 650.0
+offset_bottom = 826.0
+focus_neighbor_left = NodePath("../WFighter")
+focus_neighbor_top = NodePath("../BEquipTrap")
+focus_neighbor_right = NodePath("../WGraveyard")
+focus_neighbor_bottom = NodePath("../WR3")
+focus_next = NodePath("../WGraveyard")
+focus_previous = NodePath("../WFighter")
+flat = true
+
+[node name="WR1" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 242.0
+offset_top = 850.0
+offset_right = 362.0
+offset_bottom = 1030.0
+focus_neighbor_left = NodePath("../WTechZone")
+focus_neighbor_top = NodePath("../WEquipTrap")
+focus_neighbor_right = NodePath("../WR2")
+focus_neighbor_bottom = NodePath("../WBackrow1")
+focus_next = NodePath("../WR2")
+focus_previous = NodePath("../WTechZone")
+flat = true
+
+[node name="WR2" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 386.0
+offset_top = 850.0
+offset_right = 506.0
+offset_bottom = 1030.0
+focus_neighbor_left = NodePath("../WR1")
+focus_neighbor_top = NodePath("../WFighter")
+focus_neighbor_right = NodePath("../WR3")
+focus_neighbor_bottom = NodePath("../WBackrow2")
+focus_next = NodePath("../WR3")
+focus_previous = NodePath("../WR1")
+flat = true
+
+[node name="WR3" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 530.0
+offset_top = 850.0
+offset_right = 650.0
+offset_bottom = 1030.0
+focus_neighbor_left = NodePath("../WR2")
+focus_neighbor_top = NodePath("../WEquipMagic")
+focus_neighbor_right = NodePath("../WMedBay")
+focus_neighbor_bottom = NodePath("../WBackrow3")
+focus_next = NodePath("../WMedBay")
+focus_previous = NodePath("../WR2")
+flat = true
+
+[node name="WBackrow1" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 242.0
+offset_top = 1051.0
+offset_right = 362.0
+offset_bottom = 1231.0
+focus_neighbor_left = NodePath("../WTechDeck")
+focus_neighbor_top = NodePath("../WR1")
+focus_neighbor_right = NodePath("../WBackrow2")
+focus_neighbor_bottom = NodePath("../../WHandScroller/WHand")
+focus_next = NodePath("../WBackrow2")
+focus_previous = NodePath("../WTechDeck")
+flat = true
+
+[node name="WBackrow2" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 386.0
+offset_top = 1051.0
+offset_right = 506.0
+offset_bottom = 1231.0
+focus_neighbor_left = NodePath("../WBackrow1")
+focus_neighbor_top = NodePath("../WR2")
+focus_neighbor_right = NodePath("../WBackrow3")
+focus_neighbor_bottom = NodePath("../../WHandScroller/WHand")
+focus_next = NodePath("../WBackrow3")
+focus_previous = NodePath("../WBackrow1")
+flat = true
+
+[node name="WBackrow3" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 530.0
+offset_top = 1051.0
+offset_right = 650.0
+offset_bottom = 1231.0
+focus_neighbor_left = NodePath("../WBackrow2")
+focus_neighbor_top = NodePath("../WR3")
+focus_neighbor_right = NodePath("../WMainDeck")
+focus_neighbor_bottom = NodePath("../../WHandScroller/WHand")
+focus_next = NodePath("../WMainDeck")
+focus_previous = NodePath("../WBackrow2")
+flat = true
+
+[node name="WTechZone" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 31.0
+offset_top = 850.0
+offset_right = 151.0
+offset_bottom = 1030.0
+focus_neighbor_left = NodePath("../WGraveyard")
+focus_neighbor_top = NodePath("../WBanished")
+focus_neighbor_right = NodePath("../WR1")
+focus_neighbor_bottom = NodePath("../WTechDeck")
+focus_next = NodePath("../WR1")
+focus_previous = NodePath("../WGraveyard")
+flat = true
+
+[node name="WTechDeck" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 31.0
+offset_top = 1051.0
+offset_right = 151.0
+offset_bottom = 1231.0
+focus_neighbor_left = NodePath("../WMedBay")
+focus_neighbor_top = NodePath("../WTechZone")
+focus_neighbor_right = NodePath("../WBackrow1")
+focus_neighbor_bottom = NodePath("../../WHandScroller/WHand")
+focus_next = NodePath("../WBackrow1")
+focus_previous = NodePath("../WMedBay")
+flat = true
+
+[node name="WMedBay" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 741.0
+offset_top = 850.0
+offset_right = 861.0
+offset_bottom = 1030.0
+focus_neighbor_left = NodePath("../WR3")
+focus_neighbor_top = NodePath("../WGraveyard")
+focus_neighbor_right = NodePath("../../../../BoardScroller")
+focus_neighbor_bottom = NodePath("../WMainDeck")
+focus_next = NodePath("../WTechDeck")
+focus_previous = NodePath("../WR3")
+flat = true
+
+[node name="WMainDeck" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 741.0
+offset_top = 1051.0
+offset_right = 861.0
+offset_bottom = 1231.0
+focus_neighbor_left = NodePath("../WBackrow3")
+focus_neighbor_top = NodePath("../WMedBay")
+focus_neighbor_right = NodePath("../../../../BoardScroller")
+focus_neighbor_bottom = NodePath("../../WHandScroller/WHand")
+focus_next = NodePath("../BMainDeck")
+focus_previous = NodePath("../WBackrow3")
+flat = true
+
+[node name="WBanished" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 647.0
+offset_right = 152.0
+offset_bottom = 827.0
+rotation = 4.71239
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BBanished")
+focus_neighbor_top = NodePath("../BGraveyard")
+focus_neighbor_right = NodePath("../WEquipTrap")
+focus_neighbor_bottom = NodePath("../WTechZone")
+focus_next = NodePath("../WEquipTrap")
+focus_previous = NodePath("../BBanished")
+flat = true
+
+[node name="WGraveyard" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 742.0
+offset_top = 647.0
+offset_right = 862.0
+offset_bottom = 827.0
+rotation = 1.5708
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../WEquipMagic")
+focus_neighbor_top = NodePath("../BBanished")
+focus_neighbor_right = NodePath("../../../../BoardScroller")
+focus_neighbor_bottom = NodePath("../WMedBay")
+focus_next = NodePath("../WTechZone")
+focus_previous = NodePath("../WEquipMagic")
+flat = true
+
+[node name="BFighter" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 385.0
+offset_top = 410.0
+offset_right = 505.0
+offset_bottom = 590.0
+rotation = 3.14159
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BEquipTrap")
+focus_neighbor_top = NodePath("../WFighter")
+focus_neighbor_right = NodePath("../BEquipMagic")
+focus_neighbor_bottom = NodePath("../BR2")
+focus_next = NodePath("../BEquipMagic")
+focus_previous = NodePath("../BEquipTrap")
+flat = true
+
+[node name="BEquipTrap" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 529.0
+offset_top = 410.0
+offset_right = 649.0
+offset_bottom = 590.0
+rotation = 3.14159
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BBanished")
+focus_neighbor_top = NodePath("../WEquipMagic")
+focus_neighbor_right = NodePath("../BFighter")
+focus_neighbor_bottom = NodePath("../BR1")
+focus_next = NodePath("../BFighter")
+focus_previous = NodePath("../BBanished")
+flat = true
+
+[node name="BEquipMagic" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 242.0
+offset_top = 410.0
+offset_right = 362.0
+offset_bottom = 590.0
+rotation = 3.14159
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BFighter")
+focus_neighbor_top = NodePath("../WEquipTrap")
+focus_neighbor_right = NodePath("../BGraveyard")
+focus_neighbor_bottom = NodePath("../BR3")
+focus_next = NodePath("../BGraveyard")
+focus_previous = NodePath("../BFighter")
+flat = true
+
+[node name="BR1" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 529.0
+offset_top = 207.0
+offset_right = 649.0
+offset_bottom = 387.0
+rotation = 3.14159
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BTechZone")
+focus_neighbor_top = NodePath("../BEquipTrap")
+focus_neighbor_right = NodePath("../BR2")
+focus_neighbor_bottom = NodePath("../BBackrow1")
+focus_next = NodePath("../BR2")
+focus_previous = NodePath("../BTechZone")
+flat = true
+
+[node name="BR2" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 385.0
+offset_top = 207.0
+offset_right = 505.0
+offset_bottom = 387.0
+rotation = 3.14159
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BR1")
+focus_neighbor_top = NodePath("../BFighter")
+focus_neighbor_right = NodePath("../BR3")
+focus_neighbor_bottom = NodePath("../BBackrow2")
+focus_next = NodePath("../BR3")
+focus_previous = NodePath("../BR1")
+flat = true
+
+[node name="BR3" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 242.0
+offset_top = 207.0
+offset_right = 362.0
+offset_bottom = 387.0
+rotation = 3.14159
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BR2")
+focus_neighbor_top = NodePath("../BEquipMagic")
+focus_neighbor_right = NodePath("../BMedBay")
+focus_neighbor_bottom = NodePath("../BBackrow3")
+focus_next = NodePath("../BMedBay")
+focus_previous = NodePath("../BR2")
+flat = true
+
+[node name="BBackrow1" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 529.0
+offset_top = 6.0
+offset_right = 649.0
+offset_bottom = 186.0
+rotation = 3.14159
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BTechDeck")
+focus_neighbor_top = NodePath("../BR1")
+focus_neighbor_right = NodePath("../BBackrow2")
+focus_neighbor_bottom = NodePath("../../BHandScroller/BHand")
+focus_next = NodePath("../BBackrow2")
+focus_previous = NodePath("../BTechDeck")
+flat = true
+
+[node name="BBackrow2" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 385.0
+offset_top = 6.0
+offset_right = 505.0
+offset_bottom = 186.0
+rotation = 3.14159
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BBackrow1")
+focus_neighbor_top = NodePath("../BR2")
+focus_neighbor_right = NodePath("../BBackrow3")
+focus_neighbor_bottom = NodePath("../../BHandScroller/BHand")
+focus_next = NodePath("../BBackrow3")
+focus_previous = NodePath("../BBackrow1")
+flat = true
+
+[node name="BBackrow3" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 242.0
+offset_top = 6.0
+offset_right = 362.0
+offset_bottom = 186.0
+rotation = 3.14159
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BBackrow2")
+focus_neighbor_top = NodePath("../BR3")
+focus_neighbor_right = NodePath("../BMainDeck")
+focus_neighbor_bottom = NodePath("../../BHandScroller/BHand")
+focus_next = NodePath("../BMainDeck")
+focus_previous = NodePath("../BBackrow2")
+flat = true
+
+[node name="BTechZone" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 740.0
+offset_top = 207.0
+offset_right = 860.0
+offset_bottom = 387.0
+rotation = 3.14159
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BGraveyard")
+focus_neighbor_top = NodePath("../BBanished")
+focus_neighbor_right = NodePath("../BR1")
+focus_neighbor_bottom = NodePath("../BTechDeck")
+focus_next = NodePath("../BR1")
+focus_previous = NodePath("../BGraveyard")
+flat = true
+
+[node name="BTechDeck" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 740.0
+offset_top = 6.0
+offset_right = 860.0
+offset_bottom = 186.0
+rotation = 3.14159
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BMedBay")
+focus_neighbor_top = NodePath("../BTechZone")
+focus_neighbor_right = NodePath("../BBackrow1")
+focus_neighbor_bottom = NodePath("../../BHandScroller/BHand")
+focus_next = NodePath("../BBackrow1")
+focus_previous = NodePath("../BMedBay")
+flat = true
+
+[node name="BMedBay" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 31.0
+offset_top = 207.0
+offset_right = 151.0
+offset_bottom = 387.0
+rotation = 3.14159
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BR3")
+focus_neighbor_top = NodePath("../BGraveyard")
+focus_neighbor_right = NodePath("../../../../BoardScroller")
+focus_neighbor_bottom = NodePath("../BMainDeck")
+focus_next = NodePath("../BTechDeck")
+focus_previous = NodePath("../BR3")
+flat = true
+
+[node name="BMainDeck" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 31.0
+offset_top = 6.0
+offset_right = 151.0
+offset_bottom = 186.0
+rotation = 3.14159
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BBackrow3")
+focus_neighbor_top = NodePath("../BGraveyard")
+focus_neighbor_right = NodePath("../../../../BoardScroller")
+focus_neighbor_bottom = NodePath("../../BHandScroller/BHand")
+focus_next = NodePath("../WMainDeck")
+focus_previous = NodePath("../BBackrow3")
+flat = true
+
+[node name="BBanished" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 741.0
+offset_top = 410.0
+offset_right = 861.0
+offset_bottom = 590.0
+rotation = 1.5708
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../WBanished")
+focus_neighbor_top = NodePath("../WGraveyard")
+focus_neighbor_right = NodePath("../BEquipTrap")
+focus_neighbor_bottom = NodePath("../BTechZone")
+focus_next = NodePath("../BEquipTrap")
+focus_previous = NodePath("../WBanished")
+flat = true
+
+[node name="BGraveyard" type="Button" parent="Playmat/CardSpots/NonHands"]
+layout_mode = 0
+offset_left = 31.0
+offset_top = 411.0
+offset_right = 151.0
+offset_bottom = 591.0
+rotation = 4.71239
+pivot_offset = Vector2(60, 90)
+focus_neighbor_left = NodePath("../BEquipMagic")
+focus_neighbor_top = NodePath("../WBanished")
+focus_neighbor_right = NodePath("../../../../BoardScroller")
+focus_neighbor_bottom = NodePath("../BMedBay")
+focus_next = NodePath("../BTechZone")
+focus_previous = NodePath("../BEquipMagic")
+flat = true
+
+[node name="WMainDeckCardCount" type="Label" parent="Playmat/CardSpots"]
+layout_mode = 0
+offset_left = 858.0
+offset_top = 1185.0
+offset_right = 918.0
+offset_bottom = 1235.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("1")
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WTechDeckCardCount" type="Label" parent="Playmat/CardSpots"]
+layout_mode = 0
+offset_left = 147.0
+offset_top = 1185.0
+offset_right = 207.0
+offset_bottom = 1235.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("1")
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BMainDeckCardCount" type="Label" parent="Playmat/CardSpots"]
+layout_mode = 0
+offset_left = 33.0
+offset_top = 56.0
+offset_right = 93.0
+offset_bottom = 106.0
+rotation = 3.14159
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = SubResource("1")
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BTechDeckCardCount" type="Label" parent="Playmat/CardSpots"]
+layout_mode = 0
+offset_left = 743.0
+offset_top = 56.0
+offset_right = 818.0
+offset_bottom = 106.0
+rotation = 3.14159
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = SubResource("1")
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Turn_Controls" type="VBoxContainer" parent="Playmat"]
+layout_mode = 0
+offset_left = 845.0
+offset_top = 925.0
+offset_right = 945.0
+offset_bottom = 1053.0
+
+[node name="Next_Step" type="Button" parent="Playmat/Turn_Controls"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "Step"
+
+[node name="Next_Phase" type="Button" parent="Playmat/Turn_Controls"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "Phase"
+
+[node name="End_Turn" type="Button" parent="Playmat/Turn_Controls"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "End Turn"
+
+[node name="SwitchSides" type="TextureButton" parent="Playmat"]
+layout_mode = 0
+offset_left = 836.0
+offset_top = 807.0
+offset_right = 950.0
+offset_bottom = 921.0
+tooltip_text = "Flips the board."
+texture_normal = ExtResource("6")
+
+[node name="BoardScroller" type="VScrollBar" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 1908.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+tooltip_text = "Controls board position."
+max_value = 648.0
+value = 648.0
+rounded = true
+
+[node name="CardExaminer" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 67.0
+offset_top = 67.0
+offset_right = 697.0
+offset_bottom = 1012.0
+
+[node name="LargeEmptySlot" type="TextureRect" parent="CardExaminer"]
+layout_mode = 0
+texture = ExtResource("5")
+
+[node name="BigCard" parent="CardExaminer" instance=ExtResource("3")]
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_right = 0.0
+offset_bottom = -2.0
+
+[node name="HUD_W" parent="." instance=ExtResource("2")]
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 1058.0
+offset_top = 1009.0
+offset_right = 1798.0
+offset_bottom = 1080.0
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="HUD_B" parent="." instance=ExtResource("2")]
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 1058.0
+offset_right = 1798.0
+offset_bottom = 71.0
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="HUD_GameState" parent="." instance=ExtResource("1")]
+offset_left = 15.0
+offset_right = 755.0
+offset_bottom = 71.0
+
+[node name="Pile_Scroller" parent="." instance=ExtResource("9")]
+visible = false
+anchors_preset = 0
+offset_left = 128.0
+offset_top = 439.0
+offset_right = 983.0
+offset_bottom = 659.0
+
+[connection signal="gui_input" from="Playmat" to="." method="_on_Playmat_gui_input"]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WFighter" to="." method="_on_Card_Slot_pressed" binds= ["WFighter"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WEquipTrap" to="." method="_on_Card_Slot_pressed" binds= ["WEquipTrap"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WEquipMagic" to="." method="_on_Card_Slot_pressed" binds= ["WEquipMagic"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WR1" to="." method="_on_Card_Slot_pressed" binds= ["WR1"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WR2" to="." method="_on_Card_Slot_pressed" binds= ["WR2"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WR3" to="." method="_on_Card_Slot_pressed" binds= ["WR3"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WBackrow1" to="." method="_on_Card_Slot_pressed" binds= ["WBackrow1"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WBackrow2" to="." method="_on_Card_Slot_pressed" binds= ["WBackrow2"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WBackrow3" to="." method="_on_Card_Slot_pressed" binds= ["WBackrow3"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WTechZone" to="." method="_on_Card_Slot_pressed" binds= ["WTechZone"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WTechDeck" to="." method="_on_Card_Slot_pressed" binds= ["WTechDeck"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WMedBay" to="." method="_on_Card_Slot_pressed" binds= ["WMedBay"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WMainDeck" to="." method="_on_Card_Slot_pressed" binds= ["WMainDeck"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WBanished" to="." method="_on_Card_Slot_pressed" binds= ["WBanished"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/WGraveyard" to="." method="_on_Card_Slot_pressed" binds= ["WGraveyard"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BFighter" to="." method="_on_Card_Slot_pressed" binds= ["BFighter"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BEquipTrap" to="." method="_on_Card_Slot_pressed" binds= ["BEquipTrap"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BEquipMagic" to="." method="_on_Card_Slot_pressed" binds= ["BEquipMagic"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BR1" to="." method="_on_Card_Slot_pressed" binds= ["BR1"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BR2" to="." method="_on_Card_Slot_pressed" binds= ["BR2"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BR3" to="." method="_on_Card_Slot_pressed" binds= ["BR3"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BBackrow1" to="." method="_on_Card_Slot_pressed" binds= ["BBackrow1"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BBackrow2" to="." method="_on_Card_Slot_pressed" binds= ["BBackrow2"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BBackrow3" to="." method="_on_Card_Slot_pressed" binds= ["BBackrow3"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BTechZone" to="." method="_on_Card_Slot_pressed" binds= ["BTechZone"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BTechDeck" to="." method="_on_Card_Slot_pressed" binds= ["BTechDeck"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BMedBay" to="." method="_on_Card_Slot_pressed" binds= ["BMedBay"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BMainDeck" to="." method="_on_Card_Slot_pressed" binds= ["BMainDeck"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BBanished" to="." method="_on_Card_Slot_pressed" binds= ["BBanished"]]
+[connection signal="pressed" from="Playmat/CardSpots/NonHands/BGraveyard" to="." method="_on_Card_Slot_pressed" binds= ["BGraveyard"]]
+[connection signal="pressed" from="Playmat/Turn_Controls/Next_Step" to="." method="_on_Next_Step_pressed"]
+[connection signal="pressed" from="Playmat/Turn_Controls/Next_Phase" to="." method="_on_Next_Phase_pressed"]
+[connection signal="pressed" from="Playmat/Turn_Controls/End_Turn" to="." method="_on_End_Turn_pressed"]
+[connection signal="pressed" from="Playmat/SwitchSides" to="." method="_on_SwitchSides_pressed"]

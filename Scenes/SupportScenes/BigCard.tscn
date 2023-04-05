@@ -1,0 +1,193 @@
+[gd_scene load_steps=7 format=3 uid="uid://340nlxwjl4l8"]
+
+[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="1"]
+[ext_resource type="Script" path="res://Scripts/Card_Display.gd" id="2"]
+[ext_resource type="Theme" uid="uid://duaqetqwypx5a" path="res://Resources/Themes/Card_Text_72.tres" id="4"]
+
+[sub_resource type="FontFile" id="3"]
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+fallbacks = Array[Font]([ExtResource("1"), ExtResource("1")])
+face_index = null
+embolden = null
+transform = null
+cache/0/36/0/ascent = 0.0
+cache/0/36/0/descent = 0.0
+cache/0/36/0/underline_position = 0.0
+cache/0/36/0/underline_thickness = 0.0
+cache/0/36/0/scale = 1.0
+cache/0/36/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/72/0 = Vector2(0, 0)
+cache/0/36/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/72/0/ascent = 0.0
+cache/0/72/0/descent = 0.0
+cache/0/72/0/underline_position = 0.0
+cache/0/72/0/underline_thickness = 0.0
+cache/0/72/0/scale = 1.0
+cache/0/72/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/72/0/kerning_overrides/72/0 = Vector2(0, 0)
+cache/0/72/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/36/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/72/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[sub_resource type="FontFile" id="1"]
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+fallbacks = Array[Font]([ExtResource("1"), ExtResource("1")])
+face_index = null
+embolden = null
+transform = null
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/35/0 = Vector2(0, 0)
+cache/0/35/0/ascent = 0.0
+cache/0/35/0/descent = 0.0
+cache/0/35/0/underline_position = 0.0
+cache/0/35/0/underline_thickness = 0.0
+cache/0/35/0/scale = 1.0
+cache/0/35/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/35/0/kerning_overrides/35/0 = Vector2(0, 0)
+
+[sub_resource type="FontFile" id="2"]
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+fallbacks = Array[Font]([ExtResource("1"), ExtResource("1")])
+face_index = null
+embolden = null
+transform = null
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/103/0 = Vector2(0, 0)
+cache/0/103/0/ascent = 0.0
+cache/0/103/0/descent = 0.0
+cache/0/103/0/underline_position = 0.0
+cache/0/103/0/underline_thickness = 0.0
+cache/0/103/0/scale = 1.0
+cache/0/103/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/103/0/kerning_overrides/103/0 = Vector2(0, 0)
+
+[node name="BigCard" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1290.0
+offset_bottom = -135.0
+script = ExtResource("2")
+
+[node name="Frame" type="TextureRect" parent="."]
+layout_mode = 0
+
+[node name="NameContainer" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 55.0
+offset_top = 27.0
+offset_right = 574.0
+offset_bottom = 147.0
+
+[node name="Name" type="Label" parent="NameContainer"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -123.0
+theme = ExtResource("4")
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("3")
+theme_override_font_sizes/font_size = 72
+vertical_alignment = 1
+clip_text = true
+
+[node name="CostContainer" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 215.0
+offset_top = 768.0
+offset_right = 415.0
+offset_bottom = 918.0
+
+[node name="Cost" type="TextureRect" parent="CostContainer"]
+layout_mode = 0
+
+[node name="Description" type="Label" parent="."]
+custom_minimum_size = Vector2(519, 194)
+layout_mode = 0
+offset_left = 56.0
+offset_top = 596.0
+offset_right = 575.0
+offset_bottom = 790.0
+pivot_offset = Vector2(35, 45)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("1")
+theme_override_font_sizes/font_size = 35
+autowrap_mode = 3
+clip_text = true
+
+[node name="Attack" type="Label" parent="."]
+layout_mode = 0
+offset_left = 51.0
+offset_top = 791.0
+offset_right = 141.0
+offset_bottom = 905.0
+pivot_offset = Vector2(35, 45)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("2")
+theme_override_font_sizes/font_size = 103
+
+[node name="Health" type="Label" parent="."]
+layout_mode = 0
+offset_left = 481.0
+offset_top = 791.0
+offset_right = 571.0
+offset_bottom = 905.0
+pivot_offset = Vector2(35, 45)
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("2")
+theme_override_font_sizes/font_size = 103
+
+[node name="ArtContainer" type="Control" parent="."]
+custom_minimum_size = Vector2(520, 440)
+anchors_preset = 0
+offset_left = 55.0
+offset_top = 150.0
+offset_right = 575.0
+offset_bottom = 590.0
+
+[node name="Art" type="TextureRect" parent="ArtContainer"]
+custom_minimum_size = Vector2(520, 440)
+layout_mode = 0
+offset_right = 520.0
+offset_bottom = 440.0
+expand_mode = 1
+
+[node name="TokenContainer" type="Control" parent="."]
+anchors_preset = 0
+offset_left = -105.0
+offset_top = 1.0
+offset_bottom = 946.0
+
+[node name="Attribute" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 484.0
+offset_top = 45.0
+offset_right = 569.0
+offset_bottom = 130.0
+expand_mode = 1
