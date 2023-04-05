@@ -1,75 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://devk1wrlprsu3"]
+[gd_scene load_steps=4 format=3 uid="uid://devk1wrlprsu3"]
 
-[ext_resource type="Theme" uid="uid://duaqetqwypx5a" path="res://Resources/Themes/Card_Text_72.tres" id="1"]
-[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="2"]
-[ext_resource type="Texture2D" uid="uid://35ffupuh2sh1" path="res://Assets/Playmat/Playmat_HUD_Holder.png" id="3"]
+[ext_resource type="FontFile" uid="uid://8rvxi8gie5ay" path="res://Resources/Fonts/MTCORSVA.TTF" id="2"]
+[ext_resource type="Texture2D" uid="uid://bkj4qjue6sanb" path="res://Assets/Playmat/Playmat_HUD_Holder.png" id="3"]
 [ext_resource type="Script" path="res://Scripts/BATTLE_HUD_GameState.gd" id="4"]
-
-[sub_resource type="FontFile" id="3"]
-subpixel_positioning = 0
-msdf_pixel_range = 14
-msdf_size = 128
-fallbacks = Array[Font]([ExtResource("2")])
-face_index = null
-embolden = null
-transform = null
-cache/0/36/0/ascent = 0.0
-cache/0/36/0/descent = 0.0
-cache/0/36/0/underline_position = 0.0
-cache/0/36/0/underline_thickness = 0.0
-cache/0/36/0/scale = 1.0
-cache/0/36/0/kerning_overrides/36/0 = Vector2(0, 0)
-cache/0/36/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/36/0/kerning_overrides/55/0 = Vector2(0, 0)
-cache/0/16/0/ascent = 0.0
-cache/0/16/0/descent = 0.0
-cache/0/16/0/underline_position = 0.0
-cache/0/16/0/underline_thickness = 0.0
-cache/0/16/0/scale = 1.0
-cache/0/16/0/kerning_overrides/36/0 = Vector2(0, 0)
-cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/16/0/kerning_overrides/55/0 = Vector2(0, 0)
-cache/0/55/0/ascent = 0.0
-cache/0/55/0/descent = 0.0
-cache/0/55/0/underline_position = 0.0
-cache/0/55/0/underline_thickness = 0.0
-cache/0/55/0/scale = 1.0
-cache/0/55/0/kerning_overrides/36/0 = Vector2(0, 0)
-cache/0/55/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/55/0/kerning_overrides/55/0 = Vector2(0, 0)
-
-[sub_resource type="FontFile" id="5"]
-subpixel_positioning = 0
-msdf_pixel_range = 14
-msdf_size = 128
-fallbacks = Array[Font]([ExtResource("2")])
-face_index = null
-embolden = null
-transform = null
-cache/0/36/0/ascent = 0.0
-cache/0/36/0/descent = 0.0
-cache/0/36/0/underline_position = 0.0
-cache/0/36/0/underline_thickness = 0.0
-cache/0/36/0/scale = 1.0
-cache/0/36/0/kerning_overrides/36/0 = Vector2(0, 0)
-cache/0/36/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/36/0/kerning_overrides/60/0 = Vector2(0, 0)
-cache/0/16/0/ascent = 0.0
-cache/0/16/0/descent = 0.0
-cache/0/16/0/underline_position = 0.0
-cache/0/16/0/underline_thickness = 0.0
-cache/0/16/0/scale = 1.0
-cache/0/16/0/kerning_overrides/36/0 = Vector2(0, 0)
-cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/16/0/kerning_overrides/60/0 = Vector2(0, 0)
-cache/0/60/0/ascent = 0.0
-cache/0/60/0/descent = 0.0
-cache/0/60/0/underline_position = 0.0
-cache/0/60/0/underline_thickness = 0.0
-cache/0/60/0/scale = 1.0
-cache/0/60/0/kerning_overrides/36/0 = Vector2(0, 0)
-cache/0/60/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/60/0/kerning_overrides/60/0 = Vector2(0, 0)
 
 [node name="Battle_HUD" type="Control"]
 custom_minimum_size = Vector2(740, 71)
@@ -77,7 +10,6 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = -1180.0
 offset_bottom = -1009.0
-theme = ExtResource("1")
 script = ExtResource("4")
 
 [node name="BG" type="TextureRect" parent="."]
@@ -87,11 +19,13 @@ texture = ExtResource("3")
 [node name="Player" type="Label" parent="BG"]
 custom_minimum_size = Vector2(122, 71)
 layout_mode = 0
+offset_right = 132.0
+offset_bottom = 71.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(1, 1, 1, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/font = SubResource("3")
-theme_override_font_sizes/font_size = 55
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 60
 text = "White"
 vertical_alignment = 1
 
@@ -101,7 +35,8 @@ offset_left = 167.0
 offset_right = 561.0
 offset_bottom = 71.0
 theme_override_colors/font_color = Color(0.027451, 0, 0.643137, 1)
-theme_override_constants/outline_size = 2
+theme_override_colors/font_outline_color = Color(0.647059, 0.647059, 0.647059, 1)
+theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 39
 text = "Opening Phase, Start"
@@ -115,9 +50,9 @@ offset_left = 610.0
 offset_right = 730.0
 offset_bottom = 71.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_colors/font_outline_color = Color(0.952941, 0.952941, 0.952941, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/font = SubResource("5")
+theme_override_colors/font_outline_color = Color(1, 1, 1, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 60
 text = "#1"
 horizontal_alignment = 2

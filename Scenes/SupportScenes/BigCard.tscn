@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://340nlxwjl4l8"]
 
-[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="1"]
+[ext_resource type="FontFile" uid="uid://8rvxi8gie5ay" path="res://Resources/Fonts/MTCORSVA.TTF" id="1"]
 [ext_resource type="Script" path="res://Scripts/Card_Display.gd" id="2"]
 [ext_resource type="Theme" uid="uid://duaqetqwypx5a" path="res://Resources/Themes/Card_Text_72.tres" id="4"]
 
@@ -90,6 +90,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = -1290.0
 offset_bottom = -135.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("2")
 
 [node name="Frame" type="TextureRect" parent="."]
@@ -109,6 +111,7 @@ anchor_bottom = 1.0
 offset_right = -123.0
 theme = ExtResource("4")
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
 theme_override_fonts/font = SubResource("3")
 theme_override_font_sizes/font_size = 72
 vertical_alignment = 1
@@ -134,6 +137,7 @@ offset_bottom = 790.0
 pivot_offset = Vector2(35, 45)
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = SubResource("1")
 theme_override_font_sizes/font_size = 35
 autowrap_mode = 3
@@ -148,6 +152,7 @@ offset_bottom = 905.0
 pivot_offset = Vector2(35, 45)
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
 theme_override_fonts/font = SubResource("2")
 theme_override_font_sizes/font_size = 103
 
@@ -160,6 +165,7 @@ offset_bottom = 905.0
 pivot_offset = Vector2(35, 45)
 theme_override_colors/font_color = Color(1, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
 theme_override_fonts/font = SubResource("2")
 theme_override_font_sizes/font_size = 103
 

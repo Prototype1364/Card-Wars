@@ -1,42 +1,9 @@
-[gd_scene load_steps=11 format=3 uid="uid://dnao8q2vpkwj4"]
+[gd_scene load_steps=10 format=3 uid="uid://dnao8q2vpkwj4"]
 
 [ext_resource type="Theme" uid="uid://duaqetqwypx5a" path="res://Resources/Themes/Card_Text_72.tres" id="1"]
-[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="2"]
-[ext_resource type="Texture2D" uid="uid://35ffupuh2sh1" path="res://Assets/Playmat/Playmat_HUD_Holder.png" id="3"]
+[ext_resource type="FontFile" uid="uid://8rvxi8gie5ay" path="res://Resources/Fonts/MTCORSVA.TTF" id="2"]
+[ext_resource type="Texture2D" uid="uid://bxpidne7k1kno" path="res://Assets/Playmat/Playmat_Duelist_HUD_Holder.png" id="3_8q6kb"]
 [ext_resource type="Script" path="res://Scripts/Battle_HUD_Duelist.gd" id="5"]
-
-[sub_resource type="FontFile" id="1"]
-subpixel_positioning = 0
-msdf_pixel_range = 14
-msdf_size = 128
-fallbacks = Array[Font]([ExtResource("2"), ExtResource("2")])
-face_index = null
-embolden = null
-transform = null
-cache/0/36/0/ascent = 0.0
-cache/0/36/0/descent = 0.0
-cache/0/36/0/underline_position = 0.0
-cache/0/36/0/underline_thickness = 0.0
-cache/0/36/0/scale = 1.0
-cache/0/36/0/kerning_overrides/36/0 = Vector2(0, 0)
-cache/0/36/0/kerning_overrides/30/0 = Vector2(0, 0)
-cache/0/36/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/30/0/ascent = 0.0
-cache/0/30/0/descent = 0.0
-cache/0/30/0/underline_position = 0.0
-cache/0/30/0/underline_thickness = 0.0
-cache/0/30/0/scale = 1.0
-cache/0/30/0/kerning_overrides/36/0 = Vector2(0, 0)
-cache/0/30/0/kerning_overrides/30/0 = Vector2(0, 0)
-cache/0/30/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/16/0/ascent = 0.0
-cache/0/16/0/descent = 0.0
-cache/0/16/0/underline_position = 0.0
-cache/0/16/0/underline_thickness = 0.0
-cache/0/16/0/scale = 1.0
-cache/0/16/0/kerning_overrides/36/0 = Vector2(0, 0)
-cache/0/16/0/kerning_overrides/30/0 = Vector2(0, 0)
-cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
 
 [sub_resource type="FontFile" id="2"]
 subpixel_positioning = 0
@@ -232,7 +199,7 @@ script = ExtResource("5")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
-texture = ExtResource("3")
+texture = ExtResource("3_8q6kb")
 
 [node name="LP" type="Label" parent="BG"]
 custom_minimum_size = Vector2(87, 34)
@@ -240,7 +207,8 @@ layout_mode = 0
 offset_right = 87.0
 offset_bottom = 34.0
 theme_override_colors/font_color = Color(1, 0, 0, 1)
-theme_override_fonts/font = SubResource("1")
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 30
 text = "LP: 100"
 
@@ -250,6 +218,7 @@ offset_top = 37.0
 offset_right = 119.0
 offset_bottom = 71.0
 theme_override_colors/font_color = Color(0.913725, 0.690196, 0.160784, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = SubResource("2")
 theme_override_font_sizes/font_size = 30
 text = "Crests: 100"
@@ -260,6 +229,7 @@ offset_left = 150.0
 offset_right = 331.0
 offset_bottom = 34.0
 theme_override_colors/font_color = Color(0.913725, 0.690196, 0.160784, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = SubResource("3")
 theme_override_font_sizes/font_size = 30
 text = "ATK Bonus: +0"
@@ -271,6 +241,7 @@ offset_top = 37.0
 offset_right = 313.0
 offset_bottom = 71.0
 theme_override_colors/font_color = Color(0.913725, 0.690196, 0.160784, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = SubResource("4")
 theme_override_font_sizes/font_size = 30
 text = "HP Bonus: +0"
@@ -282,6 +253,7 @@ offset_left = 345.0
 offset_right = 669.0
 offset_bottom = 34.0
 theme_override_colors/font_color = Color(0.913725, 0.690196, 0.160784, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = SubResource("5")
 theme_override_font_sizes/font_size = 30
 text = "Cost Discounts: 0/0/0/0"
@@ -294,6 +266,7 @@ offset_top = 37.0
 offset_right = 624.0
 offset_bottom = 71.0
 theme_override_colors/font_color = Color(0.913725, 0.690196, 0.160784, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = SubResource("6")
 theme_override_font_sizes/font_size = 30
 text = "Normal/Hero/Magic/Trap"

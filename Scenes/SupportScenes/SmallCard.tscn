@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://drsw0l0otqsm0"]
 
-[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="1"]
+[ext_resource type="FontFile" uid="uid://8rvxi8gie5ay" path="res://Resources/Fonts/MTCORSVA.TTF" id="1"]
 [ext_resource type="Script" path="res://Scripts/SmallCard.gd" id="2"]
 
 [sub_resource type="FontFile" id="1"]
@@ -39,6 +39,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = -1800.0
 offset_bottom = -900.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("2")
 
 [node name="Frame" type="TextureRect" parent="."]

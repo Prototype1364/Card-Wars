@@ -1,26 +1,14 @@
-[gd_scene load_steps=11 format=3 uid="uid://68q4dnvhm7uq"]
+[gd_scene load_steps=10 format=3 uid="uid://68q4dnvhm7uq"]
 
 [ext_resource type="PackedScene" uid="uid://devk1wrlprsu3" path="res://Scenes/SupportScenes/Battle_HUD_GameState.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://dnao8q2vpkwj4" path="res://Scenes/SupportScenes/Battle_HUD_Duelist.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://340nlxwjl4l8" path="res://Scenes/SupportScenes/BigCard.tscn" id="3"]
-[ext_resource type="Texture2D" uid="uid://dooubax078kvf" path="res://Assets/Playmat/BoardImage.png" id="4"]
-[ext_resource type="Texture2D" uid="uid://cb427o5cck4ub" path="res://Assets/Playmat/Large Empty Slot.png" id="5"]
-[ext_resource type="Texture2D" uid="uid://cnsdmsj43x3t0" path="res://Assets/Playmat/Switch Button.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://br1w5id7p1ow3" path="res://Assets/Playmat/BoardImage.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://cwqu04t2c3isr" path="res://Assets/Playmat/Large Empty Slot.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://th60voflvqne" path="res://Assets/Playmat/Switch Button.png" id="6"]
 [ext_resource type="Script" path="res://Scripts/Battle.gd" id="7"]
-[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="8"]
+[ext_resource type="FontFile" uid="uid://8rvxi8gie5ay" path="res://Resources/Fonts/MTCORSVA.TTF" id="8"]
 [ext_resource type="PackedScene" path="res://Scenes/SupportScenes/Pile_Scroller.tscn" id="9"]
-
-[sub_resource type="FontFile" id="1"]
-fallbacks = Array[Font]([ExtResource("8")])
-face_index = null
-embolden = null
-transform = null
-cache/0/16/0/ascent = 0.0
-cache/0/16/0/descent = 0.0
-cache/0/16/0/underline_position = 0.0
-cache/0/16/0/underline_thickness = 0.0
-cache/0/16/0/scale = 1.0
-cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
 
 [node name="Battle" type="Control"]
 layout_mode = 3
@@ -541,7 +529,8 @@ offset_top = 1185.0
 offset_right = 918.0
 offset_bottom = 1235.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_fonts/font = SubResource("1")
+theme_override_fonts/font = ExtResource("8")
+theme_override_font_sizes/font_size = 45
 text = "X"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -553,7 +542,8 @@ offset_top = 1185.0
 offset_right = 207.0
 offset_bottom = 1235.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_fonts/font = SubResource("1")
+theme_override_fonts/font = ExtResource("8")
+theme_override_font_sizes/font_size = 45
 text = "X"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -566,7 +556,8 @@ offset_right = 93.0
 offset_bottom = 106.0
 rotation = 3.14159
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = SubResource("1")
+theme_override_fonts/font = ExtResource("8")
+theme_override_font_sizes/font_size = 45
 text = "X"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -579,7 +570,8 @@ offset_right = 818.0
 offset_bottom = 106.0
 rotation = 3.14159
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = SubResource("1")
+theme_override_fonts/font = ExtResource("8")
+theme_override_font_sizes/font_size = 45
 text = "X"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -643,6 +635,8 @@ anchor_right = 0.0
 anchor_bottom = 0.0
 offset_right = 0.0
 offset_bottom = -2.0
+grow_horizontal = 1
+grow_vertical = 1
 
 [node name="HUD_W" parent="." instance=ExtResource("2")]
 anchors_preset = 0
