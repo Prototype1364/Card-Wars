@@ -27,3 +27,5 @@ signal Update_GameState
 signal Card_Effect_Selection_Yield_Release
 
 signal Update_Duelist_HUD
+
+signal Clicked_On_A_Small_Card_Copy

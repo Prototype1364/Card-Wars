@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://th60voflvqne" path="res://Assets/Playmat/Switch Button.png" id="6"]
 [ext_resource type="Script" path="res://Scripts/Battle.gd" id="7"]
 [ext_resource type="FontFile" uid="uid://8rvxi8gie5ay" path="res://Resources/Fonts/MTCORSVA.TTF" id="8"]
-[ext_resource type="PackedScene" path="res://Scenes/SupportScenes/Pile_Scroller.tscn" id="9"]
+[ext_resource type="PackedScene" uid="uid://c0h6voa4os3xv" path="res://Scenes/SupportScenes/Pile_Scroller.tscn" id="9"]
 
 [node name="Battle" type="Control"]
 layout_mode = 3
@@ -665,8 +665,9 @@ offset_right = 755.0
 offset_bottom = 71.0
 
 [node name="Pile_Scroller" parent="." instance=ExtResource("9")]
-visible = false
 anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
 offset_left = 128.0
 offset_top = 439.0
 offset_right = 983.0

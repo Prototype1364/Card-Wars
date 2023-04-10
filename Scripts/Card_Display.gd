@@ -7,16 +7,8 @@ func _ready():
 	var _HV1 = SignalBus.connect("LookAtCard", Callable(self, "LookAtCard"))
 	var _HV2 = SignalBus.connect("NotLookingAtCard", Callable(self, "NotLookingAtCard"))
 
-func GetCardData():
-	if GameData.FocusedCardParentName == "BHand":
-		SelectedCard = self.get_parent().get_parent().get_node("Playmat/CardSpots/BHandScroller/BHand").get_node(str(GameData.FocusedCardName))
-	elif GameData.FocusedCardParentName == "WHand":
-		SelectedCard = self.get_parent().get_parent().get_node("Playmat/CardSpots/WHandScroller/WHand").get_node(str(GameData.FocusedCardName))
-	else:
-		SelectedCard = self.get_parent().get_parent().get_node("Playmat/CardSpots/NonHands/" + GameData.FocusedCardParentName).get_node(str(GameData.FocusedCardName))
-
-func LookAtCard(FrameData, ArtData, NameData, AttackData, CostData, HealthData, AttributeData):
-	self.GetCardData()
+func LookAtCard(CardNode, FrameData, ArtData, NameData, AttackData, CostData, HealthData, AttributeData):
+	SelectedCard = CardNode
 	self.visible = true
 	
 	if SelectedCard != null:

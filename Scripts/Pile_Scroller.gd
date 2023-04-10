@@ -1,17 +1,18 @@
 extends Control
 
 var Cards
-var CardParent
+var SmallCardDisplay = preload("res://Scenes/SupportScenes/PseudoSmallCard.tscn")
+
 
 func _ready():
-	pass
+	var _HV1 = SignalBus.connect("Clicked_On_A_Small_Card_Copy", Callable(self, "Close_Scroller"))
 
 func Graveyard_Called(Dueler):
 	Clear_Scroller()
 	Cards = Dueler.Graveyard
 	Add_Cards()
 
-func Medical_Bay_Called(Dueler=GameData.Player):
+func Medical_Bay_Called(Dueler):
 	Clear_Scroller()
 	Cards = Dueler.MedicalBay
 	Add_Cards()
@@ -21,47 +22,55 @@ func Banished_Called(Dueler):
 	Cards = Dueler.Banished
 	Add_Cards()
 
-
 func Clear_Scroller():
 	#Clears all cards.
 	for i in $Deck_Scroller/Deck_Container.get_children():
-		#Fixes change in position from being placed in an HBoxContainer.
-		i.position = Vector2(0,0)
-		$Deck_Scroller/Deck_Container.remove_child(i)
-		CardParent.add_child(i)
+		i.queue_free()
 
 func Add_Cards():
 	#Adds cards based on which function was called.
 	for i in Cards:
-		#Saves the cards' parent for later.
-		CardParent = i.get_parent()
-		CardParent.remove_child(i)
-		$Deck_Scroller/Deck_Container.add_child(i)
-		
-func Remove_Blocker():
-	$Focus_Blocker.visible = false
+		var NewInstance = SmallCardDisplay.instantiate()
+		NewInstance.Name = i.Name
+		NewInstance.Frame = i.Frame
+		NewInstance.Type = i.Type
+		NewInstance.Effect_Type = i.Effect_Type
+		NewInstance.Art = i.Art
+		NewInstance.Attribute = i.Attribute
+		NewInstance.Description = i.Description
+		NewInstance.Short_Description = i.Short_Description
+		NewInstance.Attack = i.Attack
+		NewInstance.ATK_Bonus = i.ATK_Bonus
+		NewInstance.Cost = i.Cost
+		NewInstance.Cost_Path = i.Cost_Path
+		NewInstance.Health = i.Health
+		NewInstance.Health_Bonus = i.Health_Bonus
+		NewInstance.Revival_Health = i.Revival_Health
+		NewInstance.Special_Edition_Text = i.Special_Edition_Text
+		NewInstance.Rarity = i.Rarity
+		NewInstance.Passcode = i.Passcode
+		NewInstance.Deck_Capacity = i.Deck_Capacity
+		NewInstance.Tokens = i.Tokens
+		NewInstance.Token_Path = i.Token_Path
+		NewInstance.Is_Set = i.Is_Set
+		NewInstance.Effect_Active = i.Effect_Active
+		NewInstance.Fusion_Level = i.Fusion_Level
+		NewInstance.Attack_As_Reinforcement = i.Attack_As_Reinforcement
+		NewInstance.Invincible = i.Invincible
+		NewInstance.Multi_Strike = i.Multi_Strike
+		NewInstance.Target_Reinforcer = i.Target_Reinforcer
+		NewInstance.Paralysis = i.Paralysis
+		NewInstance.Owner = i.Owner
+		NewInstance.Copy_Of = i
+		NewInstance.Update_Card_Visuals()
+		$Deck_Scroller/Deck_Container.add_child(NewInstance)
 
-#If I create a duplicate card, the ready() function in the SmallCard scene causes problems.
-#As such, I merely move all the cards from whichever deck to the appropriate node and back.
-#If we change this, we'll be able to duplicate the cards whenever we'd like.
+func Close_Scroller(_Copy_Of):
+	if visible == true:
+		Clear_Scroller()
+		visible = false
 
-#BigCard scene does not work and crashes the game if you focus on cards in the Pile_Scroller.
-#Probably because we didn't set anything up for it. "Focus_Blocker" node prevents this crash.
-#"Focus_Blocker" node won't be needed later if we fix the crash, thankfully.
+func _on_button_pressed():
+	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	Medical_Bay_Called(player)
 
-#Each function needs a "Side" when called. Lets us choose from whichever side's piles on case-by-case basis. 
-
-#I think I forgot something while typing this all out. This is a reminder: You forgot something, future Eric.
-
-
-#For future reference, I tried:
-#1. Making a viewport to turn a card into an image that I could then place into a TextureRect. Everything worked
-# except for the actual turning the viewport's data into an image. Not sure what the issue actually was; there was
-# too many possible explanations for its failure to function.
-#2. i.duplicate(). This worked, but ran afoul of the whole "ready()" function not knowing what to do.
-
-#Possible fixes(?)
-#1. Make a second SmallCard scene that copies data, displays, and does nothing else. It exists solely for this 
-# scene.
-#2. Transform whichever pile is being gone through into a scroller when needed.
-#3. Reconfigure the SmallCard scene so that duplicate() functions.
