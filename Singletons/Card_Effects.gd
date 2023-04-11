@@ -504,18 +504,19 @@ func c68754341(card): # Prayer (Magic)
 	var Fighter = Get_Field_Card_Data("Fighter")
 	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
 	
-	if roll_result == 1:
-		Fighter_Opp.ATK_Bonus += 3
-	elif roll_result == 2:
-		Fighter.ATK_Bonus += 3
-	elif roll_result == 3:
-		Fighter_Opp.Health = Fighter_Opp.Revival_Health
-	elif roll_result == 4:
-		Fighter.Health = Fighter.Revival_Health
-	elif roll_result == 5:
-		Fighter.Paralysis = true
-	else:
-		Fighter.Invincible = true
+	if Fighter != null and Fighter_Opp != null:
+		if roll_result == 1:
+			Fighter_Opp.ATK_Bonus += 3
+		elif roll_result == 2:
+			Fighter.ATK_Bonus += 3
+		elif roll_result == 3:
+			Fighter_Opp.Health = Fighter_Opp.Revival_Health
+		elif roll_result == 4:
+			Fighter.Health = Fighter.Revival_Health
+		elif roll_result == 5:
+			Fighter.Paralysis = true
+		else:
+			Fighter.Invincible = true
 
 func c68535761(card): # Resurrection (Magic)
 	pass
