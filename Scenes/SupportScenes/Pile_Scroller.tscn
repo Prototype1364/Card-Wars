@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://c0h6voa4os3xv"]
 
-[ext_resource type="Texture2D" uid="uid://bb1kei0phf5v0" path="res://Assets/UI/Pile_Scroller_Background.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://uc52buqkgwmi" path="res://Assets/UI/Pile_Scroller_Background.png" id="1"]
 [ext_resource type="Script" path="res://Scripts/Pile_Scroller.gd" id="2"]
 
 [node name="Pile_Scroller" type="Control"]

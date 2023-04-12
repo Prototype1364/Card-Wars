@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://dg8le21xl6poj"]
 
 [ext_resource type="Script" path="res://Scripts/MenuButton.gd" id="1"]
-[ext_resource type="Theme" uid="uid://cruk118wm154o" path="res://Resources/Themes/Card_Text_54.tres" id="2"]
 [ext_resource type="Texture2D" uid="uid://dr3s0hnbndi57" path="res://Assets/UI/Menu_Hammer.png" id="3"]
+[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="3_oj8f4"]
 
 [node name="TextureButton" type="TextureButton"]
 custom_minimum_size = Vector2(1820, 100)
@@ -19,7 +19,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 size_flags_vertical = 4
 mouse_filter = 2
-theme = ExtResource("2")
+theme_override_fonts/normal_font = ExtResource("3_oj8f4")
+theme_override_font_sizes/normal_font_size = 54
 bbcode_enabled = true
 text = "[center] New Game [/center]"
 

@@ -1,7 +1,0 @@
-[gd_resource type="Theme" load_steps=2 format=3 uid="uid://duaqetqwypx5a"]
-
-[ext_resource type="FontFile" uid="uid://8rvxi8gie5ay" path="res://Resources/Fonts/MTCORSVA.TTF" id="1"]
-
-[resource]
-default_font = ExtResource("1")
-default_font_size = 36

@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://devk1wrlprsu3"]
 
-[ext_resource type="FontFile" uid="uid://8rvxi8gie5ay" path="res://Resources/Fonts/MTCORSVA.TTF" id="2"]
-[ext_resource type="Texture2D" uid="uid://bkj4qjue6sanb" path="res://Assets/Playmat/Playmat_HUD_Holder.png" id="3"]
+[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="2"]
+[ext_resource type="Texture2D" uid="uid://35ffupuh2sh1" path="res://Assets/Playmat/Playmat_HUD_Holder.png" id="3"]
 [ext_resource type="Script" path="res://Scripts/BATTLE_HUD_GameState.gd" id="4"]
 
 [node name="Battle_HUD" type="Control"]

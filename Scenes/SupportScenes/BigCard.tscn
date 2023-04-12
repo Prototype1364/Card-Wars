@@ -1,87 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://340nlxwjl4l8"]
+[gd_scene load_steps=3 format=3 uid="uid://340nlxwjl4l8"]
 
-[ext_resource type="FontFile" uid="uid://8rvxi8gie5ay" path="res://Resources/Fonts/MTCORSVA.TTF" id="1"]
+[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="1"]
 [ext_resource type="Script" path="res://Scripts/Card_Display.gd" id="2"]
-[ext_resource type="Theme" uid="uid://duaqetqwypx5a" path="res://Resources/Themes/Card_Text_72.tres" id="4"]
-
-[sub_resource type="FontFile" id="3"]
-subpixel_positioning = 0
-msdf_pixel_range = 14
-msdf_size = 128
-fallbacks = Array[Font]([ExtResource("1"), ExtResource("1")])
-face_index = null
-embolden = null
-transform = null
-cache/0/36/0/ascent = 0.0
-cache/0/36/0/descent = 0.0
-cache/0/36/0/underline_position = 0.0
-cache/0/36/0/underline_thickness = 0.0
-cache/0/36/0/scale = 1.0
-cache/0/36/0/kerning_overrides/36/0 = Vector2(0, 0)
-cache/0/36/0/kerning_overrides/72/0 = Vector2(0, 0)
-cache/0/36/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/72/0/ascent = 0.0
-cache/0/72/0/descent = 0.0
-cache/0/72/0/underline_position = 0.0
-cache/0/72/0/underline_thickness = 0.0
-cache/0/72/0/scale = 1.0
-cache/0/72/0/kerning_overrides/36/0 = Vector2(0, 0)
-cache/0/72/0/kerning_overrides/72/0 = Vector2(0, 0)
-cache/0/72/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/16/0/ascent = 0.0
-cache/0/16/0/descent = 0.0
-cache/0/16/0/underline_position = 0.0
-cache/0/16/0/underline_thickness = 0.0
-cache/0/16/0/scale = 1.0
-cache/0/16/0/kerning_overrides/36/0 = Vector2(0, 0)
-cache/0/16/0/kerning_overrides/72/0 = Vector2(0, 0)
-cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
-
-[sub_resource type="FontFile" id="1"]
-subpixel_positioning = 0
-msdf_pixel_range = 14
-msdf_size = 128
-fallbacks = Array[Font]([ExtResource("1"), ExtResource("1")])
-face_index = null
-embolden = null
-transform = null
-cache/0/16/0/ascent = 0.0
-cache/0/16/0/descent = 0.0
-cache/0/16/0/underline_position = 0.0
-cache/0/16/0/underline_thickness = 0.0
-cache/0/16/0/scale = 1.0
-cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/16/0/kerning_overrides/35/0 = Vector2(0, 0)
-cache/0/35/0/ascent = 0.0
-cache/0/35/0/descent = 0.0
-cache/0/35/0/underline_position = 0.0
-cache/0/35/0/underline_thickness = 0.0
-cache/0/35/0/scale = 1.0
-cache/0/35/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/35/0/kerning_overrides/35/0 = Vector2(0, 0)
-
-[sub_resource type="FontFile" id="2"]
-subpixel_positioning = 0
-msdf_pixel_range = 14
-msdf_size = 128
-fallbacks = Array[Font]([ExtResource("1"), ExtResource("1")])
-face_index = null
-embolden = null
-transform = null
-cache/0/16/0/ascent = 0.0
-cache/0/16/0/descent = 0.0
-cache/0/16/0/underline_position = 0.0
-cache/0/16/0/underline_thickness = 0.0
-cache/0/16/0/scale = 1.0
-cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/16/0/kerning_overrides/103/0 = Vector2(0, 0)
-cache/0/103/0/ascent = 0.0
-cache/0/103/0/descent = 0.0
-cache/0/103/0/underline_position = 0.0
-cache/0/103/0/underline_thickness = 0.0
-cache/0/103/0/scale = 1.0
-cache/0/103/0/kerning_overrides/16/0 = Vector2(0, 0)
-cache/0/103/0/kerning_overrides/103/0 = Vector2(0, 0)
 
 [node name="BigCard" type="Control"]
 layout_mode = 3
@@ -109,10 +29,9 @@ layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = -123.0
-theme = ExtResource("4")
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
-theme_override_fonts/font = SubResource("3")
+theme_override_fonts/font = ExtResource("1")
 theme_override_font_sizes/font_size = 72
 vertical_alignment = 1
 clip_text = true
@@ -138,7 +57,7 @@ pivot_offset = Vector2(35, 45)
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 2
-theme_override_fonts/font = SubResource("1")
+theme_override_fonts/font = ExtResource("1")
 theme_override_font_sizes/font_size = 35
 autowrap_mode = 3
 clip_text = true
@@ -153,7 +72,7 @@ pivot_offset = Vector2(35, 45)
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
-theme_override_fonts/font = SubResource("2")
+theme_override_fonts/font = ExtResource("1")
 theme_override_font_sizes/font_size = 103
 
 [node name="Health" type="Label" parent="."]
@@ -166,7 +85,7 @@ pivot_offset = Vector2(35, 45)
 theme_override_colors/font_color = Color(1, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
-theme_override_fonts/font = SubResource("2")
+theme_override_fonts/font = ExtResource("1")
 theme_override_font_sizes/font_size = 103
 
 [node name="ArtContainer" type="Control" parent="."]
