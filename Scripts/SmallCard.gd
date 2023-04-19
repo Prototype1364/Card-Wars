@@ -4,6 +4,7 @@ var Name
 var Frame
 var Type
 var Effect_Type
+var Anchor_Text
 var Art
 var Attribute
 var Description
@@ -47,6 +48,7 @@ func Set_Tech_Card_Variables(Card_Index):
 	Frame = player.Tech_Deck[Card_Index].Frame
 	Type = player.Tech_Deck[Card_Index].Type
 	Effect_Type = player.Tech_Deck[Card_Index].Effect_Type
+	Anchor_Text = player.Tech_Deck[Card_Index].Anchor_Text
 	Art = load(player.Tech_Deck[Card_Index].Art) if player.Tech_Deck[Card_Index].Art != "res://Assets/Cards/Art/Special_Activate_Technology.png" else null
 	Attribute = player.Tech_Deck[Card_Index].Attribute
 	Description = player.Tech_Deck[Card_Index].Description
@@ -82,6 +84,7 @@ func Set_Card_Variables(Card_Index):
 	Frame = player.Deck[Card_Index].Frame
 	Type = player.Deck[Card_Index].Type
 	Effect_Type = player.Deck[Card_Index].Effect_Type
+	Anchor_Text = player.Deck[Card_Index].Anchor_Text
 	Art = load(player.Deck[Card_Index].Art) if player.Deck[Card_Index].Art != "res://Assets/Cards/Art/Special_Activate_Technology.png" else null
 	Attribute = player.Deck[Card_Index].Attribute
 	Description = player.Deck[Card_Index].Description
@@ -206,9 +209,8 @@ func _on_FocusSensor_pressed():
 		
 		# Allows for Fusion Summoning (Knights of the Round Table)
 		if int(Passcode) in GameData.FUSION_CARDS:
-			print(GameData.Current_Card_Effect_Step)
 			GameData.Current_Card_Effect_Step = "Clicked"
-			CardEffects.call("c"+str(Passcode), self)
+			CardEffects.call(Anchor_Text, self)
 	
 	# Allows Flip summoning of cards from backrow
 	elif "Backrow" in Parent_Name and GameData.Current_Step == "Main":

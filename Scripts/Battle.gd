@@ -19,7 +19,6 @@ func _ready():
 	var _HV5 = SignalBus.connect("Capture_Card", Callable(self, "Capture_Card"))
 	var _HV6 = SignalBus.connect("Discard_Card", Callable(self, "Discard_Card"))
 	var _HV7 = SignalBus.connect("Update_GameState", Callable(self, "Update_Game_State"))
-#	set_focus_mode(true)
 	
 	Setup_Game()
 
@@ -34,13 +33,16 @@ func Create_Deck(Deck_List, Current_Duelist):
 					card["CardName"],
 					card["CardType"],
 					card["EffectType"],
+					card["AnchorText"],
 					card["Attribute"],
 					card["Description"],
 					card["ShortDescription"],
 					card["Attack"],
 					0,
+					0,
 					card["Cost"],
 					card["Health"],
+					0,
 					0,
 					card["SpecialEditionText"],
 					card["Rarity"],
@@ -50,6 +52,9 @@ func Create_Deck(Deck_List, Current_Duelist):
 					false,
 					false,
 					1,
+					false,
+					false,
+					false,
 					false,
 					false,
 					false,
@@ -73,7 +78,7 @@ func Create_Advance_Tech_Card():
 	var Created_Card
 	for card in GameData.CardData:
 		if card["Passcode"] == 42489363:
-			Created_Card = Card.new(card["CardType"], card["CardArt"], card["CardName"], card["CardType"], card["EffectType"], card["Attribute"], card["Description"], card["ShortDescription"], card["Attack"], 0, card["Cost"], card["Health"], 0, card["SpecialEditionText"], card["Rarity"], card["Passcode"], card["DeckCapacity"], 0, false, false, 1, false, false, false, false, false, "Game")
+			Created_Card = Card.new(card["CardType"], card["CardArt"], card["CardName"], card["CardType"], card["EffectType"], card["AnchorText"], card["Attribute"], card["Description"], card["ShortDescription"], card["Attack"], 0, 0, card["Cost"], card["Health"], 0, 0, card["SpecialEditionText"], card["Rarity"], card["Passcode"], card["DeckCapacity"], 0, false, false, 1, false, false, false, false, false, false, false, false, "Game")
 	
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
@@ -162,9 +167,7 @@ func Resolve_Card_Effects():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Available_Zones = get_node("Playmat/CardSpots/NonHands").get_children() + get_node("Playmat/CardSpots/" + Side + "HandScroller/").get_children()
 	var Zones_To_Check = []
-	var Passcode
-	var string_prefix = "c"
-	var func_name
+	var AnchorText
 	
 	# Populate Zones_To_Check Array
 	for i in Available_Zones.size():
@@ -177,11 +180,11 @@ func Resolve_Card_Effects():
 	# Resolve Card Effects
 	for zone in range(len(Zones_To_Check)): # Zone loop enables you to check all zones with just a single Item (card) loop.
 		for item in range(len(Zones_To_Check[zone].get_children())):
-			Passcode = Zones_To_Check[zone].get_child(item).Passcode
-			if Zones_To_Check[zone].get_child(item).Type != "Normal": # Eliminates the need to have blank funcs for Normal cards in Card_Effects Singleton to avoid crashing game
-				var Card_To_Check = Zones_To_Check[zone].get_child(item)
-				func_name = string_prefix + str(Passcode)
-				CardEffects.call(func_name, Card_To_Check)
+			if AnchorText != null:
+				AnchorText = Zones_To_Check[zone].get_child(item).Anchor_Text
+				if Zones_To_Check[zone].get_child(item).Type != "Normal": # Eliminates the need to have blank funcs for Normal cards in Card_Effects Singleton to avoid crashing game
+					var Chosen_Card = Zones_To_Check[zone].get_child(item)
+					CardEffects.call(AnchorText, Chosen_Card)
 
 func Add_Tokens():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
@@ -220,10 +223,12 @@ func Reposition_Field_Cards(Side):
 		if ("Magic" in GameData.CardTo and (Card_To_Check.Attribute != "Equip" or Card_To_Check.Type != "Magic")) or ("Trap" in GameData.CardTo and (Card_To_Check.Attribute != "Equip" or Card_To_Check.Type != "Trap")):
 			Reset_Reposition_Card_Variables()
 			return
-	elif "Fighter" in GameData.CardTo or "R1" in GameData.CardTo or "R2" in GameData.CardTo or "R3" in GameData.CardTo:
-		if Card_To_Check.Type != "Normal" and Card_To_Check.Type != "Hero":
-			Reset_Reposition_Card_Variables()
-			return
+	elif ("R1" in GameData.CardTo or "R2" in GameData.CardTo or "R3" in GameData.CardTo) and GameData.For_Honor_And_Glory:
+		Reset_Reposition_Card_Variables()
+		return
+	elif ("Fighter" in GameData.CardTo or "R1" in GameData.CardTo or "R2" in GameData.CardTo or "R3" in GameData.CardTo) and (Card_To_Check.Type != "Normal" and Card_To_Check.Type != "Hero"):
+		Reset_Reposition_Card_Variables()
+		return
 	elif "Backrow" in GameData.CardTo:
 		if Card_To_Check.Type != "Magic" and Card_To_Check.Type != "Trap":
 			Reset_Reposition_Card_Variables()
@@ -284,6 +289,7 @@ func Play_Card(Side):
 	
 	# Ensure card played is from Turn Player's Hand.
 	if (Side == "W" and GameData.Current_Turn == "Enemy") or (Side == "B" and GameData.Current_Turn == "Player"):
+		Reset_Reposition_Card_Variables()
 		return
 	
 	# ID Card Played
@@ -292,6 +298,11 @@ func Play_Card(Side):
 	
 	# Ensures that non-equip cards are not played in equip slots.
 	if Chosen_Card.Attribute != "Equip" and "Equip" in GameData.CardTo:
+		Reset_Reposition_Card_Variables()
+		return
+	
+	# Ensures that Reinforcers are NOT played when For Honor And Glory is in effect
+	if ("R1" in GameData.CardTo or "R2" in GameData.CardTo or "R3" in GameData.CardTo) and GameData.For_Honor_And_Glory:
 		Reset_Reposition_Card_Variables()
 		return
 	
@@ -438,18 +449,15 @@ func Set_Focus_Neighbors(Focus_To_Set, Side, Node_To_Set_For):
 		Node_To_Set_For.focus_next = Node_To_Set_For.get_parent().focus_next
 
 func Activate_Summon_Effects(Chosen_Card):
-	var string_prefix = "c"
-	var func_name
+	var AnchorText = Chosen_Card.Anchor_Text
 	
-	func_name = string_prefix + str(Chosen_Card.Passcode)
-	CardEffects.call(func_name, Chosen_Card)
+	CardEffects.call(AnchorText, Chosen_Card)
 
 func Activate_Set_Card(Side, Chosen_Card):
 	# Resolves card effect if card is activatable
-	if Chosen_Card.Type != "Trap" or (Chosen_Card.Type == "Trap" and Chosen_Card.Tokens > 0):
-		var string_prefix = "c"
-		var func_name = string_prefix + str(Chosen_Card.Passcode)
-		CardEffects.call(func_name, Chosen_Card)
+	if (Chosen_Card.Type == "Magic" and GameData.Muggle_Mode == false) or (Chosen_Card.Type == "Trap" and Chosen_Card.Tokens > 0):
+		var AnchorText = Chosen_Card.Anchor_Text
+		CardEffects.call(AnchorText, Chosen_Card)
 		Chosen_Card.Is_Set = false
 		# Resets Effect_Active status to ensure card effect isn't triggered from Graveyard.
 		Chosen_Card.Effect_Active = false
@@ -531,7 +539,7 @@ func Resolve_Battle_Damage():
 					GameData.Target.Update_Data()
 			
 			# Capture Step
-			if GameData.Target.Health <= 0:
+			if GameData.Target.Health <= 0 and GameData.Target.Immortal == false:
 				GameData.Current_Step = "Capture"
 				Capture_Card(GameData.Target, GameData.Target.get_parent())
 			
@@ -564,6 +572,7 @@ func Capture_Card(Card_Captured, slot_name, Capture_Type = "Normal"):
 	Card_Captured.ATK_Bonus = 0
 	Card_Captured.Health = Card_Captured.Revival_Health * Card_Captured.Fusion_Level
 	Card_Captured.Health_Bonus = 0
+	Card_Captured.Burn_Damage = 0
 	Card_Captured.Update_Data()
 	
 	# Update Current_Fighter value (if applicable)
