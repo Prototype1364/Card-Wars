@@ -18,6 +18,7 @@ func Get_Field_Card_Data(Zone):
 	var Side_Opponent = "B" if Side == "W" else "W"
 	var Fighter
 	var Reinforcers = []
+	var Backrow_Cards = []
 	
 	if Zone == "Fighter":
 		var Fighter_Path = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Fighter")
@@ -41,6 +42,22 @@ func Get_Field_Card_Data(Zone):
 			if Reinforcer_Path_Opponent.get_child_count() > 0:
 				Reinforcers.append(Reinforcer_Path_Opponent.get_child(0))
 		return Reinforcers
+	elif Zone == "Traps":
+		for i in range(0, 3):
+			var Backrow_Path = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Backrow" + str(i + 1))
+			if Backrow_Path.get_child_count() > 0:
+				var Card_To_Check = Backrow_Path.get_child(0)
+				if Card_To_Check.Type == "Trap":
+					Backrow_Cards.append(Backrow_Path.get_child(0))
+		return Backrow_Cards
+	elif Zone == "Traps Opponent":
+		for i in range(0, 3):
+			var Backrow_Path_Opp = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opponent + "Backrow" + str(i + 1))
+			if Backrow_Path_Opp.get_child_count() > 0:
+				var Card_To_Check = Backrow_Path_Opp.get_child(0)
+				if Card_To_Check.Type == "Trap":
+					Backrow_Cards.append(Backrow_Path_Opp.get_child(0))
+		return Backrow_Cards
 
 func Dice_Roll():
 	var rng = RandomNumberGenerator.new()
@@ -108,39 +125,48 @@ func Wizard(card):
 func Conqueror(card):
 	pass
 
-func Juggernaut(card):
-	pass
+func Juggernaut(card): # NOTE: This is just a strictly better effect than the current implementation of TailorMade (since it repeats every turn instead of just on summon)
+	if On_Field(card) and GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect":
+		card.ATK_Bonus += card.ATK_Bonus
+		card.Update_Data()
 
 func Invincibility(card):
-	pass
+	if On_Field(card) and card.Invincible == false:
+		card.Invincible = true
+	else:
+		card.Invincible = false
 
 func Paralysis(card):
 	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
 	
-	if On_Field(card) and card.Effect_Active and Fighter_Opp.size() > 0:
-		Fighter_Opp.Paralysis = true
+	if On_Field(card) and card.Effect_Active:
+		if Fighter_Opp != null:
+			Fighter_Opp.Paralysis = true
 
 func Poison(card):
 	var Fighter = Get_Field_Card_Data("Fighter")
 	
-	if On_Field(card) and card.Effect_Active and card in Fighter and GameData.Current_Step == "Damage":
+	if On_Field(card) and card.Effect_Active and card == Fighter and GameData.Current_Step == "Damage":
 		GameData.Target.Burn_Damage += card.Toxicity
+		GameData.Target.Health -= GameData.Target.Burn_Damage
 		GameData.Target.Update_Data()
 
 func Relentless(card):
-	if On_Field(card) and card.Effect_Active and card.Relentless == false:
+	if On_Field(card) and card.Relentless == false:
 		card.Relentless = true
 	else:
 		card.Relentless = false
 
 func Barrage(card):
-	if On_Field(card) and card.Effect_Active and card.Multi_Strike == false:
+	if On_Field(card) and card.Multi_Strike == false:
 		card.Multi_Strike = true
+	else:
+		card.Multi_Strike = false
 
 func Retribution(card):
 	var player = GameData.Player if GameData.Current_Turn == "Enemy" else GameData.Enemy
 	var Fighter_Opp = Get_Field_Card_Data("Fighter") # Not "Fighter Opponent" since this effect will occur during opponent's turn!
-
+	
 	if On_Field(card) and GameData.Cards_Captured_This_Turn.size() > 0 and GameData.Current_Phase == "End Phase" and GameData.Current_Step == "Effect":
 		Fighter_Opp.Health -= (card.Attack + card.ATK_Bonus + player.Field_ATK_Bonus)
 		Fighter_Opp.Update_Data()
@@ -151,7 +177,9 @@ func Fury(card):
 	if On_Field(card) and card.Effect_Active:
 		card.Effect_Active = false
 		var MedBay_Count = player.MedicalBay.size()
+		print(card.ATK_Bonus)
 		card.ATK_Bonus += MedBay_Count
+		print(card.ATK_Bonus)
 		card.Update_Data()
 
 func Guardian(card):
@@ -182,6 +210,11 @@ func Reformation(card):
 func Detonate(card):
 	if On_Field(card):
 		GameData.Auto_Spring_Traps = true
+		var Side = "W" if GameData.Current_Turn == "Player" else "B"
+		var Trap_Cards = Get_Field_Card_Data("Traps")
+		var Battle_Script = load("res://Scripts/Battle.gd").new()
+		for i in range(len(Trap_Cards)):
+			Battle_Script.Activate_Set_Card(Side, Trap_Cards[i])
 	else:
 		GameData.Auto_Spring_Traps = false
 
@@ -191,8 +224,8 @@ func Defiance(card):
 func For_Honor_And_Glory(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
-	var MedBay = get_node("/root/Battle/Playmat/CardSpots/NonHands" + Side + "MedBay")
-	var MedBay_Opp = get_node("/root/Battle/Playmat/CardSpots/NonHands" + Side_Opp + "MedBay")
+	var MedBay = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay")
+	var MedBay_Opp = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay")
 	var Reinforcers = Get_Field_Card_Data("Reinforcers")
 	var Reinforcers_Opp = Get_Field_Card_Data("Reinforcers Opponent")
 	
@@ -230,23 +263,26 @@ func Disorient(card):
 	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
 	var Reinforcers_Opp = Get_Field_Card_Data("Reinforcers Opponent")
 	
-	if On_Field(card) and card.Effect_Active and Fighter_Opp.size() > 0 and Reinforcers_Opp.size() > 0:
-		# Randomly Choose Replacement Reinforcer
-		var rng = RandomNumberGenerator.new()
-		rng.randomize()
-		var roll_result = rng.randi_range(1,Reinforcers_Opp.size())
-		
-		# Reparent Nodes
-		var Fighter_Parent = Fighter_Opp.get_parent()
-		var Reinforcer_Parent = Reinforcers_Opp[roll_result].get_parent()
-		Fighter_Parent.remove_child(Fighter_Opp)
-		Reinforcer_Parent.remove_child(Reinforcers_Opp[roll_result])
-		Fighter_Parent.add_child(Reinforcers_Opp[roll_result])
-		Reinforcer_Parent.add_child(Fighter_Opp)
+	if Fighter_Opp != null:
+		if On_Field(card) and Reinforcers_Opp.size() > 0 and GameData.Current_Step == "Selection":
+			# Randomly Choose Replacement Reinforcer
+			var rng = RandomNumberGenerator.new()
+			rng.randomize()
+			var roll_result = rng.randi_range(0,Reinforcers_Opp.size() - 1)
+			
+			# Reparent Nodes
+			var Fighter_Parent = Fighter_Opp.get_parent()
+			var Reinforcer_Parent = Reinforcers_Opp[roll_result].get_parent()
+			Fighter_Parent.remove_child(Fighter_Opp)
+			Reinforcer_Parent.remove_child(Reinforcers_Opp[roll_result])
+			Fighter_Parent.add_child(Reinforcers_Opp[roll_result])
+			Reinforcer_Parent.add_child(Fighter_Opp)
 
-func Moonshot(card):
-	if On_Field(card) and card.Effect_Active and card.Direct_Attack == false:
+func Behind_Enemy_Lines(card): # Name changed from Moonshot to be more descriptive of actual function.
+	if On_Field(card) and card.Direct_Attack == false:
 		card.Direct_Attack = true
+	elif On_Field(card) == false:
+		card.Direct_Attack = false
 
 func Atrocity(card):
 	pass
@@ -257,7 +293,7 @@ func Earthbound(card):
 	else:
 		GameData.Muggle_Mode = false
 
-func TailorMade(card): # Currently just doubles ATK_Bonus (instead of Equip-specific stat boosts, like Hephestus' effect did originally). Eric claims more thinking needs to be done on this effect due to lameness.
+func Tailor_Made(card): # Currently just doubles ATK_Bonus when summoned (instead of Equip-specific stat boosts, like Hephestus' effect did originally). Eric claims more thinking needs to be done on this effect due to lameness.
 	if On_Field(card) and card.Effect_Active:
 		card.Effect_Active = false
 		card.ATK_Bonus += card.ATK_Bonus

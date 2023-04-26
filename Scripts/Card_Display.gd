@@ -42,7 +42,10 @@ func LookAtCard(CardNode, FrameData, ArtData, NameData, AttackData, CostData, He
 			if SelectedCard.Short_Description == null:
 				$Description.text = "This card has no Short Description."
 			else:
-				$Description.text = SelectedCard.Short_Description
+				if SelectedCard.Anchor_Text != null:
+					$Description.text = "[" + SelectedCard.Anchor_Text + "] " + SelectedCard.Short_Description
+				else:
+					$Description.text = SelectedCard.Short_Description
 			if SelectedCard.Type == "Normal" or SelectedCard.Type == "Hero":
 				$Attack.text = str(max(AttackData, 0))
 				$Health.text = str(max(HealthData, 0))

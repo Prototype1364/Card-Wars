@@ -11,10 +11,12 @@ var Description
 var Short_Description
 var Attack
 var ATK_Bonus
+var Toxicity
 var Cost
 var Cost_Path
 var Health
 var Health_Bonus
+var Burn_Damage
 var Revival_Health # HP that a card resets to upon Capture
 var Special_Edition_Text
 var Rarity
@@ -26,10 +28,13 @@ var Is_Set
 var Effect_Active
 var Fusion_Level
 var Attack_As_Reinforcement
+var Immortal
 var Invincible
+var Relentless
 var Multi_Strike
 var Target_Reinforcer
 var Paralysis
+var Direct_Attack
 var Owner
 
 
@@ -55,10 +60,12 @@ func Set_Tech_Card_Variables(Card_Index):
 	Short_Description = player.Tech_Deck[Card_Index].Short_Description
 	Attack = player.Tech_Deck[Card_Index].Attack if player.Tech_Deck[Card_Index].Attack != null else ""
 	ATK_Bonus = player.Tech_Deck[Card_Index].ATK_Bonus
+	Toxicity = player.Tech_Deck[Card_Index].Toxicity
 	Cost = player.Tech_Deck[Card_Index].Cost
 	Cost_Path = null
 	Health = player.Tech_Deck[Card_Index].Health if player.Tech_Deck[Card_Index].Health != null else ""
 	Health_Bonus = player.Tech_Deck[Card_Index].Health_Bonus
+	Burn_Damage = player.Tech_Deck[Card_Index].Burn_Damage
 	Revival_Health = Health
 	Special_Edition_Text = player.Tech_Deck[Card_Index].Special_Edition_Text
 	Rarity = player.Tech_Deck[Card_Index].Rarity
@@ -69,9 +76,12 @@ func Set_Tech_Card_Variables(Card_Index):
 	Effect_Active = player.Tech_Deck[Card_Index].Effect_Active
 	Fusion_Level = player.Tech_Deck[Card_Index].Fusion_Level
 	Attack_As_Reinforcement = player.Tech_Deck[Card_Index].Attack_As_Reinforcement
+	Immortal = player.Tech_Deck[Card_Index].Immortal
 	Invincible = player.Tech_Deck[Card_Index].Invincible
+	Relentless = player.Tech_Deck[Card_Index].Relentless
 	Multi_Strike = player.Tech_Deck[Card_Index].Multi_Strike
 	Paralysis = player.Tech_Deck[Card_Index].Paralysis
+	Direct_Attack = player.Tech_Deck[Card_Index].Direct_Attack
 	Owner = player.Tech_Deck[Card_Index].Owner
 	
 	# Forces the correct values to be shown visually in Tech cards instantiated via Effect (i.e. from Hestia)
@@ -91,10 +101,12 @@ func Set_Card_Variables(Card_Index):
 	Short_Description = player.Deck[Card_Index].Short_Description
 	Attack = player.Deck[Card_Index].Attack if player.Deck[Card_Index].Attack != null else ""
 	ATK_Bonus = player.Deck[Card_Index].ATK_Bonus
+	Toxicity = player.Deck[Card_Index].Toxicity
 	Cost = player.Deck[Card_Index].Cost
 	Cost_Path = load("res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png") if player.Deck[Card_Index].Type != "Special" else null
 	Health = player.Deck[Card_Index].Health if player.Deck[Card_Index].Health != null else ""
 	Health_Bonus = player.Deck[Card_Index].Health_Bonus
+	Burn_Damage = player.Deck[Card_Index].Burn_Damage
 	Revival_Health = Health
 	Special_Edition_Text = player.Deck[Card_Index].Special_Edition_Text
 	Rarity = player.Deck[Card_Index].Rarity
@@ -105,9 +117,12 @@ func Set_Card_Variables(Card_Index):
 	Effect_Active = player.Deck[Card_Index].Effect_Active
 	Fusion_Level = player.Deck[Card_Index].Fusion_Level
 	Attack_As_Reinforcement = player.Deck[Card_Index].Attack_As_Reinforcement
+	Immortal = player.Deck[Card_Index].Immortal
 	Invincible = player.Deck[Card_Index].Invincible
+	Relentless = player.Deck[Card_Index].Relentless
 	Multi_Strike = player.Deck[Card_Index].Multi_Strike
 	Paralysis = player.Deck[Card_Index].Paralysis
+	Direct_Attack = player.Deck[Card_Index].Direct_Attack
 	Owner = player.Deck[Card_Index].Owner
 
 func Update_Card_Visuals():

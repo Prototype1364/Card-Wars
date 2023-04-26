@@ -12,7 +12,7 @@ var Cost_Discount_Normal
 var Cost_Discount_Hero
 var Cost_Discount_Magic
 var Cost_Discount_Trap
-var Relentless
+var Relentless # Refers to the Duelist's ability to grant extra attacks to their Fighter(s) each turn. This var is likely only changeable with a Tech Card.
 var Deck
 var Tech_Deck
 var Hand
