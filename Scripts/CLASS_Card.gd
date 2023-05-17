@@ -10,6 +10,7 @@ var Anchor_Text
 var Attribute
 var Description
 var Short_Description
+var Attacks_Remaining
 var Attack
 var ATK_Bonus # Used to keep track of Equip card bonuses specifically.
 var Toxicity # The amount of Burn_Damage per turn you add to the Target card's Burn_Damage variable.
@@ -64,6 +65,7 @@ func _init(Card_Frame, Card_Art, Card_Name, Card_Type, Card_EffectType, Card_Anc
 	Immortal = Card_Immortal
 	Invincible = Card_Invincible
 	Relentless = Card_Relentless
+	Attacks_Remaining = 1 if Relentless == false else 2
 	Multi_Strike = Card_Multi_Strike
 	Target_Reinforcer = Card_Target_Reinforcer
 	Paralysis = Card_Paralysis

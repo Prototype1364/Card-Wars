@@ -309,3 +309,6 @@ func Faithful(card):
 
 func Inspiration(card):
 	pass
+
+
+"""--------------------------------- Magic/Trap Effects ---------------------------------"""

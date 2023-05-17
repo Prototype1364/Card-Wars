@@ -220,6 +220,7 @@ focus_neighbor_right = NodePath("../WBackrow1")
 focus_neighbor_bottom = NodePath("../../WHandScroller/WHand")
 focus_next = NodePath("../WBackrow1")
 focus_previous = NodePath("../WMedBay")
+button_mask = 0
 flat = true
 
 [node name="WMedBay" type="Button" parent="Playmat/CardSpots/NonHands"]
@@ -248,6 +249,7 @@ focus_neighbor_right = NodePath("../../../../BoardScroller")
 focus_neighbor_bottom = NodePath("../../WHandScroller/WHand")
 focus_next = NodePath("../BMainDeck")
 focus_previous = NodePath("../WBackrow3")
+button_mask = 0
 flat = true
 
 [node name="WBanished" type="Button" parent="Playmat/CardSpots/NonHands"]
@@ -456,6 +458,7 @@ focus_neighbor_right = NodePath("../BBackrow1")
 focus_neighbor_bottom = NodePath("../../BHandScroller/BHand")
 focus_next = NodePath("../BBackrow1")
 focus_previous = NodePath("../BMedBay")
+button_mask = 0
 flat = true
 
 [node name="BMedBay" type="Button" parent="Playmat/CardSpots/NonHands"]
@@ -488,6 +491,7 @@ focus_neighbor_right = NodePath("../../../../BoardScroller")
 focus_neighbor_bottom = NodePath("../../BHandScroller/BHand")
 focus_next = NodePath("../WMainDeck")
 focus_previous = NodePath("../BBackrow3")
+button_mask = 0
 flat = true
 
 [node name="BBanished" type="Button" parent="Playmat/CardSpots/NonHands"]

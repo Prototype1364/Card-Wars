@@ -17,15 +17,16 @@ var Cards_Captured_This_Turn = []
 var Attacks_To_Launch = 0
 var Attacker
 var Target
-var For_Honor_And_Glory = false
-var Player = Duelist.new("Player",100,50,0,0,0,0,0,0,0,0,false,[],[],[],[],[],[],[],[],[],[],"None")
-var Enemy = Duelist.new("Enemy",100,50,0,0,0,0,0,0,0,0,false,[],[],[],[],[],[],[],[],[],[],"None")
+var For_Honor_And_Glory = true
+var Player = Duelist.new("Player",100,50,0,0,0,0,0,0,0,0,false,[],[],[],[],[],[],[],[],[],[])
+var Enemy = Duelist.new("Enemy",100,50,0,0,0,0,0,0,0,0,false,[],[],[],[],[],[],[],[],[],[])
 
 # Focus Card variables
 var FocusedCardName = ""
 var FocusedCardParentName = ""
 
 # Play/Reposition Card variables
+var Chosen_Card = null
 var Summon_Mode = ""
 var CardFrom = ""
 var CardTo = ""
@@ -37,7 +38,6 @@ var Yield_Mode = false
 var Resolve_On_Opposing_Card = false
 var Muggle_Mode = false
 var Auto_Spring_Traps = false
-var ChosenCard
 
 # Variable used to name Card nodes
 var CardCounter = 0
