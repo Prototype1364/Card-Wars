@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://devk1wrlprsu3"]
+[gd_scene load_steps=3 format=3 uid="uid://devk1wrlprsu3"]
 
 [ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="2"]
 [ext_resource type="Texture2D" uid="uid://35ffupuh2sh1" path="res://Assets/Playmat/Playmat_HUD_Holder.png" id="3"]
-[ext_resource type="Script" path="res://Scripts/BATTLE_HUD_GameState.gd" id="4"]
 
 [node name="Battle_HUD" type="Control"]
 custom_minimum_size = Vector2(740, 71)
@@ -10,7 +9,6 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = -1180.0
 offset_bottom = -1009.0
-script = ExtResource("4")
 
 [node name="BG" type="TextureRect" parent="."]
 layout_mode = 0

@@ -44,7 +44,7 @@ func _ready(Base = "Normal", Card_Index = -1):
 	Set_Card_Visuals()
 	Update_Data()
 
-func Can_Attack():
+func Can_Attack() -> bool:
 	if Attacks_Remaining > 0 and ("Fighter" in get_parent().name or (Attack_As_Reinforcement and get_parent().name in ["R1", "R2", "R3"])):
 		return true
 	else:
@@ -163,9 +163,7 @@ func defocusing():
 
 func _on_FocusSensor_pressed():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 	var Reposition_Zones = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
-	var Reposition_Zones_Opp = [Side_Opp + "Fighter", Side_Opp + "R1", Side_Opp + "R2", Side_Opp + "R3"]
 	var Reinforcement_Zones = [Side + "R1", Side + "R2", Side + "R3"]
 	var Parent_Name = self.get_parent().name
 	
@@ -178,15 +176,17 @@ func _on_FocusSensor_pressed():
 				if int(Passcode) in GameData.FUSION_CARDS:
 					GameData.Current_Card_Effect_Step = "Clicked"
 					CardEffects.call(Anchor_Text, self)
-			else:
+			elif "Hand" in Parent_Name:
 				$Action_Button_Container/Summon.visible = true
 				$Action_Button_Container/Set.visible = true
+			elif Parent_Name in Reposition_Zones and GameData.Chosen_Card == null:
+				GameData.Chosen_Card = self
 		"Selection":
 			if Valid_Attacker_Selection(Reposition_Zones, Reinforcement_Zones, Parent_Name, Side):
 				GameData.Attacker = self
 				SignalBus.emit_signal("Check_For_Targets")
 		"Target":
-			if ("Fighter" in Parent_Name and (Parent_Name.left(1) != Side) or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name) and GameData.Attacker.Target_Reinforcer)):
+			if ("Fighter" in Parent_Name and (Parent_Name.left(1) != Side)) or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name) and GameData.Attacker.Target_Reinforcer):
 				$Action_Button_Container/Target.visible = true
 		"Discard":
 			GameData.CardFrom = Parent_Name
@@ -194,14 +194,6 @@ func _on_FocusSensor_pressed():
 			if "Hand" in GameData.CardFrom:
 				SignalBus.emit_signal("Discard_Card", GameData.CardFrom.left(1))
 	
-	
-	
-	# Allows you to choose a card to receive effect benefits/penalties
-	if (GameData.Yield_Mode and Reposition_Zones.has(Parent_Name) and (Type == "Normal" or Type == "Hero")) or (GameData.Yield_Mode and Reposition_Zones_Opp.has(Parent_Name) and (Type == "Normal" or Type == "Hero") and GameData.Resolve_On_Opposing_Card):
-		GameData.Chosen_Card = self
-		SignalBus.emit_signal("Card_Effect_Selection_Yield_Release", self)
-	
-		"""-----------------------------------------------------------------------------"""
 	# Allows repositioning of cards on field (Currently doesn't allow for Exchange-like card effect [i.e. swapping 1 card of yours for one card of the opponent's on the field])
 	if Reposition_Zones.has(Parent_Name) and GameData.Current_Step == "Main":
 		if GameData.CardFrom == "":
@@ -211,23 +203,21 @@ func _on_FocusSensor_pressed():
 			GameData.CardTo = self.get_parent()
 			GameData.CardSwitched = self.name
 			SignalBus.emit_signal("Reposition_Field_Cards", GameData.CardTo.name.left(1))
-		"""-----------------------------------------------------------------------------"""
 	
 	# Allows Flip summoning of cards from backrow
-	elif "Backrow" in Parent_Name and GameData.Current_Step == "Main":
+	elif Side + "Backrow" in Parent_Name and GameData.Current_Step == "Main":
 		$Action_Button_Container/Summon.text = "Flip"
 		$Action_Button_Container/Summon.visible = true
 		GameData.CardFrom = Parent_Name
 		GameData.CardMoved = self.name
 
-func Valid_Attacker_Selection(Reposition_Zones, Reinforcement_Zones, Parent_Name, Side):
+func Valid_Attacker_Selection(Reposition_Zones, Reinforcement_Zones, Parent_Name, Side) -> bool:
 	if (Reposition_Zones[0] in Parent_Name or (Attack_As_Reinforcement == true and Reinforcement_Zones.has(Parent_Name))) and Parent_Name.left(1) == Side and Paralysis == false:
 		return true
 	else:
 		return false
 
 func _on_Summon_Set_pressed(Mode):
-	var Battle_Scene = load("res://Scenes/MainScenes/Battle.tscn").instantiate()
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Parent_Name = self.get_parent().name
 	
@@ -240,7 +230,7 @@ func _on_Summon_Set_pressed(Mode):
 			var slot_name = Side + "Equip" + self.Type
 			GameData.CardFrom = Parent_Name
 			GameData.CardMoved = self.name
-			Battle_Scene._on_Card_Slot_pressed(slot_name)
+			SignalBus.emit_signal("Summon_Set_Pressed", slot_name)
 	
 	elif "Hand" in Parent_Name and Mode == "Set":
 		GameData.Summon_Mode = "Set"
@@ -249,10 +239,6 @@ func _on_Summon_Set_pressed(Mode):
 	elif "Backrow" in Parent_Name and Mode == "Summon":
 		$Action_Button_Container/Summon.text = "Summon"
 		SignalBus.emit_signal("Activate_Set_Card", Side, self)
-	
-	elif "Hand" in Parent_Name and Mode == "Set":
-		GameData.Summon_Mode = "Set"
-		self.Is_Set = true
 	
 	GameData.CardFrom = Parent_Name
 	GameData.CardMoved = self.name
@@ -285,3 +271,12 @@ func _on_Hide_Action_Buttons_pressed(_event):
 		$Action_Button_Container/Summon.visible = false
 		$Action_Button_Container/Set.visible = false
 		$Action_Button_Container/Target.visible = false
+
+
+
+"""NEW FUNCS"""
+func Reset_Variables_After_Flip_Summon():
+	Is_Set = false
+	Effect_Active = false # Ensures effects aren't triggered from Graveyard.
+	Tokens = 0
+	Update_Token_Info()

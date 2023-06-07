@@ -49,3 +49,6 @@ func _init(Duelist_Name, Duelist_LP, Duelist_Summon_Crests, Duelist_Tokens, Duel
 	Graveyard = Duelist_Graveyard
 	Banished = Duelist_Banished
 	Tech_Zone = Duelist_Tech_Zone
+
+func Update_Summon_Crests(roll_result):
+	Summon_Crests += roll_result

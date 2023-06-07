@@ -1,19 +1,19 @@
 [gd_scene load_steps=10 format=3 uid="uid://68q4dnvhm7uq"]
 
 [ext_resource type="PackedScene" uid="uid://devk1wrlprsu3" path="res://Scenes/SupportScenes/Battle_HUD_GameState.tscn" id="1"]
+[ext_resource type="Script" path="res://Scripts/Managers/Battle_Manager.gd" id="1_gcaxc"]
 [ext_resource type="PackedScene" uid="uid://dnao8q2vpkwj4" path="res://Scenes/SupportScenes/Battle_HUD_Duelist.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://340nlxwjl4l8" path="res://Scenes/SupportScenes/BigCard.tscn" id="3"]
 [ext_resource type="Texture2D" uid="uid://dooubax078kvf" path="res://Assets/Playmat/BoardImage.png" id="4"]
 [ext_resource type="Texture2D" uid="uid://cb427o5cck4ub" path="res://Assets/Playmat/Large Empty Slot.png" id="5"]
 [ext_resource type="Texture2D" uid="uid://cnsdmsj43x3t0" path="res://Assets/Playmat/Switch Button.png" id="6"]
-[ext_resource type="Script" path="res://Scripts/Battle.gd" id="7"]
 [ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="8"]
 [ext_resource type="PackedScene" uid="uid://c0h6voa4os3xv" path="res://Scenes/SupportScenes/Pile_Scroller.tscn" id="9"]
 
 [node name="Battle" type="Control"]
 layout_mode = 3
 anchors_preset = 0
-script = ExtResource("7")
+script = ExtResource("1_gcaxc")
 
 [node name="Playmat" type="TextureRect" parent="."]
 layout_mode = 0

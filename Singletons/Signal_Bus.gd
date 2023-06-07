@@ -29,3 +29,29 @@ signal Card_Effect_Selection_Yield_Release
 signal Update_Duelist_HUD
 
 signal Clicked_On_A_Small_Card_Copy
+
+signal Advance_Phase
+
+signal Advance_Turn
+
+
+
+
+"""NEW SIGNALS"""
+signal Activate_Summon_Effects
+
+signal Resolve_Card_Effects
+
+signal Update_HUD_Duelist
+
+signal Summon_Affordable
+
+signal Summon_Set_Pressed
+
+signal Flip_Field
+
+signal Flip_Duelist_HUDs
+
+signal Update_HUD_GameState
+
+signal Clear_MedBay
