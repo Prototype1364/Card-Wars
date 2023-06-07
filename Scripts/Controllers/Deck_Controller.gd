@@ -33,3 +33,10 @@ func Shuffle_Deck(player):
 
 func Pop_Deck(Deck_To_Pop):
 	Deck_To_Pop.Deck.pop_back()
+
+func Reload_Deck(Deck_ID, MedBay_ID):
+	if len(Deck_ID) == 0 and len(MedBay_ID) > 0:
+		for i in range(len(MedBay_ID)):
+			Deck_ID.append(MedBay_ID[i])
+		MedBay_ID.clear()
+		SignalBus.emit_signal("Clear_MedBay")

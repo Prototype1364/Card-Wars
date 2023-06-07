@@ -12,7 +12,7 @@ const FUNC_STEPS = ["Damage"]
 @onready var DC = DeckController.new()
 @onready var IC = InputController.new()
 @onready var UI = UIController.new()
-@onready var BF = FieldController.new(BC)
+@onready var BF = FieldController.new()
 
 
 """--------------------------------- Engine Functions ---------------------------------"""
@@ -32,6 +32,8 @@ func _ready():
 	var _HV12 = SignalBus.connect("Clear_MedBay", Callable(self, "Clear_MedBay"))
 	var _HV13 = SignalBus.connect("Resolve_Card_Effects", Callable(self, "Resolve_Card_Effects"))
 	var _HV14 = SignalBus.connect("Reposition_Field_Cards", Callable(self, "Reposition_Field_Cards"))
+	var _HV15 = SignalBus.connect("Reset_Reposition_Card_Variables", Callable(self, "Reset_Reposition_Card_Variables"))
+	var _HV16 = SignalBus.connect("Play_Card", Callable(self, "Play_Card"))
 	
 	Setup_Game()
 
@@ -125,8 +127,9 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1):
 	var Deck_ID = "WMainDeck" if Turn_Player == "Player" else "BMainDeck"
 	
 	for _i in range(Cards_To_Draw):
+		var InstanceCard = BC.Instantiate_Card()
 		BC.Draw_Card(player, Cards_To_Draw)
-		BF.Add_Card_Node_To_Hand(Deck_ID)
+		BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
 		DC.Pop_Deck(player)
 
 func Add_Tokens():
@@ -169,6 +172,9 @@ func Reposition_Field_Cards(Side):
 
 func Resolve_Card_Effects():
 	BC.Resolve_Card_Effects()
+
+func Reset_Reposition_Card_Variables():
+	BC.Reset_Reposition_Card_Variables()
 
 
 
@@ -243,6 +249,16 @@ func Conduct_Main_Phase():
 	# Flip by on_Focus_Sensor_pressed() in SmallCard.gd and Activate_Set_Card()
 	pass
 
+func Play_Card(Base_Node, Side):
+	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var Card_Is_Valid = BC.Valid_Card(Base_Node.get_parent(), Side, GameData.Chosen_Card)
+	var Card_Net_Cost = BC.Calculate_Net_Cost(player, GameData.Chosen_Card)
+	var Destination_Is_Valid = BC.Valid_Destination(Side, GameData.CardTo, GameData.Chosen_Card)
+	var Card_Is_Affordable = BC.Summon_Affordable(player, Card_Net_Cost)
+	
+	if Card_Is_Valid and Destination_Is_Valid and Card_Is_Affordable:
+		BF.Play_Card(Base_Node, Side, Card_Net_Cost)
+
 func Activate_Set_Card(Side, Chosen_Card):
 	BC.Activate_Set_Card(Chosen_Card)
 	BF.Activate_Set_Card(Side, Chosen_Card)
@@ -294,7 +310,7 @@ func Conduct_End_Phase():
 	UI.Update_HUD_GameState()
 	
 	# Check for required Reload
-	BC.Reload_Deck(player.Deck, player.MedicalBay)
+	DC.Reload_Deck(player.Deck, player.MedicalBay)
 	DC.Shuffle_Deck(player)
 	UI.Update_Deck_Counts()
 	

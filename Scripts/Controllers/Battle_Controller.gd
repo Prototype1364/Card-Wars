@@ -245,10 +245,3 @@ func Get_Destination_MedBay_on_Capture(Capture_Type) -> Node:
 	else:
 		var Destination_MedBay = Node_BMedBay if GameData.Current_Turn == "Player" else Node_WMedBay
 		return Destination_MedBay
-
-func Reload_Deck(Deck_ID, MedBay_ID):
-	if len(Deck_ID) == 0 and len(MedBay_ID) > 0:
-		for i in range(len(MedBay_ID)):
-			Deck_ID.append(MedBay_ID[i])
-		MedBay_ID.clear()
-		SignalBus.emit_signal("Clear_MedBay")

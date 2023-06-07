@@ -55,3 +55,5 @@ signal Flip_Duelist_HUDs
 signal Update_HUD_GameState
 
 signal Clear_MedBay
+
+signal Reset_Reposition_Card_Variables
