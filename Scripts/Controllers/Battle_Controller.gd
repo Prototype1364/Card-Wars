@@ -12,8 +12,11 @@ var Node_BMedBay = Engine.get_main_loop().get_current_scene().get_node("Battle/P
 """--------------------------------- Pre-Filled Functions ---------------------------------"""
 func Resolve_Card_Effects(Base_Node = Node_CardSpots):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Opposition = "B" if GameData.Current_Turn == "Player" else "W"
 	var Available_Zones = Base_Node.get_node("NonHands").get_children() + Base_Node.get_node(Side + "HandScroller/").get_children()
+	var Available_Opposite_Zones = Base_Node.get_node("NonHands").get_children() + Base_Node.get_node(Opposition + "HandScroller/").get_children()
 	var Zones_To_Check = []
+	var Zones_To_Check_Opposite = []
 	var AnchorText
 	
 	# Populate Zones_To_Check Array
@@ -22,14 +25,29 @@ func Resolve_Card_Effects(Base_Node = Node_CardSpots):
 			if ! Available_Zones[i].name in ["Deck", "Banished"]:
 				Zones_To_Check.append(Available_Zones[i])
 	
-	# Resolve Card Effects
+	# Populate Zones_To_Check_Opposite Array
+	for i in Available_Opposite_Zones.size():
+		if Available_Opposite_Zones[i].name.left(1) == Opposition or ! Available_Opposite_Zones[i].name in [Opposition + "Hand", "Backrow"]:
+			if ! Available_Opposite_Zones[i].name in ["Deck", "Banished"]:
+				Zones_To_Check_Opposite.append(Available_Opposite_Zones[i])
+	
+	# Resolve Card Effects (Current Side)
 	for zone in range(len(Zones_To_Check)): # Zone loop enables you to check all zones with just a single Item (card) loop.
 		for item in range(len(Zones_To_Check[zone].get_children())):
 			AnchorText = Zones_To_Check[zone].get_child(item).Anchor_Text
 			if AnchorText != null:
 				if Zones_To_Check[zone].get_child(item).Type != "Normal": # Eliminates the need to have blank funcs for Normal cards in Card_Effects Singleton to avoid crashing game
 					var Chosen_Card = Zones_To_Check[zone].get_child(item)
-					CardEffects.call(AnchorText, Chosen_Card)
+					CardEffects.call(AnchorText, Chosen_Card, Side)
+	
+	# Resolve Card Effects (Opposite Side)
+	for zone in range(len(Zones_To_Check_Opposite)): # Zone loop enables you to check all zones with just a single Item (card) loop.
+		for item in range(len(Zones_To_Check_Opposite[zone].get_children())):
+			AnchorText = Zones_To_Check_Opposite[zone].get_child(item).Anchor_Text
+			if AnchorText != null:
+				if Zones_To_Check_Opposite[zone].get_child(item).Type != "Normal": # Eliminates the need to have blank funcs for Normal cards in Card_Effects Singleton to avoid crashing game
+					var Chosen_Card = Zones_To_Check_Opposite[zone].get_child(item)
+					CardEffects.call(AnchorText, Chosen_Card, Opposition)
 
 func Check_For_Victor_LP(player = GameData.Player, enemy = GameData.Enemy) -> bool:
 	if player.LP <= 0:
@@ -124,11 +142,12 @@ func Add_Tokens(Backrow_Slots):
 
 func Activate_Summon_Effects(Chosen_Card):
 	var AnchorText = Chosen_Card.Anchor_Text
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	
 	if Chosen_Card.Type == "Hero" or (Chosen_Card.Type == "Magic" and Chosen_Card.Is_Set == false and GameData.Muggle_Mode == false) or (Chosen_Card.Type == "Trap" and Chosen_Card.Attribute == "Equip" and Chosen_Card.Is_Set == false):
 		Chosen_Card.Effect_Active = true
 		GameData.Current_Card_Effect_Step = "Activation"
-		CardEffects.call(AnchorText, Chosen_Card)
+		CardEffects.call(AnchorText, Chosen_Card, Side)
 		# Resets Effect_Active status to ensure card doesn't activate from Graveyard
 		Chosen_Card.Effect_Active = false
 
