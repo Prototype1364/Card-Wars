@@ -21,7 +21,7 @@ func Add_Card_Node_To_Hand(Deck_ID, InstanceCard, Base_Node = Node_CardSpots):
 		TechZone.add_child(InstanceCard)
 
 func Reparent_Nodes(Source_Node, Destination_Node):
-	Source_Node.set_position(Vector2(0, 0))
+	Source_Node.set_position(Vector2.ZERO)
 	Source_Node.get_parent().remove_child(Source_Node)
 	Destination_Node.add_child(Source_Node)
 

@@ -1,5 +1,7 @@
 extends Control
 
+# Used when interacting with Pile_Scroller scene (it's basically a simplified version of the smallcard scene).
+
 var Name
 var Frame
 var Type
@@ -78,5 +80,3 @@ func _on_FocusSensor_focus_exited():
 
 func Card_Clicked():
 	SignalBus.emit_signal("Clicked_On_A_Small_Card_Copy", Copy_Of)
-
-
