@@ -122,10 +122,10 @@ func Wizard(card):
 
 
 """--------------------------------- Hero Effects ---------------------------------"""
-func Conqueror(card, card_current_owner):
+func Conqueror(card):
 	pass
 
-func Juggernaut(card, card_current_owner): # NOTE: This is just a strictly better effect than the current implementation of TailorMade (since it repeats every turn instead of just on summon)
+func Juggernaut(card): # NOTE: This is just a strictly better effect than the current implementation of TailorMade (since it repeats every turn instead of just on summon)
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -134,7 +134,7 @@ func Juggernaut(card, card_current_owner): # NOTE: This is just a strictly bette
 		card.ATK_Bonus += card.ATK_Bonus
 		card.Update_Data()
 
-func Invincibility(card, card_current_owner):
+func Invincibility(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -144,7 +144,7 @@ func Invincibility(card, card_current_owner):
 	else:
 		card.Invincible = false
 
-func Paralysis(card, card_current_owner):
+func Paralysis(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -155,7 +155,7 @@ func Paralysis(card, card_current_owner):
 		if Fighter_Opp != null:
 			Fighter_Opp.Paralysis = true
 
-func Poison(card, card_current_owner):
+func Poison(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -167,7 +167,7 @@ func Poison(card, card_current_owner):
 		GameData.Target.Health -= GameData.Target.Burn_Damage
 		GameData.Target.Update_Data()
 
-func Relentless(card, card_current_owner):
+func Relentless(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -177,7 +177,7 @@ func Relentless(card, card_current_owner):
 	else:
 		card.Relentless = false
 
-func Barrage(card, card_current_owner):
+func Barrage(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -187,7 +187,7 @@ func Barrage(card, card_current_owner):
 	else:
 		card.Multi_Strike = false
 
-func Retribution(card, card_current_owner):
+func Retribution(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -199,7 +199,7 @@ func Retribution(card, card_current_owner):
 		Fighter_Opp.Health -= (card.Attack + card.ATK_Bonus + player.Field_ATK_Bonus)
 		Fighter_Opp.Update_Data()
 
-func Fury(card, card_current_owner):
+func Fury(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -214,8 +214,9 @@ func Fury(card, card_current_owner):
 		print(card.ATK_Bonus)
 		card.Update_Data()
 
-func Guardian(card, card_current_owner):
+func Guardian(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	
 	if Side != card_current_owner:
 		return
 	
@@ -228,22 +229,22 @@ func Guardian(card, card_current_owner):
 		GameData.Target.Update_Data()
 		GameData.Attacker.Update_Data()
 
-func Absorption(card, card_current_owner):
+func Absorption(card):
 	pass
 
-func Expansion(card, card_current_owner):
+func Expansion(card):
 	pass
 
-func Spawn(card, card_current_owner):
+func Spawn(card):
 	pass
 
-func Reincarnation(card, card_current_owner):
+func Reincarnation(card):
 	pass
 
-func Reformation(card, card_current_owner):
+func Reformation(card):
 	pass
 
-func Detonate(card, card_current_owner):
+func Detonate(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -257,10 +258,10 @@ func Detonate(card, card_current_owner):
 	else:
 		GameData.Auto_Spring_Traps = false
 
-func Defiance(card, card_current_owner):
+func Defiance(card):
 	pass
 
-func For_Honor_And_Glory(card, card_current_owner):
+func For_Honor_And_Glory(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -286,22 +287,22 @@ func For_Honor_And_Glory(card, card_current_owner):
 	else:
 		GameData.For_Honor_And_Glory = false
 
-func Humiliator(card, card_current_owner):
+func Humiliator(card):
 	pass
 
-func Counter(card, card_current_owner):
+func Counter(card):
 	pass
 
-func Perfect_Copy(card, card_current_owner):
+func Perfect_Copy(card):
 	pass
 
-func Mimic(card, card_current_owner):
+func Mimic(card):
 	pass
 
-func Taunt(card, card_current_owner):
+func Taunt(card):
 	pass
 
-func Disorient(card, card_current_owner):
+func Disorient(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -324,7 +325,7 @@ func Disorient(card, card_current_owner):
 			Fighter_Parent.add_child(Reinforcers_Opp[roll_result])
 			Reinforcer_Parent.add_child(Fighter_Opp)
 
-func Behind_Enemy_Lines(card, card_current_owner): # Name changed from Moonshot to be more descriptive of actual function.
+func Behind_Enemy_Lines(card): # Name changed from Moonshot to be more descriptive of actual function.
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -334,10 +335,10 @@ func Behind_Enemy_Lines(card, card_current_owner): # Name changed from Moonshot 
 	elif On_Field(card) == false:
 		card.Direct_Attack = false
 
-func Atrocity(card, card_current_owner):
+func Atrocity(card):
 	pass
 
-func Earthbound(card, card_current_owner):
+func Earthbound(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -347,7 +348,7 @@ func Earthbound(card, card_current_owner):
 	else:
 		GameData.Muggle_Mode = false
 
-func Tailor_Made(card, card_current_owner): # Currently just doubles ATK_Bonus when summoned (instead of Equip-specific stat boosts, like Hephestus' effect did originally). Eric claims more thinking needs to be done on this effect due to lameness.
+func Tailor_Made(card): # Currently just doubles ATK_Bonus when summoned (instead of Equip-specific stat boosts, like Hephestus' effect did originally). Eric claims more thinking needs to be done on this effect due to lameness.
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -357,7 +358,7 @@ func Tailor_Made(card, card_current_owner): # Currently just doubles ATK_Bonus w
 		card.ATK_Bonus += card.ATK_Bonus
 		card.Update_Data()
 
-func Faithful(card, card_current_owner):
+func Faithful(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	if Side != card_current_owner:
 		return
@@ -369,7 +370,7 @@ func Faithful(card, card_current_owner):
 	else:
 		card.Immortal = false
 
-func Inspiration(card, card_current_owner):
+func Inspiration(card):
 	pass
 
 
