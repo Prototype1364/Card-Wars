@@ -1,0 +1,47 @@
+[gd_scene load_steps=3 format=3 uid="uid://brufb56qoikv5"]
+
+[ext_resource type="Script" path="res://Scripts/Controllers/Card_Selector_Controller.gd" id="1_5jl2s"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jvo1i"]
+bg_color = Color(0.4, 0.4, 0.4, 1)
+
+[node name="CardSelector" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 532.5
+offset_top = 380.0
+offset_right = 532.5
+offset_bottom = 380.0
+size_flags_horizontal = 4
+script = ExtResource("1_5jl2s")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(855, 320)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_jvo1i")
+
+[node name="Label" type="Label" parent="."]
+custom_minimum_size = Vector2(255, 0)
+layout_mode = 0
+offset_left = 300.0
+offset_top = 5.0
+offset_right = 555.0
+offset_bottom = 31.0
+text = "Choose A Card!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+custom_minimum_size = Vector2(845, 270)
+layout_mode = 0
+offset_left = 5.0
+offset_top = 45.0
+offset_right = 850.0
+offset_bottom = 295.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

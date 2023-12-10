@@ -7,8 +7,7 @@ func Create_Deck(Deck_List, Current_Duelist):
 		if card["Passcode"] in GameData.Master_Deck_List["Decks"][Deck_List]:
 			var Passcode = card["Passcode"]
 			for _copies in range(0,GameData.Master_Deck_List["Decks"][Deck_List].count(Passcode)):
-				var Created_Card = Card.new(card["CardType"], card["CardArt"], card["CardName"], card["CardType"], card["EffectType"], card["AnchorText"], card["Attribute"], card["Description"], card["ShortDescription"], card["Attack"], 0, 0, card["Cost"], card["Health"], 0, 0, card["SpecialEditionText"], card["Rarity"], card["Passcode"], card["DeckCapacity"], 0, false, false, 1, false, false, false, false, false, false, false, false, Current_Duelist)
-				
+				var Created_Card = Card.new(card["CardType"], card["CardArt"], card["CardName"], card["CardType"], card["EffectType"], card["AnchorText"], card["ResolveSide"], card["ResolvePhase"], card["ResolveStep"], card["Attribute"], card["Description"], card["ShortDescription"], card["Attack"], 0, 0, card["Cost"], card["Health"], 0, 0, card["SpecialEditionText"], card["Rarity"], card["Passcode"], card["DeckCapacity"], 0, false, false, 1, false, false, false, false, false, false, false, false, Current_Duelist)
 				# Ensures that Tech cards go into the Tech Deck.
 				var player = GameData.Player if Current_Duelist == "Player" else GameData.Enemy
 				if Created_Card.Type == "Tech":
@@ -20,7 +19,7 @@ func Create_Advance_Tech_Card():
 	var Created_Card
 	for card in GameData.CardData:
 		if card["Passcode"] == 42489363:
-			Created_Card = Card.new(card["CardType"], card["CardArt"], card["CardName"], card["CardType"], card["EffectType"], card["AnchorText"], card["Attribute"], card["Description"], card["ShortDescription"], card["Attack"], 0, 0, card["Cost"], card["Health"], 0, 0, card["SpecialEditionText"], card["Rarity"], card["Passcode"], card["DeckCapacity"], 0, false, false, 1, false, false, false, false, false, false, false, false, "Game")
+			Created_Card = Card.new(card["CardType"], card["CardArt"], card["CardName"], card["CardType"], card["EffectType"], card["AnchorText"], card["ResolveSide"], card["ResolvePhase"], card["ResolveStep"], card["Attribute"], card["Description"], card["ShortDescription"], card["Attack"], 0, 0, card["Cost"], card["Health"], 0, 0, card["SpecialEditionText"], card["Rarity"], card["Passcode"], card["DeckCapacity"], 0, false, false, 1, false, false, false, false, false, false, false, false, "Game")
 	
 	var random_number = Utils.RNGesus(1, 2)
 	if random_number == 1:

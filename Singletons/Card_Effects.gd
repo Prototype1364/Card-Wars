@@ -3,12 +3,26 @@ extends Node
 func _ready():
 	pass
 
-func On_Field(card):
+func On_Field(card) -> bool:
 	var Parent_Name = card.get_parent().name
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Valid_Slots = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
+	var Valid_Slots = ["WFighter", "WR1", "WR2", "WR3", "BFighter", "BR1", "BR2", "BR3"]
 	
 	if Valid_Slots.has(Parent_Name):
+		return true
+	else:
+		return false
+
+func Resolvable_Card(card) -> bool:
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Parent_Name = card.get_parent().name.left(1)
+	
+	if card.Resolve_Side == "Both" or (card.Resolve_Side == "Self" and Side == Parent_Name) or (card.Resolve_Side == "Opponent" and Side != Parent_Name):
+		return true
+	else:
+		return false
+
+func Valid_GameState(card) -> bool:
+	if (GameData.Current_Phase == card.Resolve_Phase and GameData.Current_Step == card.Resolve_Step) or card.Resolve_Step == "Any":
 		return true
 	else:
 		return false
@@ -75,10 +89,19 @@ func Flip_Coin():
 func Breakthrough(card): # Activate Tech (Special)
 	pass
 
+func Actor(card):
+	pass
+
+func Assassin(card):
+	pass
+
 func Creature(card):
 	pass
 
 func Cryptid(card):
+	pass
+
+func Engineer(card):
 	pass
 
 func Explorer(card):
@@ -91,7 +114,13 @@ func Olympian(card):
 	pass
 
 func Outlaw(card):
-	pass
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
+	
+	if Valid_Card:
+		var Card_Selector = load("res://Scenes/SupportScenes/card_selector.tscn").instantiate()
+		var Battle_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle")
+		Battle_Scene.add_child(Card_Selector)
+		Card_Selector.Determine_Card_List("Opponent Hand")
 
 func Philosopher(card):
 	pass
@@ -100,6 +129,25 @@ func Politician(card):
 	pass
 
 func Ranged(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
+	
+	if Valid_Card:
+		var Fighter = Get_Field_Card_Data("Fighter")
+		var Reinforcers = Get_Field_Card_Data("Reinforcers")
+		var Ranged_On_Field = false
+		
+		for i in Reinforcers:
+			if Reinforcers[i].Attribute == "Ranged":
+				Ranged_On_Field = true
+				break
+		
+		if Ranged_On_Field:
+			Fighter.Target_Reinforcer = true
+			Fighter.Attacks_Remaining += 1
+		else:
+			Fighter.Target_Reinforcer = false
+
+func Rogue(card):
 	pass
 
 func Scientist(card):
@@ -114,6 +162,12 @@ func Support(card):
 func Titan(card):
 	pass
 
+func Treasure_Hunter(card):
+	pass
+
+func Trickster(card):
+	pass
+
 func Warrior(card):
 	pass
 
@@ -126,104 +180,68 @@ func Conqueror(card):
 	pass
 
 func Juggernaut(card): # NOTE: This is just a strictly better effect than the current implementation of TailorMade (since it repeats every turn instead of just on summon)
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
-	
-	if On_Field(card) and GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect":
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
+	if Valid_Card:
 		card.ATK_Bonus += card.ATK_Bonus
 		card.Update_Data()
 
 func Invincibility(card):
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	
-	if On_Field(card) and card.Invincible == false:
-		card.Invincible = true
-	else:
-		card.Invincible = false
+	card.Invincible == true if Valid_Card else false
 
 func Paralysis(card):
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
-	
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
 	
-	if On_Field(card) and card.Effect_Active:
+	if Valid_Card and card.Effect_Active:
 		if Fighter_Opp != null:
 			Fighter_Opp.Paralysis = true
 
 func Poison(card):
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
-	
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	var Fighter = Get_Field_Card_Data("Fighter")
 	
-	if On_Field(card) and card.Effect_Active and card == Fighter and GameData.Current_Step == "Damage":
+	if Valid_Card and card.Effect_Active and card == Fighter:
 		GameData.Target.Burn_Damage += card.Toxicity
 		GameData.Target.Health -= GameData.Target.Burn_Damage
 		GameData.Target.Update_Data()
 
 func Relentless(card):
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	
-	if On_Field(card) and card.Relentless == false:
-		card.Relentless = true
-	else:
-		card.Relentless = false
+	card.Relentless == true if Valid_Card else false
 
 func Barrage(card):
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	
-	if On_Field(card) and card.Multi_Strike == false:
-		card.Multi_Strike = true
-	else:
-		card.Multi_Strike = false
+	card.Multi_Strike == true if Valid_Card else false
 
 func Retribution(card):
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
-		
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	var player = GameData.Player if GameData.Current_Turn == "Enemy" else GameData.Enemy
 	var Fighter_Opp = Get_Field_Card_Data("Fighter") # Not "Fighter Opponent" since this effect will occur during opponent's turn!
 	
-	if On_Field(card) and GameData.Cards_Captured_This_Turn.size() > 0 and GameData.Current_Phase == "End Phase" and GameData.Current_Step == "Effect":
+	if Valid_Card and GameData.Cards_Captured_This_Turn.size() > 0:
 		Fighter_Opp.Health -= (card.Attack + card.ATK_Bonus + player.Field_ATK_Bonus)
 		Fighter_Opp.Update_Data()
 
 func Fury(card):
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
-		
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	
-	if On_Field(card) and card.Effect_Active:
+	if Valid_Card and card.Effect_Active:
 		card.Effect_Active = false
 		var MedBay_Count = player.MedicalBay.size()
-		print(card.ATK_Bonus)
 		card.ATK_Bonus += MedBay_Count
-		print(card.ATK_Bonus)
 		card.Update_Data()
 
 func Guardian(card):
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	
-	if Side != card_current_owner:
-		return
-	
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	var Reinforcers = Get_Field_Card_Data("Reinforcers Opponent")
 	
-	if On_Field(card) and GameData.Current_Step == "Damage" and GameData.Target in Reinforcers:
+	if Valid_Card and GameData.Target in Reinforcers:
 		GameData.Target.Health += (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus)
 		GameData.Attacker.Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus)
 		GameData.Target.Update_Data()
@@ -245,11 +263,10 @@ func Reformation(card):
 	pass
 
 func Detonate(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
 		
-	if On_Field(card):
+	if Valid_Card:
 		GameData.Auto_Spring_Traps = true
 		var Trap_Cards = Get_Field_Card_Data("Traps")
 		var Battle_Script = load("res://Scripts/Battle.gd").new()
@@ -262,17 +279,15 @@ func Defiance(card):
 	pass
 
 func For_Honor_And_Glory(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
-	
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 	var MedBay = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay")
 	var MedBay_Opp = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay")
 	var Reinforcers = Get_Field_Card_Data("Reinforcers")
 	var Reinforcers_Opp = Get_Field_Card_Data("Reinforcers Opponent")
 	
-	if On_Field(card):
+	if Valid_Card:
 		GameData.For_Honor_And_Glory = true
 		# Reparent Nodes
 		for i in len(Reinforcers):
@@ -303,15 +318,12 @@ func Taunt(card):
 	pass
 
 func Disorient(card):
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
-	
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
 	var Reinforcers_Opp = Get_Field_Card_Data("Reinforcers Opponent")
 	
 	if Fighter_Opp != null:
-		if On_Field(card) and Reinforcers_Opp.size() > 0 and GameData.Current_Step == "Selection":
+		if Valid_Card and Reinforcers_Opp.size() > 0:
 			# Randomly Choose Replacement Reinforcer
 			var rng = RandomNumberGenerator.new()
 			rng.randomize()
@@ -326,52 +338,69 @@ func Disorient(card):
 			Reinforcer_Parent.add_child(Fighter_Opp)
 
 func Behind_Enemy_Lines(card): # Name changed from Moonshot to be more descriptive of actual function.
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
-
-	if On_Field(card) and card.Direct_Attack == false:
-		card.Direct_Attack = true
-	elif On_Field(card) == false:
-		card.Direct_Attack = false
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
+	
+	card.Direct_Attack == true if Valid_Card else false
 
 func Atrocity(card):
 	pass
 
 func Earthbound(card):
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	
-	if On_Field(card) and GameData.Muggle_Mode == false:
-		GameData.Muggle_Mode = true
-	else:
-		GameData.Muggle_Mode = false
+	GameData.Muggle_Mode == true if Valid_Card else false
 
 func Tailor_Made(card): # Currently just doubles ATK_Bonus when summoned (instead of Equip-specific stat boosts, like Hephestus' effect did originally). Eric claims more thinking needs to be done on this effect due to lameness.
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	
-	if On_Field(card) and card.Effect_Active:
+	if Valid_Card and card.Effect_Active:
 		card.Effect_Active = false
 		card.ATK_Bonus += card.ATK_Bonus
 		card.Update_Data()
 
 func Faithful(card):
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	if Side != card_current_owner:
-		return
-	
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	var Reinforcers = Get_Field_Card_Data("Reinforcers")
 	
-	if On_Field(card) and Reinforcers.size() >= 3 and card.Immortal == false:
-		card.Immortal = true
-	else:
-		card.Immortal = false
+	card.Immortal == true if Valid_Card and Reinforcers.size() >= 3 else false
 
 func Inspiration(card):
 	pass
 
 
 """--------------------------------- Magic/Trap Effects ---------------------------------"""
+func Excalibur(card):
+	pass
+
+func Sword(card):
+	pass
+
+func Morale_Boost(card):
+	pass
+
+func Last_Stand(card):
+	pass
+
+func Blade_Song(card):
+	pass
+
+func Runetouched(card):
+	pass
+
+func Miraculous_Recovery(card):
+	pass
+
+func Heart_of_the_Underdog(card):
+	pass
+
+func Disable(card):
+	pass
+
+func Prayer(card):
+	pass
+
+func Resurrection(card):
+	pass
+
+func Deep_Pit(card):
+	pass

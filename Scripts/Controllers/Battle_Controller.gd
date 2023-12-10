@@ -7,30 +7,27 @@ var Node_CardSpots = Engine.get_main_loop().get_current_scene().get_node("Battle
 var Node_WMedBay = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/WMedBay")
 var Node_BMedBay = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/BMedBay")
 
-
-
 """--------------------------------- Pre-Filled Functions ---------------------------------"""
 func Resolve_Card_Effects(Base_Node = Node_CardSpots):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
-	var Available_Zones = Base_Node.get_node("NonHands").get_children() + Base_Node.get_node(Side + "HandScroller/").get_children() + Base_Node.get_node("NonHands").get_children() + Base_Node.get_node(Side_Opp + "HandScroller/").get_children()
+	var Available_Zones = Base_Node.get_node("NonHands").get_children() + Base_Node.get_node(Side + "HandScroller/").get_children() + Base_Node.get_node(Side_Opp + "HandScroller/").get_children()
 	var Zones_To_Check = []
+	var Zones_To_Avoid = [Side + "Hand", Side + "MainDeck", Side + "TechDeck", Side + "TechZone", Side + "Banished", Side_Opp + "Hand", Side_Opp + "MainDeck", Side_Opp + "TechDeck", Side_Opp + "TechZone", Side_Opp + "Banished"]
 	var AnchorText
 	
 	# Populate Zones_To_Check Array
 	for i in Available_Zones.size():
-		if Available_Zones[i].name.left(1) == Side or ! Available_Zones[i].name in [Side + "Hand", "Backrow"]:
-			if ! Available_Zones[i].name in ["Deck", "Banished"]:
-				Zones_To_Check.append(Available_Zones[i])
+		if (Available_Zones[i].name.left(1) == Side or Available_Zones[i].name.left(1) == Side_Opp) and ! Available_Zones[i].name in Zones_To_Avoid:
+			Zones_To_Check.append(Available_Zones[i])
 	
 	# Resolve Card Effects
 	for zone in range(len(Zones_To_Check)): # Zone loop enables you to check all zones with just a single Item (card) loop.
 		for item in range(len(Zones_To_Check[zone].get_children())):
 			AnchorText = Zones_To_Check[zone].get_child(item).Anchor_Text
 			if AnchorText != null:
-				if Zones_To_Check[zone].get_child(item).Type != "Normal": # Eliminates the need to have blank funcs for Normal cards in Card_Effects Singleton to avoid crashing game
-					var Chosen_Card = Zones_To_Check[zone].get_child(item)
-					CardEffects.call(AnchorText, Chosen_Card)
+				var Chosen_Card = Zones_To_Check[zone].get_child(item)
+				CardEffects.call(AnchorText, Chosen_Card)
 
 func Check_For_Victor_LP(player = GameData.Player, enemy = GameData.Enemy) -> bool:
 	if player.LP <= 0:
@@ -62,8 +59,7 @@ func Instantiate_Card() -> Node:
 	return InstanceCard
 
 func Draw_Card(Turn_Player, Cards_To_Draw = 1):
-	for _i in range(Cards_To_Draw):
-		Turn_Player.Hand.append(Turn_Player.Deck[-1])
+	Turn_Player.Hand.append(Turn_Player.Deck[-1])
 
 func Reset_Reposition_Card_Variables():
 	GameData.Chosen_Card = null

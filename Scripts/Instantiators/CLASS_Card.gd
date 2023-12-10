@@ -7,6 +7,9 @@ var Name
 var Type
 var Effect_Type
 var Anchor_Text
+var Resolve_Side
+var Resolve_Phase
+var Resolve_Step
 var Attribute
 var Description
 var Short_Description
@@ -30,20 +33,23 @@ var Fusion_Level # Refers to the number of cards it is Fused with (defaults to 1
 var Attack_As_Reinforcement # Refers to a card's ability to launch an attack from a Reinforcement slot. Mongols (when led by Ghenghis Khan) is the first card to have this ability.
 var Immortal # Refers to whether a card can be captured with 0 HP. Demeter (in SAP version) is the first card to have this effect.
 var Invincible # Refers to a card that cannot be captured in Battle. It must be defeated by a Hero/Magic/Trap/Tech card's effects. "The Level Beyond" is the first card to have this ability.
-var Relentless # Refers to a card that may attack more than once per turn.King Leonidas was the first card to have this ability.
+var Relentless # Refers to a card that may attack more than once per turn. King Leonidas was the first card to have this ability.
 var Multi_Strike # Refers to a card's ability to deal damage to cards in the opponent's Reinforcement zone (Zeus is the first card to have this ability).
 var Target_Reinforcer # Refers to a card's ability to choose to target an opponent in a reinforcement slot instead of the opposing Fighter (Poseidon is the first card to have this ability).
 var Paralysis # Refers to a card's ability to launch an attack. Lancelot is the first card to utilize this Attribute (there's a 1/3 chance that his effect will result in him being unable to attack during that turn's Battle Phase).
 var Direct_Attack
 var Owner # Refers to the card's original Owner (Player or Enemy). Used as part of Mordred's Hero card effect.
 
-func _init(Card_Frame, Card_Art, Card_Name, Card_Type, Card_EffectType, Card_Anchor_Text, Card_Attribute, Card_Description, Card_Short_Description, Card_Attack, Card_ATK_Bonus, Card_Toxicity, Card_Cost, Card_Health, Card_Health_Bonus, Card_Burn_Damage, Card_Special_Edition_Text, Card_Rarity, Card_Passcode, Card_Deck_Capacity, Card_Tokens, Card_Is_Set, Card_Effect_Active, Card_Fusion_Level, Card_Attack_As_Reinforcement, Card_Immortal, Card_Invincible, Card_Relentless, Card_Multi_Strike, Card_Target_Reinforcer, Card_Paralysis, Card_Direct_Attack, Card_Owner):
+func _init(Card_Frame, Card_Art, Card_Name, Card_Type, Card_EffectType, Card_Anchor_Text, Card_Resolve_Side, Card_Resolve_Phase, Card_Resolve_Step, Card_Attribute, Card_Description, Card_Short_Description, Card_Attack, Card_ATK_Bonus, Card_Toxicity, Card_Cost, Card_Health, Card_Health_Bonus, Card_Burn_Damage, Card_Special_Edition_Text, Card_Rarity, Card_Passcode, Card_Deck_Capacity, Card_Tokens, Card_Is_Set, Card_Effect_Active, Card_Fusion_Level, Card_Attack_As_Reinforcement, Card_Immortal, Card_Invincible, Card_Relentless, Card_Multi_Strike, Card_Target_Reinforcer, Card_Paralysis, Card_Direct_Attack, Card_Owner):
 	Frame = Card_Frame
 	Art = Card_Art
 	Name = Card_Name
 	Type = Card_Type
 	Effect_Type = Card_EffectType
 	Anchor_Text = Card_Anchor_Text
+	Resolve_Side = Card_Resolve_Side
+	Resolve_Phase = Card_Resolve_Phase
+	Resolve_Step = Card_Resolve_Step
 	Attribute = Card_Attribute
 	Description = Card_Description
 	Short_Description = Card_Short_Description

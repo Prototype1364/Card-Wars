@@ -5,6 +5,9 @@ var Frame
 var Type
 var Effect_Type
 var Anchor_Text
+var Resolve_Side
+var Resolve_Phase
+var Resolve_Step
 var Art
 var Attribute
 var Description
@@ -38,8 +41,7 @@ var Paralysis
 var Direct_Attack
 var Owner
 
-
-func _ready(Base = "Normal", Card_Index = -1):
+func _ready(Base = "TurnMainDeck", Card_Index = -1):
 	Set_Card_Variables(Card_Index, Base)
 	Set_Card_Visuals()
 	Update_Data()
@@ -58,47 +60,99 @@ func Update_Attacks_Remaining(Role):
 
 func Set_Card_Variables(Card_Index, Source):
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
-	var Source_Deck = player.Tech_Deck if Source == "Tech" else player.Deck
+	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	
-	Name = Source_Deck[Card_Index].Name
-	Frame = Source_Deck[Card_Index].Frame
-	Type = Source_Deck[Card_Index].Type
-	Effect_Type = Source_Deck[Card_Index].Effect_Type
-	Anchor_Text = Source_Deck[Card_Index].Anchor_Text
-	Art = load(Source_Deck[Card_Index].Art) if Source_Deck[Card_Index].Art != "res://Assets/Cards/Art/Special_Activate_Technology.png" else null
-	Attribute = Source_Deck[Card_Index].Attribute
-	Description = Source_Deck[Card_Index].Description
-	Short_Description = Source_Deck[Card_Index].Short_Description
-	Attacks_Remaining = Source_Deck[Card_Index].Attacks_Remaining
-	Attack = Source_Deck[Card_Index].Attack if Source_Deck[Card_Index].Attack != null else ""
-	ATK_Bonus = Source_Deck[Card_Index].ATK_Bonus
-	Toxicity = Source_Deck[Card_Index].Toxicity
-	Cost = Source_Deck[Card_Index].Cost
-	Health = Source_Deck[Card_Index].Health if Source_Deck[Card_Index].Health != null else ""
-	Health_Bonus = Source_Deck[Card_Index].Health_Bonus
-	Burn_Damage = Source_Deck[Card_Index].Burn_Damage
-	Revival_Health = Health
-	Special_Edition_Text = Source_Deck[Card_Index].Special_Edition_Text
-	Rarity = Source_Deck[Card_Index].Rarity
-	Passcode = Source_Deck[Card_Index].Passcode
-	Deck_Capacity = Source_Deck[Card_Index].Deck_Capacity
-	Tokens = Source_Deck[Card_Index].Tokens
-	Is_Set = Source_Deck[Card_Index].Is_Set
-	Effect_Active = Source_Deck[Card_Index].Effect_Active
-	Fusion_Level = Source_Deck[Card_Index].Fusion_Level
-	Attack_As_Reinforcement = Source_Deck[Card_Index].Attack_As_Reinforcement
-	Immortal = Source_Deck[Card_Index].Immortal
-	Invincible = Source_Deck[Card_Index].Invincible
-	Relentless = Source_Deck[Card_Index].Relentless
-	Multi_Strike = Source_Deck[Card_Index].Multi_Strike
-	Paralysis = Source_Deck[Card_Index].Paralysis
-	Direct_Attack = Source_Deck[Card_Index].Direct_Attack
-	Owner = Source_Deck[Card_Index].Owner
+	var card_sources = {
+	"TurnHand": player.Hand,
+	"TurnMainDeck": player.Deck,
+	"TurnTechDeck": player.Tech_Deck,
+	"NonTurnHand": enemy.Hand,
+	"NonTurnMainDeck": enemy.Deck,
+	"NonTurnTechDeck": enemy.Tech_Deck}
+
+	if card_sources.has(Source):
+		Name = card_sources[Source][Card_Index].Name
+		Frame = card_sources[Source][Card_Index].Frame
+		Type = card_sources[Source][Card_Index].Type
+		Effect_Type = card_sources[Source][Card_Index].Effect_Type
+		Anchor_Text = card_sources[Source][Card_Index].Anchor_Text
+		Resolve_Side = card_sources[Source][Card_Index].Resolve_Side
+		Resolve_Phase = card_sources[Source][Card_Index].Resolve_Phase
+		Resolve_Step = card_sources[Source][Card_Index].Resolve_Step
+		Art = load(card_sources[Source][Card_Index].Art) if card_sources[Source][Card_Index].Art != "res://Assets/Cards/Art/Special_Activate_Technology.png" else null
+		Attribute = card_sources[Source][Card_Index].Attribute
+		Description = card_sources[Source][Card_Index].Description
+		Short_Description = card_sources[Source][Card_Index].Short_Description
+		Attacks_Remaining = card_sources[Source][Card_Index].Attacks_Remaining
+		Attack = card_sources[Source][Card_Index].Attack if card_sources[Source][Card_Index].Attack != null else ""
+		ATK_Bonus = card_sources[Source][Card_Index].ATK_Bonus
+		Toxicity = card_sources[Source][Card_Index].Toxicity
+		Cost = card_sources[Source][Card_Index].Cost
+		Health = card_sources[Source][Card_Index].Health if card_sources[Source][Card_Index].Health != null else ""
+		Health_Bonus = card_sources[Source][Card_Index].Health_Bonus
+		Burn_Damage = card_sources[Source][Card_Index].Burn_Damage
+		Revival_Health = Health
+		Special_Edition_Text = card_sources[Source][Card_Index].Special_Edition_Text
+		Rarity = card_sources[Source][Card_Index].Rarity
+		Passcode = card_sources[Source][Card_Index].Passcode
+		Deck_Capacity = card_sources[Source][Card_Index].Deck_Capacity
+		Tokens = card_sources[Source][Card_Index].Tokens
+		Is_Set = card_sources[Source][Card_Index].Is_Set
+		Effect_Active = card_sources[Source][Card_Index].Effect_Active
+		Fusion_Level = card_sources[Source][Card_Index].Fusion_Level
+		Attack_As_Reinforcement = card_sources[Source][Card_Index].Attack_As_Reinforcement
+		Immortal = card_sources[Source][Card_Index].Immortal
+		Invincible = card_sources[Source][Card_Index].Invincible
+		Relentless = card_sources[Source][Card_Index].Relentless
+		Multi_Strike = card_sources[Source][Card_Index].Multi_Strike
+		Paralysis = card_sources[Source][Card_Index].Paralysis
+		Direct_Attack = card_sources[Source][Card_Index].Direct_Attack
+		Owner = card_sources[Source][Card_Index].Owner
+	
+	#var Source_Deck = player.Tech_Deck if Source == "Tech" else player.Deck
+	
+#	Name = Source_Deck[Card_Index].Name
+#	Frame = Source_Deck[Card_Index].Frame
+#	Type = Source_Deck[Card_Index].Type
+#	Effect_Type = Source_Deck[Card_Index].Effect_Type
+#	Anchor_Text = Source_Deck[Card_Index].Anchor_Text
+#	Resolve_Side = Source_Deck[Card_Index].Resolve_Side
+#	Resolve_Phase = Source_Deck[Card_Index].Resolve_Phase
+#	Resolve_Step = Source_Deck[Card_Index].Resolve_Step
+#	Art = load(Source_Deck[Card_Index].Art) if Source_Deck[Card_Index].Art != "res://Assets/Cards/Art/Special_Activate_Technology.png" else null
+#	Attribute = Source_Deck[Card_Index].Attribute
+#	Description = Source_Deck[Card_Index].Description
+#	Short_Description = Source_Deck[Card_Index].Short_Description
+#	Attacks_Remaining = Source_Deck[Card_Index].Attacks_Remaining
+#	Attack = Source_Deck[Card_Index].Attack if Source_Deck[Card_Index].Attack != null else ""
+#	ATK_Bonus = Source_Deck[Card_Index].ATK_Bonus
+#	Toxicity = Source_Deck[Card_Index].Toxicity
+#	Cost = Source_Deck[Card_Index].Cost
+#	Health = Source_Deck[Card_Index].Health if Source_Deck[Card_Index].Health != null else ""
+#	Health_Bonus = Source_Deck[Card_Index].Health_Bonus
+#	Burn_Damage = Source_Deck[Card_Index].Burn_Damage
+#	Revival_Health = Health
+#	Special_Edition_Text = Source_Deck[Card_Index].Special_Edition_Text
+#	Rarity = Source_Deck[Card_Index].Rarity
+#	Passcode = Source_Deck[Card_Index].Passcode
+#	Deck_Capacity = Source_Deck[Card_Index].Deck_Capacity
+#	Tokens = Source_Deck[Card_Index].Tokens
+#	Is_Set = Source_Deck[Card_Index].Is_Set
+#	Effect_Active = Source_Deck[Card_Index].Effect_Active
+#	Fusion_Level = Source_Deck[Card_Index].Fusion_Level
+#	Attack_As_Reinforcement = Source_Deck[Card_Index].Attack_As_Reinforcement
+#	Immortal = Source_Deck[Card_Index].Immortal
+#	Invincible = Source_Deck[Card_Index].Invincible
+#	Relentless = Source_Deck[Card_Index].Relentless
+#	Multi_Strike = Source_Deck[Card_Index].Multi_Strike
+#	Paralysis = Source_Deck[Card_Index].Paralysis
+#	Direct_Attack = Source_Deck[Card_Index].Direct_Attack
+#	Owner = Source_Deck[Card_Index].Owner
 	
 	if Source == "Tech":
 		Cost_Path = null
 	else:
-		Cost_Path = load("res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png") if player.Deck[Card_Index].Type != "Special" else null
+		Cost_Path = load("res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png") if card_sources[Source][Card_Index].Type != "Special" else null
 
 func Set_Card_Visuals():
 	if Frame != "Special":

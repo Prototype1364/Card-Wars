@@ -13,6 +13,7 @@ var Card_Drawn = preload("res://Scenes/SupportScenes/SmallCard.tscn")
 
 """--------------------------------- Engine Functions ---------------------------------"""
 func _ready():
+	print("READY")
 	# Setup Signal_Bus functionality. Note: Holder Variables (_HV) serve to eliminate Debugger warnings.
 	var _HV1 = SignalBus.connect("Reposition_Field_Cards", Callable(self, "Reposition_Field_Cards"))
 	var _HV2 = SignalBus.connect("Play_Card", Callable(self, "Play_Card"))
