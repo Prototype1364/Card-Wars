@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://brufb56qoikv5"]
 
-[ext_resource type="Script" path="res://Scripts/Controllers/Card_Selector_Controller.gd" id="1_5jl2s"]
+[ext_resource type="Script" path="res://Scripts/Controllers/Card_Selector_Controller.gd" id="1_i7mxe"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jvo1i"]
 bg_color = Color(0.4, 0.4, 0.4, 1)
@@ -13,7 +13,7 @@ offset_top = 380.0
 offset_right = 532.5
 offset_bottom = 380.0
 size_flags_horizontal = 4
-script = ExtResource("1_5jl2s")
+script = ExtResource("1_i7mxe")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 custom_minimum_size = Vector2(855, 320)

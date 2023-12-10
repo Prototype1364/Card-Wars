@@ -1,6 +1,7 @@
 extends Control
 
 func _ready():
+	print("READY")
 	$"VBoxContainer/Button_Container/Quick Play".grab_focus()
 
 func _On_Quick_Play_Pressed():
