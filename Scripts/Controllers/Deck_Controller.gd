@@ -21,7 +21,8 @@ func Create_Advance_Tech_Card():
 		if card["Passcode"] == 42489363:
 			Created_Card = Card.new(card["CardType"], card["CardArt"], card["CardName"], card["CardType"], card["EffectType"], card["AnchorText"], card["ResolveSide"], card["ResolvePhase"], card["ResolveStep"], card["Attribute"], card["Description"], card["ShortDescription"], card["Attack"], 0, 0, card["Cost"], card["Health"], 0, 0, card["SpecialEditionText"], card["Rarity"], card["Passcode"], card["DeckCapacity"], 0, false, false, 1, false, false, false, false, false, false, false, false, "Game")
 	
-	var random_number = Utils.RNGesus(1, 2)
+	#var random_number = Utils.RNGesus(1, 2)
+	var random_number = 2
 	if random_number == 1:
 		GameData.Player.Deck.append(Created_Card)
 	else:

@@ -108,47 +108,7 @@ func Set_Card_Variables(Card_Index, Source):
 		Paralysis = card_sources[Source][Card_Index].Paralysis
 		Direct_Attack = card_sources[Source][Card_Index].Direct_Attack
 		Owner = card_sources[Source][Card_Index].Owner
-	
-	#var Source_Deck = player.Tech_Deck if Source == "Tech" else player.Deck
-	
-#	Name = Source_Deck[Card_Index].Name
-#	Frame = Source_Deck[Card_Index].Frame
-#	Type = Source_Deck[Card_Index].Type
-#	Effect_Type = Source_Deck[Card_Index].Effect_Type
-#	Anchor_Text = Source_Deck[Card_Index].Anchor_Text
-#	Resolve_Side = Source_Deck[Card_Index].Resolve_Side
-#	Resolve_Phase = Source_Deck[Card_Index].Resolve_Phase
-#	Resolve_Step = Source_Deck[Card_Index].Resolve_Step
-#	Art = load(Source_Deck[Card_Index].Art) if Source_Deck[Card_Index].Art != "res://Assets/Cards/Art/Special_Activate_Technology.png" else null
-#	Attribute = Source_Deck[Card_Index].Attribute
-#	Description = Source_Deck[Card_Index].Description
-#	Short_Description = Source_Deck[Card_Index].Short_Description
-#	Attacks_Remaining = Source_Deck[Card_Index].Attacks_Remaining
-#	Attack = Source_Deck[Card_Index].Attack if Source_Deck[Card_Index].Attack != null else ""
-#	ATK_Bonus = Source_Deck[Card_Index].ATK_Bonus
-#	Toxicity = Source_Deck[Card_Index].Toxicity
-#	Cost = Source_Deck[Card_Index].Cost
-#	Health = Source_Deck[Card_Index].Health if Source_Deck[Card_Index].Health != null else ""
-#	Health_Bonus = Source_Deck[Card_Index].Health_Bonus
-#	Burn_Damage = Source_Deck[Card_Index].Burn_Damage
-#	Revival_Health = Health
-#	Special_Edition_Text = Source_Deck[Card_Index].Special_Edition_Text
-#	Rarity = Source_Deck[Card_Index].Rarity
-#	Passcode = Source_Deck[Card_Index].Passcode
-#	Deck_Capacity = Source_Deck[Card_Index].Deck_Capacity
-#	Tokens = Source_Deck[Card_Index].Tokens
-#	Is_Set = Source_Deck[Card_Index].Is_Set
-#	Effect_Active = Source_Deck[Card_Index].Effect_Active
-#	Fusion_Level = Source_Deck[Card_Index].Fusion_Level
-#	Attack_As_Reinforcement = Source_Deck[Card_Index].Attack_As_Reinforcement
-#	Immortal = Source_Deck[Card_Index].Immortal
-#	Invincible = Source_Deck[Card_Index].Invincible
-#	Relentless = Source_Deck[Card_Index].Relentless
-#	Multi_Strike = Source_Deck[Card_Index].Multi_Strike
-#	Paralysis = Source_Deck[Card_Index].Paralysis
-#	Direct_Attack = Source_Deck[Card_Index].Direct_Attack
-#	Owner = Source_Deck[Card_Index].Owner
-	
+		
 	if Source == "Tech":
 		Cost_Path = null
 	else:
@@ -185,25 +145,28 @@ func Reset_Stats_On_Capture():
 	Health_Bonus = 0
 	Burn_Damage = 0
 
+func Reset_Variables_After_Flip_Summon():
+	Is_Set = false
+	Effect_Active = false # Ensures effects aren't triggered from Graveyard.
+	Tokens = 0
+	Update_Token_Info()
+
 func Add_Token():
 	if Type == "Trap" and "Backrow" in get_parent().name:
 		Tokens += 1
 
 func Update_Token_Info():
 	var Token_Container = $TokenContainer/VBoxContainer
-	if Token_Container.get_child_count() < Tokens:
+	if Token_Container.get_child_count() < Tokens: # Add Token(s) up to the number of Tokens on the card
 		for _i in range(Tokens - Token_Container.get_child_count()):
 			var InstanceToken = Token_Path.instantiate()
 			InstanceToken.name = "Token" + str(Token_Container.get_child_count() + 1)
 			Token_Container.add_child(InstanceToken)
-	elif Token_Container.get_child_count() > Tokens:
-		for i in Token_Container.get_children():
+	elif Token_Container.get_child_count() > Tokens: # Remove excess Token(s)
+		while Token_Container.get_child_count() > Tokens:
+			var i = Token_Container.get_child(Token_Container.get_child_count() - 1)
 			Token_Container.remove_child(i)
 			i.queue_free()
-		for _i in range(Tokens - Token_Container.get_child_count()):
-			var InstanceToken = Token_Path.instantiate()
-			InstanceToken.name = "Token" + str(Token_Container.get_child_count() + 1)
-			Token_Container.add_child(InstanceToken)
 
 func focusing():
 	GameData.FocusedCardName = self.name
@@ -215,7 +178,7 @@ func defocusing():
 	GameData.FocusedCardParentName = ""
 	SignalBus.emit_signal("NotLookingAtCard")
 
-func _on_FocusSensor_pressed():
+func _on_FocusSensor_pressed(): # FIXME: Might need to be split into multiple functions to follow SOLID Principles
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Reposition_Zones = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
 	var Reinforcement_Zones = [Side + "R1", Side + "R2", Side + "R3"]
@@ -227,7 +190,7 @@ func _on_FocusSensor_pressed():
 			if "Hand" in Parent_Name and (Type == "Normal" or Type == "Hero"):
 				GameData.Summon_Mode = "Summon"
 				GameData.Chosen_Card = self
-				if int(Passcode) in GameData.FUSION_CARDS:
+				if int(Passcode) in GameData.FUSION_CARDS: # Fusion summon
 					GameData.Current_Card_Effect_Step = "Clicked"
 					CardEffects.call(Anchor_Text, self)
 			elif "Hand" in Parent_Name:
@@ -235,6 +198,8 @@ func _on_FocusSensor_pressed():
 				$Action_Button_Container/Set.visible = true
 			elif Parent_Name in Reposition_Zones and GameData.Chosen_Card == null:
 				GameData.Chosen_Card = self
+			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
+				SignalBus.emit_signal("EffectTargetSelected", self)
 		"Selection":
 			if Valid_Attacker_Selection(Reposition_Zones, Reinforcement_Zones, Parent_Name, Side):
 				GameData.Attacker = self
@@ -248,7 +213,7 @@ func _on_FocusSensor_pressed():
 			if "Hand" in GameData.CardFrom:
 				SignalBus.emit_signal("Discard_Card", GameData.CardFrom.left(1))
 	
-	# Allows repositioning of cards on field (Currently doesn't allow for Exchange-like card effect [i.e. swapping 1 card of yours for one card of the opponent's on the field])
+	# Allows repositioning of cards on own field
 	if Reposition_Zones.has(Parent_Name) and GameData.Current_Step == "Main":
 		if GameData.CardFrom == "":
 			GameData.CardFrom = Parent_Name
@@ -325,12 +290,3 @@ func _on_Hide_Action_Buttons_pressed(_event):
 		$Action_Button_Container/Summon.visible = false
 		$Action_Button_Container/Set.visible = false
 		$Action_Button_Container/Target.visible = false
-
-
-
-"""NEW FUNCS"""
-func Reset_Variables_After_Flip_Summon():
-	Is_Set = false
-	Effect_Active = false # Ensures effects aren't triggered from Graveyard.
-	Tokens = 0
-	Update_Token_Info()

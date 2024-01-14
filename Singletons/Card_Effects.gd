@@ -3,6 +3,8 @@ extends Node
 func _ready():
 	pass
 
+"""--------------------------------- General Functions ---------------------------------"""
+
 func On_Field(card) -> bool:
 	var Parent_Name = card.get_parent().name
 	var Valid_Slots = ["WFighter", "WR1", "WR2", "WR3", "BFighter", "BR1", "BR2", "BR3"]
@@ -116,7 +118,7 @@ func Olympian(card):
 func Outlaw(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
 	
-	if Valid_Card:
+	if Valid_Card and card.Effect_Active:
 		var Card_Selector = load("res://Scenes/SupportScenes/card_selector.tscn").instantiate()
 		var Battle_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle")
 		Battle_Scene.add_child(Card_Selector)
@@ -157,7 +159,38 @@ func Spy(card):
 	pass
 
 func Support(card):
-	pass
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
+
+	if Valid_Card:
+		var Fighter = Get_Field_Card_Data("Fighter")
+		if Fighter != null:
+			# Create a popup scene to allow the selection of the amount of HP to transfer to Fighter
+			var Text_Entry = load("res://Scenes/SupportScenes/text_entry.tscn").instantiate()
+			var Card_Scene = Engine.get_main_loop().get_current_scene().get_node(card.get_path())
+			Card_Scene.add_child(Text_Entry)
+
+			# Wait for the Confirm signal to be emitted using await
+			await SignalBus.Confirm
+
+			# Get Health Transfer Value
+			var Health_Transfer_Value = int(Text_Entry.Select_Transfer_Amount())
+			if Health_Transfer_Value < 0:
+				Health_Transfer_Value = 0
+			if Health_Transfer_Value > card.Health:
+				Health_Transfer_Value = card.Health
+			
+			# Remove Scene
+			Text_Entry.Remove_Scene()
+			
+			# Update Health Values
+			Fighter.Health += Health_Transfer_Value
+			card.Health -= Health_Transfer_Value
+			Fighter.Update_Data()
+			card.Update_Data()
+
+			# Capture card if it dies
+			if card.Health <= 0:
+				SignalBus.emit_signal("Capture_Card", card, "Inverted")
 
 func Titan(card):
 	pass
@@ -169,7 +202,34 @@ func Trickster(card):
 	pass
 
 func Warrior(card):
-	pass
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) else false
+
+	if Valid_Card:
+		var Fighter = Get_Field_Card_Data("Fighter")
+		if Fighter != null:
+			# Create a popup scene to allow the selection of the amount of HP to transfer to Fighter
+			var Text_Entry = load("res://Scenes/SupportScenes/text_entry.tscn").instantiate()
+			var Card_Scene = Engine.get_main_loop().get_current_scene().get_node(card.get_path())
+			Card_Scene.add_child(Text_Entry)
+
+			# Wait for the Confirm signal to be emitted using await
+			await SignalBus.Confirm
+
+			# Get Attack Transfer Value
+			var Attack_Transfer_Value = int(Text_Entry.Select_Transfer_Amount())
+			if Attack_Transfer_Value < 0:
+				Attack_Transfer_Value = 0
+			if Attack_Transfer_Value > card.Attack:
+				Attack_Transfer_Value = card.Attack
+
+			# Remove Scene
+			Text_Entry.Remove_Scene()
+
+			# Update Attack Values
+			Fighter.Attack += Attack_Transfer_Value
+			card.Attack -= Attack_Transfer_Value
+			Fighter.Update_Data()
+			card.Update_Data()
 
 func Wizard(card):
 	pass

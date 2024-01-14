@@ -6,7 +6,7 @@
 script/source = "extends Control
 
 var Cards
-var SmallCardDisplay = preload(\"res://Scenes/SupportScenes/PseudoSmallCard.tscn\")
+var SmallCardDisplay = preload(\"res://Scenes/SupportScenes/SmallCard.tscn\")
 
 
 func _ready():

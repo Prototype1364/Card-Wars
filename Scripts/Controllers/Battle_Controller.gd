@@ -58,7 +58,7 @@ func Instantiate_Card() -> Node:
 	GameData.CardCounter += 1
 	return InstanceCard
 
-func Draw_Card(Turn_Player, Cards_To_Draw = 1):
+func Draw_Card(Turn_Player):
 	Turn_Player.Hand.append(Turn_Player.Deck[-1])
 
 func Reset_Reposition_Card_Variables():
@@ -122,7 +122,7 @@ func Add_Tokens(Backrow_Slots):
 func Activate_Summon_Effects(Chosen_Card):
 	var AnchorText = Chosen_Card.Anchor_Text
 	
-	if Chosen_Card.Type == "Hero" or (Chosen_Card.Type == "Magic" and Chosen_Card.Is_Set == false and GameData.Muggle_Mode == false) or (Chosen_Card.Type == "Trap" and Chosen_Card.Attribute == "Equip" and Chosen_Card.Is_Set == false):
+	if Chosen_Card.Type == "Hero" or Chosen_Card.Type == "Normal" or (Chosen_Card.Type == "Magic" and Chosen_Card.Is_Set == false and GameData.Muggle_Mode == false) or (Chosen_Card.Type == "Trap" and Chosen_Card.Attribute == "Equip" and Chosen_Card.Is_Set == false):
 		Chosen_Card.Effect_Active = true
 		GameData.Current_Card_Effect_Step = "Activation"
 		CardEffects.call(AnchorText, Chosen_Card)

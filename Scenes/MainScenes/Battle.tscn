@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://cb427o5cck4ub" path="res://Assets/Playmat/Large Empty Slot.png" id="5"]
 [ext_resource type="Texture2D" uid="uid://cnsdmsj43x3t0" path="res://Assets/Playmat/Switch Button.png" id="6"]
 [ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="8"]
-[ext_resource type="PackedScene" uid="uid://c0h6voa4os3xv" path="res://Scenes/SupportScenes/Pile_Scroller.tscn" id="9"]
+[ext_resource type="PackedScene" uid="uid://cocpwyqsydvrn" path="res://Scenes/SupportScenes/Pile_Scroller.tscn" id="9"]
 
 [node name="Battle" type="Control"]
 layout_mode = 3

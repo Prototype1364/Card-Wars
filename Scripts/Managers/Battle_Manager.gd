@@ -128,7 +128,7 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1):
 	
 	for _i in range(Cards_To_Draw):
 		var InstanceCard = BC.Instantiate_Card()
-		BC.Draw_Card(player, Cards_To_Draw)
+		BC.Draw_Card(player)
 		BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
 		DC.Pop_Deck(player)
 
@@ -160,6 +160,7 @@ func Set_Attacks_To_Launch():
 """--------------------------------- Pass-Along Functions ---------------------------------"""
 func _input(event):
 	IC.Advance_GameState(event)
+	IC.Confirm(event)
 
 func Update_HUD_Duelist(Node_To_Update, Dueler):
 	UI.Update_HUD_Duelist(Node_To_Update, Dueler)
@@ -282,7 +283,7 @@ func Resolve_Battle_Damage():
 	UI.Update_HUD_Duelist(get_node("HUD_" + Side_Opp), enemy)
 	UI.Update_HUD_GameState()
 
-func Capture_Card(Card_Captured, Capture_Type = "Normal"):
+func Capture_Card(Card_Captured, Capture_Type = "Normal", Reset_Stats = true):
 	var attacking_player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var Destination_MedBay = BC.Get_Destination_MedBay_on_Capture(Capture_Type)
 	
@@ -290,8 +291,9 @@ func Capture_Card(Card_Captured, Capture_Type = "Normal"):
 	BF.Reparent_Nodes(Card_Captured, Destination_MedBay)
 	
 	# Reset Captured Card's Stats/Visuals
-	Card_Captured.Reset_Stats_On_Capture()
-	Card_Captured.Update_Data()
+	if Reset_Stats:
+		Card_Captured.Reset_Stats_On_Capture()
+		Card_Captured.Update_Data()
 
 
 

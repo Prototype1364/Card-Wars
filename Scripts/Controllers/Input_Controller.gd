@@ -18,3 +18,7 @@ func Scroll(event, Playmat = Node_Playmat, BoardScroller = Node_BoardScroller):
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			BoardScroller.value += 30
 		Playmat.position.y = 0 - BoardScroller.value
+
+func Confirm(event):
+	if event.is_action_pressed("Confirm"):
+		SignalBus.emit_signal("Confirm")
