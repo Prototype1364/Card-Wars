@@ -13,11 +13,13 @@ func Advance_GameState(event):
 
 func Scroll(event, Playmat = Node_Playmat, BoardScroller = Node_BoardScroller):
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			BoardScroller.value -= 30
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			BoardScroller.value += 30
-		Playmat.position.y = 0 - BoardScroller.value
+		# Ensures board doesn't scroll when mouse is over Hand UIs
+		if not ((event.position.x >= 1000 and event.position.y >= 1500) or (event.position.x <= 1860 and event.position.y <= 255)):
+			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				BoardScroller.value -= 30
+			elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				BoardScroller.value += 30
+			Playmat.position.y = 0 - BoardScroller.value
 
 func Confirm(event):
 	if event.is_action_pressed("Confirm"):
