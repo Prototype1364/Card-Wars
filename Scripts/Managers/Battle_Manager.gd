@@ -34,6 +34,8 @@ func _ready():
 	var _HV14 = SignalBus.connect("Reposition_Field_Cards", Callable(self, "Reposition_Field_Cards"))
 	var _HV15 = SignalBus.connect("Reset_Reposition_Card_Variables", Callable(self, "Reset_Reposition_Card_Variables"))
 	var _HV16 = SignalBus.connect("Play_Card", Callable(self, "Play_Card"))
+	var _HV17 = SignalBus.connect("Draw_Card", Callable(self, "Draw_Card"))
+	var _HV18 = SignalBus.connect("Reparent_Nodes", Callable(self, "Reparent_Nodes"))
 	
 	Setup_Game()
 
@@ -122,15 +124,37 @@ func Update_Game_Turn():
 
 
 """--------------------------------- Utility Functions ---------------------------------"""
-func Draw_Card(Turn_Player, Cards_To_Draw = 1):
+func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main"):
 	var player = GameData.Player if Turn_Player == "Player" else GameData.Enemy
-	var Deck_ID = "WMainDeck" if Turn_Player == "Player" else "BMainDeck"
+	var Deck_ID
+	if Deck_Type == "Main":
+		Deck_ID = "WMainDeck" if Turn_Player == "Player" else "BMainDeck"
+	elif Deck_Type == "Tech":
+		Deck_ID = "WTechDeck" if Turn_Player == "Player" else "BTechDeck"
 	
 	for _i in range(Cards_To_Draw):
 		var InstanceCard = BC.Instantiate_Card()
-		BC.Draw_Card(player)
-		BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
-		DC.Pop_Deck(player)
+		if Deck_Type == "Main":
+			BC.Draw_Card(player)
+			InstanceCard.Set_Card_Variables(-1, "TurnMainDeck")
+			InstanceCard.Set_Card_Visuals()
+			BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
+			InstanceCard.Update_Data()
+			DC.Pop_Deck(player)
+
+			# Activate Advance Tech Card Effect when Drawn
+			if InstanceCard.Type == "Special":
+				BC.Activate_Summon_Effects(InstanceCard)
+
+		elif Deck_Type == "Tech":
+			InstanceCard.Set_Card_Variables(-1, "TurnTechDeck")
+			InstanceCard.Set_Card_Visuals()
+			BF.Add_Card_Node_To_Tech_Zone(Deck_ID, InstanceCard)
+			InstanceCard.Update_Data()
+			DC.Pop_Deck(player, "Tech")
+
+			# Activate Tech Effect
+			BC.Activate_Summon_Effects(InstanceCard)
 
 func Add_Tokens():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
@@ -167,6 +191,9 @@ func Update_HUD_Duelist(Node_To_Update, Dueler):
 
 func Activate_Summon_Effects(Chosen_Card): # Play Card Supporter
 	BC.Activate_Summon_Effects(Chosen_Card)
+
+func Reparent_Nodes(Source_Node, Destination_Node):
+	BF.Reparent_Nodes(Source_Node, Destination_Node)
 
 func Reposition_Field_Cards(Side):
 	BF.Reposition_Field_Cards(Side)

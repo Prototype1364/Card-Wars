@@ -15,10 +15,12 @@ func Add_Card_Node_To_Hand(Deck_ID, InstanceCard, Base_Node = Node_CardSpots):
 			SignalBus.emit_signal("Reset_Reposition_Card_Variables")
 			Hand.add_child(InstanceCard)
 			Set_Focus_Neighbors("Hand", Deck_ID.left(1), Hand)
-	elif "TechDeck" in Deck_ID:
-		SignalBus.emit_signal("Reset_Reposition_Card_Variables")
-		var TechZone = get_node("NonHands/" + Deck_ID.left(5) + "Zone")
-		TechZone.add_child(InstanceCard)
+
+func Add_Card_Node_To_Tech_Zone(Deck_ID, InstanceCard, Base_Node = Node_CardSpots):
+	var TechZone = Base_Node.get_node("NonHands/" + Deck_ID.left(1) + "TechZone")
+	InstanceCard.set_position(Vector2.ZERO) # Choosing to manually set position here instead of calling Reparent_Nodes() because InstanceCard has no parent (SourceNode) yet.
+	TechZone.add_child(InstanceCard)
+	Set_Focus_Neighbors("Field", Deck_ID.left(1), TechZone)
 
 func Reparent_Nodes(Source_Node, Destination_Node):
 	Source_Node.set_position(Vector2.ZERO)
@@ -133,7 +135,7 @@ func Play_Card(Base_Node, Side, Net_Cost):
 	Set_Focus_Neighbors("Field",Side,Reparent_Variables[1].get_child(0))
 	Set_Focus_Neighbors("Hand",Side,Base_Node.get_parent().get_node(Side + "HandScroller/" + Side + "Hand"))
 	SignalBus.emit_signal("Activate_Summon_Effects", GameData.Chosen_Card)
-	
+		
 	# Ensures that card summoned to Equip slot is not immediately sent to Graveyard.
 	if GameData.Chosen_Card.Type == "Magic" and not ("Equip" in GameData.Chosen_Card.get_parent().name) and GameData.Chosen_Card.Is_Set == false:
 		Reparent_Nodes(Reparent_Variables[2], Graveyard)

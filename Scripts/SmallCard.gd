@@ -41,10 +41,8 @@ var Paralysis
 var Direct_Attack
 var Owner
 
-func _ready(Base = "TurnMainDeck", Card_Index = -1):
-	Set_Card_Variables(Card_Index, Base)
-	Set_Card_Visuals()
-	Update_Data()
+func _ready():
+	pass
 
 func Can_Attack() -> bool:
 	if Attacks_Remaining > 0 and ("Fighter" in get_parent().name or (Attack_As_Reinforcement and get_parent().name in ["R1", "R2", "R3"])):
@@ -58,7 +56,7 @@ func Update_Attacks_Remaining(Role):
 	else:
 		Attacks_Remaining = 1 if Relentless == false else 2
 
-func Set_Card_Variables(Card_Index, Source):
+func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	
@@ -109,7 +107,7 @@ func Set_Card_Variables(Card_Index, Source):
 		Direct_Attack = card_sources[Source][Card_Index].Direct_Attack
 		Owner = card_sources[Source][Card_Index].Owner
 		
-	if Source == "Tech":
+	if "Tech" in Source:
 		Cost_Path = null
 	else:
 		Cost_Path = load("res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png") if card_sources[Source][Card_Index].Type != "Special" else null

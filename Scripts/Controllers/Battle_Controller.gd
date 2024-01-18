@@ -56,6 +56,7 @@ func Instantiate_Card() -> Node:
 	var InstanceCard = Card_Drawn.instantiate()
 	InstanceCard.name = "Card" + str(GameData.CardCounter)
 	GameData.CardCounter += 1
+
 	return InstanceCard
 
 func Draw_Card(Turn_Player):
@@ -96,7 +97,7 @@ func Calculate_Net_Cost(player, Chosen_Card) -> int:
 	var Discount_Used = DISCOUNT_TYPES.get(Chosen_Card.Type, 0)
 	
 	if Discount_Used:
-		return Chosen_Card.Cost + player.get(Discount_Used)
+		return max(0, Chosen_Card.Cost + player.get(Discount_Used)) # Adding max function to ensure that the Net Cost is never negative.
 	else:
 		return 0
 
@@ -122,7 +123,7 @@ func Add_Tokens(Backrow_Slots):
 func Activate_Summon_Effects(Chosen_Card):
 	var AnchorText = Chosen_Card.Anchor_Text
 	
-	if Chosen_Card.Type == "Hero" or Chosen_Card.Type == "Normal" or (Chosen_Card.Type == "Magic" and Chosen_Card.Is_Set == false and GameData.Muggle_Mode == false) or (Chosen_Card.Type == "Trap" and Chosen_Card.Attribute == "Equip" and Chosen_Card.Is_Set == false):
+	if Chosen_Card.Type == "Hero" or Chosen_Card.Type == "Normal" or (Chosen_Card.Type == "Magic" and Chosen_Card.Is_Set == false and GameData.Muggle_Mode == false) or (Chosen_Card.Type == "Trap" and Chosen_Card.Attribute == "Equip" and Chosen_Card.Is_Set == false) or Chosen_Card.Type == "Tech" or Chosen_Card.Type == "Special":
 		Chosen_Card.Effect_Active = true
 		GameData.Current_Card_Effect_Step = "Activation"
 		CardEffects.call(AnchorText, Chosen_Card)
@@ -179,8 +180,8 @@ func Set_Turn_Player():
 		GameData.Current_Turn = "Player" if GameData.Current_Turn == "Enemy" else "Enemy"
 
 func Choose_Starting_Player():
-#	var random_number = Utils.RNGesus(1, 2)
 	var random_number = 1
+	#	var random_number = Utils.RNGesus(1, 2)
 	GameData.Current_Turn = "Player" if random_number == 1 else "Enemy"
 	
 	# Flip field (if Black goes first)

@@ -52,3 +52,21 @@ func _init(Duelist_Name, Duelist_LP, Duelist_Summon_Crests, Duelist_Tokens, Duel
 
 func Update_Summon_Crests(roll_result):
 	Summon_Crests += roll_result
+
+func Update_Cost_Discount_Normal(change_amount):
+	Cost_Discount_Normal += change_amount
+
+func Update_Cost_Discount_Hero(change_amount):
+	Cost_Discount_Hero += change_amount
+
+func Update_Cost_Discount_Magic(change_amount):
+	Cost_Discount_Magic += change_amount
+
+func Update_Cost_Discount_Trap(change_amount):
+	Cost_Discount_Trap += change_amount
+
+func Update_Field_ATK_Bonus(change_amount):
+	Field_ATK_Bonus += change_amount
+
+func Update_Field_Health_Bonus(change_amount):
+	Field_Health_Bonus += change_amount

@@ -8,6 +8,8 @@ signal NotLookingAtCard
 
 signal MoveInProgress
 
+signal Reparent_Nodes
+
 signal Reposition_Field_Cards
 
 signal Play_Card
@@ -61,3 +63,7 @@ signal Reset_Reposition_Card_Variables
 signal EffectTargetSelected
 
 signal Confirm
+
+signal Button_Selected
+
+signal Draw_Card

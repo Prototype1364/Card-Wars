@@ -1,0 +1,40 @@
+[gd_scene load_steps=2 format=3 uid="uid://cno1he31c2mte"]
+
+[ext_resource type="Script" path="res://Scripts/Controllers/Button_Selector_Controller.gd" id="1_avn8r"]
+
+[node name="ButtonSelector" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_avn8r")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(350, 500)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Header" type="Label" parent="."]
+custom_minimum_size = Vector2(350, 40)
+layout_mode = 2
+offset_right = 350.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 24
+text = "Pick An Effect to Disable"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+custom_minimum_size = Vector2(350, 460)
+layout_mode = 0
+offset_top = 40.0
+offset_right = 350.0
+offset_bottom = 460.0
+
+[node name="Options_List" type="VBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

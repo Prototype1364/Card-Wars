@@ -21,8 +21,7 @@ func Create_Advance_Tech_Card():
 		if card["Passcode"] == 42489363:
 			Created_Card = Card.new(card["CardType"], card["CardArt"], card["CardName"], card["CardType"], card["EffectType"], card["AnchorText"], card["ResolveSide"], card["ResolvePhase"], card["ResolveStep"], card["Attribute"], card["Description"], card["ShortDescription"], card["Attack"], 0, 0, card["Cost"], card["Health"], 0, 0, card["SpecialEditionText"], card["Rarity"], card["Passcode"], card["DeckCapacity"], 0, false, false, 1, false, false, false, false, false, false, false, false, "Game")
 	
-	#var random_number = Utils.RNGesus(1, 2)
-	var random_number = 2
+	var random_number = Utils.RNGesus(1, 2)
 	if random_number == 1:
 		GameData.Player.Deck.append(Created_Card)
 	else:
@@ -31,8 +30,11 @@ func Create_Advance_Tech_Card():
 func Shuffle_Deck(player):
 	player.Deck.shuffle()
 
-func Pop_Deck(Deck_To_Pop):
-	Deck_To_Pop.Deck.pop_back()
+func Pop_Deck(Dueler, Deck_Type = "Main"):
+	if Deck_Type == "Main":
+		Dueler.Deck.pop_back()
+	elif Deck_Type == "Tech":
+		Dueler.Tech_Deck.pop_back()
 
 func Reload_Deck(Deck_ID, MedBay_ID):
 	if len(Deck_ID) == 0 and len(MedBay_ID) > 0:
