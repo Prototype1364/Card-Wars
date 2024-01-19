@@ -252,7 +252,8 @@ func Warrior(card):
 
 	if Valid_Card:
 		var Fighter = Get_Field_Card_Data("Fighter")
-		if Fighter != null:
+		var Reinforcers = Get_Field_Card_Data("Reinforcers")
+		if Fighter != null and card != Fighter and card.Attack > 0 and len(Reinforcers) > 0:
 			# Create a popup scene to allow the selection of the amount of HP to transfer to Fighter
 			var Text_Entry = load("res://Scenes/SupportScenes/text_entry.tscn").instantiate()
 			var Card_Scene = Engine.get_main_loop().get_current_scene().get_node(card.get_path())
