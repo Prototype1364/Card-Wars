@@ -13,32 +13,36 @@ func Determine_Card_List(selection_type, slot = null):
 
 	match selection_type:
 		"Deck":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "NonHands/" + Side + "MainDeck")
+			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "MainDeck")
 		"Tech Deck":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "NonHands/" + Side + "TechDeck")
+			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "TechDeck")
 		"Field":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "NonHands/" + Side + slot)
+			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + slot)
 		"Medbay":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "NonHands/" + Side + "Medbay")
+			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "MedBay")
 		"Grave":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "NonHands/" + Side + "Graveyard")
+			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "Graveyard")
 		"Hand":
 			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
 		"Opponent Deck":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side_Opp + "NonHands/" + Side_Opp + "MainDeck")
+			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "MainDeck")
 		"Opponent Tech Deck":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side_Opp + "NonHands/" + Side_Opp + "TechDeck")
+			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "TechDeck")
 		"Opponent Field":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side_Opp + "NonHands/" + Side_Opp + slot)
+			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + slot)
 		"Opponent Medbay":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side_Opp + "NonHands/" + Side_Opp + "Medbay")
+			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "MedBay")
 		"Opponent Grave":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side_Opp + "NonHands/" + Side_Opp + "Graveyard")
+			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "Graveyard")
 		"Opponent Hand":
 			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side_Opp + "HandScroller/" + Side_Opp + "Hand")
 
 	# Populate the list of cards to choose from
 	var Card_List = []
+
+	if Selection_Source.get_child_count() == 0:
+		return
+
 	for i in Selection_Source.get_children():
 		Card_List.append(i)
 	
@@ -66,7 +70,7 @@ func On_Card_Selection(card):
 func _on_confirm_button_pressed():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
-	
+
 	# Find index of card in current hand (Defaults to last card in hand if no card is selected)
 	var Card_Index = $ScrollContainer/Effect_Target_List.get_children().find(Card_Selected)
 
