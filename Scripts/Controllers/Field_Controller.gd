@@ -148,6 +148,9 @@ func Play_Card(Base_Node, Side, Net_Cost):
 	GameData.Current_Card_Effect_Step = "Resolving"
 	SignalBus.emit_signal("Resolve_Card_Effects")
 	GameData.Current_Card_Effect_Step = null
+
+	# Update Card Data
+	GameData.Chosen_Card.Update_Data()
 	
 	# Resets GameData variables for next movement.
 	SignalBus.emit_signal("Reset_Reposition_Card_Variables")

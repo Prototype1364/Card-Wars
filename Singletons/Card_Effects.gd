@@ -111,7 +111,30 @@ func Assassin(card):
 	pass
 
 func Creature(card):
-	pass
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+
+	if Valid_Card and card.Effect_Active:
+		# Get Field Card Data for Fighter and Reinforcers
+		var Fighter = Get_Field_Card_Data("Fighter")
+		var Cards_On_Field = Get_Field_Card_Data("Reinforcers")
+		Cards_On_Field.append(Fighter) # Required to do in two steps due to the fact that append returns null
+
+		# Check if a copy of the card exists on the field
+		for i in Cards_On_Field:
+			if i.Name == card.Name and i != card:
+				# Perform Fusion Summon
+				i.Attack += card.Attack
+				i.Health += card.Health
+				i.Fusion_Level += 1
+				i.Update_Data()
+
+				# Reparent Nodes (to MedBay)
+				var Side = "W" if GameData.Current_Turn == "Player" else "B"
+				var Destination_Node = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Banished")
+				SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
+
+				# End loop
+				break
 
 func Cryptid(card):
 	pass

@@ -216,11 +216,11 @@ func Resolve_Battle_Damage(Reinforcers_Opp, player, enemy):
 			if GameData.Target.Invincible == false:
 				for _i in range(GameData.Attacker.Attacks_Remaining):
 					GameData.Attacker.Update_Attacks_Remaining("Attack")
-					GameData.Target.Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus)
+					GameData.Target.Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus - (GameData.Target.Fusion_Level - 1))
 					GameData.Target.Update_Data()
 					if GameData.Attacker.Multi_Strike:
 						for i in range(len(Reinforcers_Opp)):
-							Reinforcers_Opp[i].Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus)
+							Reinforcers_Opp[i].Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus - (GameData.Target.Fusion_Level - 1))
 							Reinforcers_Opp[i].Update_Data()
 							if Reinforcers_Opp[i].Health <= 0 and Reinforcers_Opp[i].Immortal == false:
 								GameData.Current_Step = "Capture"

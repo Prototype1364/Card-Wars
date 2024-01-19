@@ -123,15 +123,18 @@ func Set_Card_Visuals():
 		$Frame.texture = load("res://Assets/Cards/Frame/Small_Advance_Tech_Card.png")
 
 func Update_Data():
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var Parent_Name = get_parent().name
 	if Type == "Normal" or Type == "Hero":
 		if Parent_Name in ["MedBay", "Graveyard", "Banished", "Deck"]:
 			$Attack.text = str(max(0, Attack + ATK_Bonus))
 			$Health.text = str(max(0, Health + Health_Bonus))
 		else:
-			$Attack.text = str(max(0, Attack + ATK_Bonus + player.Field_ATK_Bonus))
-			$Health.text = str(max(0, Health + Health_Bonus + player.Field_Health_Bonus))
+			if Parent_Name.left(1) == "W":
+				$Attack.text = str(max(0, Attack + ATK_Bonus + GameData.Player.Field_ATK_Bonus))
+				$Health.text = str(max(0, Health + Health_Bonus + GameData.Player.Field_Health_Bonus))
+			else:
+				$Attack.text = str(max(0, Attack + ATK_Bonus + GameData.Enemy.Field_ATK_Bonus))
+				$Health.text = str(max(0, Health + Health_Bonus + GameData.Enemy.Field_Health_Bonus))
 	
 	# Add Token-related visuals to card
 	Update_Token_Info()

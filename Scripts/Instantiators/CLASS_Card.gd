@@ -28,7 +28,7 @@ var Passcode
 var Deck_Capacity
 var Tokens
 var Is_Set
-var Effect_Active # Primarily used to determine if Equip card effects have been activitated to ensure stat boosts don't accumulate each turn.
+var Effect_Active # Primarily used to determine if cards with Summon Effects have been activitated to ensure they don't trigger each turn.
 var Fusion_Level # Refers to the number of cards it is Fused with (defaults to 1 as it'll allow for easier multiplication of Attack/Health stats). Knights of the Round Table is the first card to have this ability.
 var Attack_As_Reinforcement # Refers to a card's ability to launch an attack from a Reinforcement slot. Mongols (when led by Ghenghis Khan) is the first card to have this ability.
 var Immortal # Refers to whether a card can be captured with 0 HP. Demeter (in SAP version) is the first card to have this effect.
