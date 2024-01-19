@@ -93,6 +93,7 @@ func Flip_Coin():
 	var flip_result = rng.randi_range(1,2)
 	return flip_result
 
+
 """--------------------------------- Attribute Effects ---------------------------------"""
 func Breakthrough(card): # Activate Tech (Special)
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
@@ -301,90 +302,29 @@ func Wizard(card):
 
 
 """--------------------------------- Hero Effects ---------------------------------"""
-func Conqueror(card):
+func Absorption(card):
 	pass
 
-func Juggernaut(card): # NOTE: This is just a strictly better effect than the current implementation of TailorMade (since it repeats every turn instead of just on summon)
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	if Valid_Card:
-		card.ATK_Bonus += card.ATK_Bonus
-		card.Update_Data()
-
-func Invincibility(card):
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	
-	card.Invincible == true if Valid_Card else false
-
-func Paralysis(card):
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
-	
-	if Valid_Card and card.Effect_Active:
-		if Fighter_Opp != null:
-			Fighter_Opp.Paralysis = true
-
-func Poison(card):
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	var Fighter = Get_Field_Card_Data("Fighter")
-	
-	if Valid_Card and card.Effect_Active and card == Fighter:
-		GameData.Target.Burn_Damage += card.Toxicity
-		GameData.Target.Health -= GameData.Target.Burn_Damage
-		GameData.Target.Update_Data()
-
-func Relentless(card):
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	
-	card.Relentless == true if Valid_Card else false
+func Atrocity(card):
+	pass
 
 func Barrage(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	
 	card.Multi_Strike == true if Valid_Card else false
 
-func Retribution(card):
+func Behind_Enemy_Lines(card): # Name changed from Moonshot to be more descriptive of actual function.
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	var player = GameData.Player if GameData.Current_Turn == "Enemy" else GameData.Enemy
-	var Fighter_Opp = Get_Field_Card_Data("Fighter") # Not "Fighter Opponent" since this effect will occur during opponent's turn!
 	
-	if Valid_Card and GameData.Cards_Captured_This_Turn.size() > 0:
-		Fighter_Opp.Health -= (card.Attack + card.ATK_Bonus + player.Field_ATK_Bonus)
-		Fighter_Opp.Update_Data()
+	card.Direct_Attack == true if Valid_Card else false
 
-func Fury(card):
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
-	
-	if Valid_Card and card.Effect_Active:
-		card.Effect_Active = false
-		var MedBay_Count = player.MedicalBay.size()
-		card.ATK_Bonus += MedBay_Count
-		card.Update_Data()
-
-func Guardian(card):
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
-	var Reinforcers = Get_Field_Card_Data("Reinforcers Opponent")
-	
-	if Valid_Card and GameData.Target in Reinforcers:
-		GameData.Target.Health += (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus)
-		GameData.Attacker.Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus)
-		GameData.Target.Update_Data()
-		GameData.Attacker.Update_Data()
-
-func Absorption(card):
+func Conqueror(card):
 	pass
 
-func Expansion(card):
+func Counter(card):
 	pass
 
-func Spawn(card):
-	pass
-
-func Reincarnation(card):
-	pass
-
-func Reformation(card):
+func Defiance(card):
 	pass
 
 func Detonate(card):
@@ -398,10 +338,41 @@ func Detonate(card):
 		for i in range(len(Trap_Cards)):
 			Battle_Script.Activate_Set_Card(Side, Trap_Cards[i])
 	else:
-		GameData.Auto_Spring_Traps = false
+		GameData.Auto_Spring_Traps = false	
 
-func Defiance(card):
+func Disorient(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
+	var Reinforcers_Opp = Get_Field_Card_Data("Reinforcers Opponent")
+	
+	if Fighter_Opp != null:
+		if Valid_Card and Reinforcers_Opp.size() > 0:
+			# Randomly Choose Replacement Reinforcer
+			var rng = RandomNumberGenerator.new()
+			rng.randomize()
+			var roll_result = rng.randi_range(0,Reinforcers_Opp.size() - 1)
+			
+			# Reparent Nodes
+			var Fighter_Parent = Fighter_Opp.get_parent()
+			var Reinforcer_Parent = Reinforcers_Opp[roll_result].get_parent()
+			Fighter_Parent.remove_child(Fighter_Opp)
+			Reinforcer_Parent.remove_child(Reinforcers_Opp[roll_result])
+			Fighter_Parent.add_child(Reinforcers_Opp[roll_result])
+			Reinforcer_Parent.add_child(Fighter_Opp)
+
+func Earthbound(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	
+	GameData.Muggle_Mode == true if Valid_Card else false
+
+func Expansion(card):
 	pass
+
+func Faithful(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var Reinforcers = Get_Field_Card_Data("Reinforcers")
+	
+	card.Immortal == true if Valid_Card and Reinforcers.size() >= 3 else false
 
 func For_Honor_And_Glory(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -427,53 +398,89 @@ func For_Honor_And_Glory(card):
 	else:
 		GameData.For_Honor_And_Glory = false
 
+func Fury(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	
+	if Valid_Card and card.Effect_Active:
+		card.Effect_Active = false
+		var MedBay_Count = player.MedicalBay.size()
+		card.ATK_Bonus += MedBay_Count
+		card.Update_Data()
+
+func Guardian(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
+	var Reinforcers = Get_Field_Card_Data("Reinforcers Opponent")
+	
+	if Valid_Card and GameData.Target in Reinforcers:
+		GameData.Target.Health += (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus)
+		GameData.Attacker.Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus)
+		GameData.Target.Update_Data()
+		GameData.Attacker.Update_Data()
+
 func Humiliator(card):
+	pass		
+
+func Inspiration(card):
 	pass
 
-func Counter(card):
-	pass
+func Invincibility(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	
+	card.Invincible == true if Valid_Card else false
 
-func Perfect_Copy(card):
-	pass
+func Juggernaut(card): # NOTE: This is just a strictly better effect than the current implementation of TailorMade (since it repeats every turn instead of just on summon)
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	if Valid_Card:
+		card.ATK_Bonus += card.ATK_Bonus
+		card.Update_Data()
 
 func Mimic(card):
 	pass
 
-func Taunt(card):
-	pass
-
-func Disorient(card):
+func Paralysis(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
-	var Reinforcers_Opp = Get_Field_Card_Data("Reinforcers Opponent")
 	
-	if Fighter_Opp != null:
-		if Valid_Card and Reinforcers_Opp.size() > 0:
-			# Randomly Choose Replacement Reinforcer
-			var rng = RandomNumberGenerator.new()
-			rng.randomize()
-			var roll_result = rng.randi_range(0,Reinforcers_Opp.size() - 1)
-			
-			# Reparent Nodes
-			var Fighter_Parent = Fighter_Opp.get_parent()
-			var Reinforcer_Parent = Reinforcers_Opp[roll_result].get_parent()
-			Fighter_Parent.remove_child(Fighter_Opp)
-			Reinforcer_Parent.remove_child(Reinforcers_Opp[roll_result])
-			Fighter_Parent.add_child(Reinforcers_Opp[roll_result])
-			Reinforcer_Parent.add_child(Fighter_Opp)
+	if Valid_Card and card.Effect_Active:
+		if Fighter_Opp != null:
+			Fighter_Opp.Paralysis = true
 
-func Behind_Enemy_Lines(card): # Name changed from Moonshot to be more descriptive of actual function.
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	
-	card.Direct_Attack == true if Valid_Card else false
-
-func Atrocity(card):
+func Perfect_Copy(card):
 	pass
 
-func Earthbound(card):
+func Poison(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var Fighter = Get_Field_Card_Data("Fighter")
+	
+	if Valid_Card and card.Effect_Active and card == Fighter:
+		GameData.Target.Burn_Damage += card.Toxicity
+		GameData.Target.Health -= GameData.Target.Burn_Damage
+		GameData.Target.Update_Data()
+
+func Reformation(card):
+	pass
+
+func Reincarnation(card):
+	pass
+
+func Relentless(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	
-	GameData.Muggle_Mode == true if Valid_Card else false
+	card.Relentless == true if Valid_Card else false
+
+func Retribution(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var player = GameData.Player if GameData.Current_Turn == "Enemy" else GameData.Enemy
+	var Fighter_Opp = Get_Field_Card_Data("Fighter") # Not "Fighter Opponent" since this effect will occur during opponent's turn!
+	
+	if Valid_Card and GameData.Cards_Captured_This_Turn.size() > 0:
+		Fighter_Opp.Health -= (card.Attack + card.ATK_Bonus + player.Field_ATK_Bonus)
+		Fighter_Opp.Update_Data()
+
+func Spawn(card):
+	pass
 
 func Tailor_Made(card): # Currently just doubles ATK_Bonus when summoned (instead of Equip-specific stat boosts, like Hephestus' effect did originally). Eric claims more thinking needs to be done on this effect due to lameness.
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -483,42 +490,33 @@ func Tailor_Made(card): # Currently just doubles ATK_Bonus when summoned (instea
 		card.ATK_Bonus += card.ATK_Bonus
 		card.Update_Data()
 
-func Faithful(card):
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	var Reinforcers = Get_Field_Card_Data("Reinforcers")
-	
-	card.Immortal == true if Valid_Card and Reinforcers.size() >= 3 else false
-
-func Inspiration(card):
+func Taunt(card):
 	pass
 
 
 """--------------------------------- Magic/Trap Effects ---------------------------------"""
-func Excalibur(card):
-	pass
-
-func Sword(card):
-	pass
-
-func Morale_Boost(card):
-	pass
-
-func Last_Stand(card):
-	pass
-
 func Blade_Song(card):
 	pass
 
-func Runetouched(card):
+func Deep_Pit(card):
 	pass
 
-func Miraculous_Recovery(card):
+func Disable(card):
+	pass
+
+func Excalibur(card):
 	pass
 
 func Heart_of_the_Underdog(card):
 	pass
 
-func Disable(card):
+func Last_Stand(card):
+	pass
+
+func Miraculous_Recovery(card):
+	pass
+
+func Morale_Boost(card):
 	pass
 
 func Prayer(card):
@@ -527,7 +525,10 @@ func Prayer(card):
 func Resurrection(card):
 	pass
 
-func Deep_Pit(card):
+func Runetouched(card):
+	pass
+
+func Sword(card):
 	pass
 
 
