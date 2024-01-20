@@ -98,12 +98,14 @@ func Flip_Coin():
 func Breakthrough(card): # Activate Tech (Special)
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 	var Dueler = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var opponent = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	var Dueler_Str = "Player" if GameData.Current_Turn == "Player" else "Enemy"
 	var Destination_Node = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay")
 
 	if Dueler.Tech_Deck.size() > 0 and card.Effect_Active:
 		SignalBus.emit_signal("Draw_Card", Dueler_Str, 1, "Tech")
 		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
+		opponent.MedicalBay.append(card)
 
 func Actor(card):
 	pass
@@ -159,7 +161,8 @@ func Outlaw(card):
 		var Card_Selector = load("res://Scenes/SupportScenes/card_selector.tscn").instantiate()
 		var Battle_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle")
 		Battle_Scene.add_child(Card_Selector)
-		Card_Selector.Determine_Card_List("Opponent Hand")
+		Card_Selector.Determine_Card_List("Opponent Hand", "NonTurnHand")
+		Card_Selector.Set_Action_Type("Steal")
 
 func Philosopher(card):
 	pass
@@ -306,7 +309,17 @@ func Absorption(card):
 	pass
 
 func Atrocity(card):
-	pass
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var Battle_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle")
+	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
+	var MedBay_Opp = Battle_Scene.get_node("Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay")
+	
+	if Valid_Card and MedBay_Opp.get_child_count() > 0:
+		var Card_Selector = load("res://Scenes/SupportScenes/card_selector.tscn").instantiate()
+		Battle_Scene.add_child(Card_Selector)
+		Card_Selector.Determine_Card_List("Opponent MedBay", "NonTurnMedBay")
+		Card_Selector.Set_Action_Type("Damage")
+		Card_Selector.Set_Effect_Card(card)
 
 func Barrage(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -334,7 +347,7 @@ func Detonate(card):
 	if Valid_Card:
 		GameData.Auto_Spring_Traps = true
 		var Trap_Cards = Get_Field_Card_Data("Traps")
-		var Battle_Script = load("res://Scripts/Battle.gd").new()
+		var Battle_Script = load("res://Scripts/Controllers/Battle_Controller.gd").new()
 		for i in range(len(Trap_Cards)):
 			Battle_Script.Activate_Set_Card(Side, Trap_Cards[i])
 	else:
@@ -376,6 +389,8 @@ func Faithful(card):
 
 func For_Honor_And_Glory(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 	var MedBay = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay")
@@ -390,11 +405,13 @@ func For_Honor_And_Glory(card):
 			var Reinforcer_Parent = Reinforcers[i].get_parent()
 			Reinforcer_Parent.remove_child(Reinforcers[i])
 			MedBay.add_child(Reinforcers[i])
+			player.MedicalBay.append(Reinforcers[i])
 		
 		for i in len(Reinforcers_Opp):
 			var Reinforcer_Parent = Reinforcers_Opp[i].get_parent()
 			Reinforcer_Parent.remove_child(Reinforcers_Opp[i])
 			MedBay_Opp.add_child(Reinforcers_Opp[i])
+			enemy.MedicalBay.append(Reinforcers_Opp[i])
 	else:
 		GameData.For_Honor_And_Glory = false
 

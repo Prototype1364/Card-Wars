@@ -64,9 +64,15 @@ func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
 	"TurnHand": player.Hand,
 	"TurnMainDeck": player.Deck,
 	"TurnTechDeck": player.Tech_Deck,
+	"TurnMedBay": player.MedicalBay,
+	"TurnGraveyard": player.Graveyard,
+	"TurnBanished": player.Banished,
 	"NonTurnHand": enemy.Hand,
 	"NonTurnMainDeck": enemy.Deck,
-	"NonTurnTechDeck": enemy.Tech_Deck}
+	"NonTurnTechDeck": enemy.Tech_Deck,
+	"NonTurnMedBay": enemy.MedicalBay,
+	"NonTurnGraveyard": enemy.Graveyard,
+	"NonTurnBanished": enemy.Banished}
 
 	if card_sources.has(Source):
 		Name = card_sources[Source][Card_Index].Name
@@ -77,7 +83,8 @@ func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
 		Resolve_Side = card_sources[Source][Card_Index].Resolve_Side
 		Resolve_Phase = card_sources[Source][Card_Index].Resolve_Phase
 		Resolve_Step = card_sources[Source][Card_Index].Resolve_Step
-		Art = load(card_sources[Source][Card_Index].Art) if card_sources[Source][Card_Index].Art != "res://Assets/Cards/Art/Special_Activate_Technology.png" else null
+		if typeof(card_sources[Source][Card_Index].Art) == TYPE_STRING:
+			Art = load(card_sources[Source][Card_Index].Art) if card_sources[Source][Card_Index].Art != "res://Assets/Cards/Art/Special_Activate_Technology.png" else null
 		Attribute = card_sources[Source][Card_Index].Attribute
 		Description = card_sources[Source][Card_Index].Description
 		Short_Description = card_sources[Source][Card_Index].Short_Description
@@ -205,14 +212,20 @@ func _on_FocusSensor_pressed(): # FIXME: Might need to be split into multiple fu
 			if Valid_Attacker_Selection(Reposition_Zones, Reinforcement_Zones, Parent_Name, Side):
 				GameData.Attacker = self
 				SignalBus.emit_signal("Check_For_Targets")
+			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
+				SignalBus.emit_signal("EffectTargetSelected", self)
 		"Target":
 			if ("Fighter" in Parent_Name and (Parent_Name.left(1) != Side)) or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name) and GameData.Attacker.Target_Reinforcer):
 				$Action_Button_Container/Target.visible = true
+			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
+				SignalBus.emit_signal("EffectTargetSelected", self)
 		"Discard":
 			GameData.CardFrom = Parent_Name
 			GameData.CardMoved = self.name
 			if "Hand" in GameData.CardFrom:
 				SignalBus.emit_signal("Discard_Card", GameData.CardFrom.left(1))
+			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
+				SignalBus.emit_signal("EffectTargetSelected", self)
 	
 	# Allows repositioning of cards on own field
 	if Reposition_Zones.has(Parent_Name) and GameData.Current_Step == "Main":
