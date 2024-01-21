@@ -60,11 +60,8 @@ func Determine_Card_List(selection_type, Card_Source, slot = null):
 	Populate_Card_Options_List(Card_List, Card_Source)
 
 func Populate_Card_Options_List(Card_List, Card_Source):
-	var index_modifier = 0 # Ensures the Advance Tech card is not accidentally selected
-
 	for i in len(Card_List):
 		if Card_List[i].Frame == "Special":
-			index_modifier += 1
 			continue
 		else:
 			var original = Card_List[i]
