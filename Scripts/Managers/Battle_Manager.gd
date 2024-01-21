@@ -61,12 +61,12 @@ func Update_Game_Step():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	
 	# Call required funcs at appropriate Steps (and contain step values within bounds of current Phase)
+	if GameData.Current_Step in EFFECT_STEPS: # Ensures that Card Effects are resolved when appropriate (moved to first if statement to ensure effects are resolved before step is handled [important for Damage step-related card efffects])
+		BC.Resolve_Card_Effects()
 	if STEPS.find(GameData.Current_Step) == 8: # Current Step is Damage Step
 		Resolve_Battle_Damage()
 	if STEPS.find(GameData.Current_Step) == 11 and get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > 5: # Ensures cards are discarded when appropriate
 		return
-	if GameData.Current_Step in EFFECT_STEPS: # Ensures that Card Effects are resolved when appropriate
-		BC.Resolve_Card_Effects()
 	
 	# Update Step value
 	if STEPS.find(GameData.Current_Step) + 1 > len(STEPS): # Resets index to start of New Turn.
@@ -312,10 +312,30 @@ func Resolve_Battle_Damage():
 
 func Capture_Card(Card_Captured, Capture_Type = "Normal", Reset_Stats = true):
 	var attacking_player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var defending_player = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	var Destination_MedBay = BC.Get_Destination_MedBay_on_Capture(Capture_Type)
+	var Parent_Name = Card_Captured.get_parent().name
+	var Fighter_Captured = true if "Fighter" in Parent_Name else false
 	
-	BC.Capture_Card(attacking_player, Card_Captured)
+	# Capture Targeted Card
+	BC.Capture_Card(attacking_player, defending_player, Card_Captured, "MedBay")
 	BF.Reparent_Nodes(Card_Captured, Destination_MedBay)
+
+	# Move Equips to Graveyard when Fighter is Captured
+	if Fighter_Captured:
+		var Side = "W" if defending_player == GameData.Player else "B"
+		var Equip_Magic_Slot = BC.Get_Field_Card_Slot(Side, "EquipMagic")
+		var Equip_Trap_Slot = BC.Get_Field_Card_Slot(Side, "EquipTrap")
+		var Graveyard = BC.Get_Destination_Graveyard_on_Capture(Capture_Type)
+
+		if Equip_Magic_Slot.get_child_count() > 0:
+			var Equip_Magic_Card = Equip_Magic_Slot.get_child(0)
+			BC.Capture_Card(attacking_player, defending_player, Equip_Magic_Card, "Graveyard")
+			BF.Reparent_Nodes(Equip_Magic_Card, Graveyard)
+		if Equip_Trap_Slot.get_child_count() > 0:
+			var Equip_Trap_Card = Equip_Trap_Slot.get_child(0)
+			BC.Capture_Card(attacking_player, defending_player, Equip_Trap_Card, "Graveyard")
+			BF.Reparent_Nodes(Equip_Trap_Card, Graveyard)
 	
 	# Reset Captured Card's Stats/Visuals
 	if Reset_Stats:

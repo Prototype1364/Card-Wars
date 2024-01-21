@@ -120,12 +120,13 @@ func Reposition_Field_Cards(Side) -> void:
 	SignalBus.emit_signal("Reset_Reposition_Card_Variables")
 
 func Play_Card(Base_Node, Side, Net_Cost):
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var Dueler = GameData.Player if GameData.CardTo.name.left(1) == "W" else GameData.Enemy
 	var Reparent_Variables = [GameData.Chosen_Card.get_parent(), GameData.CardTo, GameData.Chosen_Card]
 	var Equip_Slot = Base_Node.get_node(Side + "EquipMagic") if Reparent_Variables[2].Type == "Magic" else Base_Node.get_node(Side + "EquipTrap")
 	var Graveyard = Base_Node.get_node(Side + "Graveyard")
+	var Parent_Name = GameData.CardTo.name
 	
-	player.Summon_Crests -= Net_Cost
+	Dueler.Summon_Crests -= Net_Cost
 	
 	# Reparents Previous Equip Card Node (if applicable)
 	if Equip_Slot.get_child_count() > 0 and Reparent_Variables[2].Attribute == "Equip":
@@ -151,12 +152,24 @@ func Play_Card(Base_Node, Side, Net_Cost):
 
 	# Update Card Data
 	GameData.Chosen_Card.Update_Data()
+
+	# Append card to appropriate array when a card is played
+	if "Fighter" in Parent_Name:
+		Dueler.Fighter.append(GameData.Chosen_Card)
+	elif "EquipMagic" in Parent_Name:
+		Dueler.Equip_Magic.append(GameData.Chosen_Card)
+	elif "EquipTrap" in Parent_Name:
+		Dueler.Equip_Trap.append(GameData.Chosen_Card)
+	elif "R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name:
+		Dueler.Reinforcement.append(GameData.Chosen_Card)
+	elif "Backrow" in Parent_Name:
+		Dueler.Backrow.append(GameData.Chosen_Card)
 	
 	# Resets GameData variables for next movement.
 	SignalBus.emit_signal("Reset_Reposition_Card_Variables")
 	
 	# Updates Duelist HUD (Places at end of func so that summon effects resolve before update)
-	SignalBus.emit_signal("Update_HUD_Duelist", Base_Node.get_parent().get_parent().get_parent().get_node("HUD_" + Side), player)
+	SignalBus.emit_signal("Update_HUD_Duelist", Base_Node.get_parent().get_parent().get_parent().get_node("HUD_" + Side), Dueler)
 
 func Activate_Set_Card(Side, Chosen_Card):
 	# Replaces current Equip card with activated card & Reparents appropriate Nodes

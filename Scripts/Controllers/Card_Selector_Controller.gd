@@ -3,6 +3,7 @@ extends Control
 var Current_Scene = Engine.get_main_loop().get_current_scene()
 var Card_Selected = null
 var Effect_Card = null
+var Card_Slot = null
 
 func _ready():
 	var _HV1 = SignalBus.connect("EffectTargetSelected", Callable(self, "On_Card_Selection"))
@@ -10,48 +11,60 @@ func _ready():
 func Determine_Card_List(selection_type, Card_Source, slot = null):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
-	var Selection_Source = null
+	var Selection_Source = []
+
+	# Set Card_Slot if not null
+	if slot != null:
+		Card_Slot = slot
 
 	match selection_type:
 		"Deck":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "MainDeck")
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "MainDeck"))
 		"Tech Deck":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "TechDeck")
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "TechDeck"))
 		"Field":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + slot)
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + slot))
 		"MedBay":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "MedBay")
-		"Grave":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "Graveyard")
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "MedBay"))
+		"Graveyard":
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "Graveyard"))
 		"Hand":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand"))
 		"Opponent Deck":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "MainDeck")
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "MainDeck"))
 		"Opponent Tech Deck":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "TechDeck")
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "TechDeck"))
 		"Opponent Field":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + slot)
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + slot))
 		"Opponent MedBay":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "MedBay")
-		"Opponent Grave":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "Graveyard")
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "MedBay"))
+		"Opponent Graveyard":
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "Graveyard"))
 		"Opponent Hand":
-			Selection_Source = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side_Opp + "HandScroller/" + Side_Opp + "Hand")
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side_Opp + "HandScroller/" + Side_Opp + "Hand"))
+		"All MedBays":
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "MedBay"))
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "MedBay"))
+
 
 	# Populate the list of cards to choose from
 	var Card_List = []
-
-	if Selection_Source.get_child_count() == 0:
+	for source in Selection_Source:
+		if source.get_child_count() > 0:
+			for i in source.get_children():
+				Card_List.append(i)
+	
+	if len(Card_List) == 0:
 		return
-
-	for i in Selection_Source.get_children():
-		Card_List.append(i)
 	
 	Populate_Card_Options_List(Card_List, Card_Source)
 
 func Populate_Card_Options_List(Card_List, Card_Source):
+	var index_modifier = 0 # Ensures the Advance Tech card is not accidentally selected
+
 	for i in len(Card_List):
 		if Card_List[i].Frame == "Special":
+			index_modifier += 1
 			continue
 		else:
 			var original = Card_List[i]
@@ -68,18 +81,14 @@ func Populate_Card_Options_List(Card_List, Card_Source):
 func On_Card_Selection(card):
 	Card_Selected = card
 
-func Set_Action_Type(action_type):
-	$Header.text = "Choose a card to " + action_type
-
 func Set_Effect_Card(card):
 	Effect_Card = card
 
 func _on_confirm_button_pressed():
-	var Action_Type = $Header.text
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 
-	if "Steal" in Action_Type:
+	if Effect_Card.Anchor_Text == "Outlaw":
 		# Find index of card in current hand (Defaults to last card in hand if no card is selected)
 		var Card_Index = $ScrollContainer/Effect_Target_List.get_children().find(Card_Selected)
 
@@ -93,7 +102,7 @@ func _on_confirm_button_pressed():
 			# Update Hands
 			Source_Hand.remove_child(Card_Node)
 			Destination_Hand.add_child(Card_Node)
-	elif "Damage" in Action_Type:
+	elif Effect_Card.Anchor_Text == "Atrocity":
 		var Card_Index = $ScrollContainer/Effect_Target_List.get_children().find(Card_Selected)
 
 		if Card_Index != -1:
@@ -106,6 +115,52 @@ func _on_confirm_button_pressed():
 			var damage_dealt = int(floor((Effect_Card.Attack + Effect_Card.ATK_Bonus + Dueler.Field_ATK_Bonus) * Damage_Modifier))
 			Card_Node.Health = max(0, Card_Node.Health - damage_dealt)
 			Card_Node.Update_Data()
+	elif Effect_Card.Anchor_Text == "Morale_Boost":
+		var Card_Index = $ScrollContainer/Effect_Target_List.get_children().find(Card_Selected)
+
+		if Card_Index != -1:
+			var Card_Node = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + Card_Slot).get_child(Card_Index)
+
+			# Add Attack if card is a Normal/Hero type
+			if Card_Node.Type == "Normal" or Card_Node.Type == "Hero":
+				Card_Node.Attack += 1
+				Card_Node.Update_Data()
+	elif Effect_Card.Anchor_Text == "Blade_Song":
+		var Card_Index = $ScrollContainer/Effect_Target_List.get_children().find(Card_Selected)
+
+		if Card_Index != -1:
+			var Card_Node = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + Card_Slot).get_child(Card_Index)
+
+			# Move Equip Card to proper hand
+			if Card_Node.Attribute == "Equip":
+				var Source_Graveyard = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "Graveyard")
+				var Destination_Hand = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
+
+				# Update Graveyard/Hand
+				Source_Graveyard.remove_child(Card_Node)
+				Destination_Hand.add_child(Card_Node)
+	elif Effect_Card.Anchor_Text == "Miraculous_Recovery":
+		var Card_Index = $ScrollContainer/Effect_Target_List.get_children().find(Card_Selected)
+
+		if Card_Index != -1:
+			var player_MedBay_Size = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay").get_child_count()
+			if Card_Index > player_MedBay_Size - 1:
+				var Card_Node = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay").get_child(Card_Index - player_MedBay_Size)
+				var Source_MedBay = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay")
+				var Destination_Hand = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
+				var Dueler_Opp = GameData.Enemy if Side == "W" else GameData.Player
+				Source_MedBay.remove_child(Card_Node)
+				Destination_Hand.add_child(Card_Node)
+				Dueler_Opp.MedicalBay.erase(Card_Node)
+			else:
+				var Card_Node = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay").get_child(Card_Index)
+				var Source_MedBay = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay")
+				var Destination_Hand = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
+				var Dueler = GameData.Player if Side == "W" else GameData.Enemy
+				Source_MedBay.remove_child(Card_Node)
+				Destination_Hand.add_child(Card_Node)
+				Dueler.MedicalBay.erase(Card_Node)
+	
 
 	# Queue free the Card Selector scene from the scene tree
 	var Card_Selector_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle/CardSelector")

@@ -6,6 +6,8 @@ var Card_Drawn = preload("res://Scenes/SupportScenes/SmallCard.tscn")
 var Node_CardSpots = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots")
 var Node_WMedBay = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/WMedBay")
 var Node_BMedBay = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/BMedBay")
+var Node_WGraveyard = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/WGraveyard")
+var Node_BGraveyard = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/BGraveyard")
 
 """--------------------------------- Pre-Filled Functions ---------------------------------"""
 func Resolve_Card_Effects(Base_Node = Node_CardSpots):
@@ -192,11 +194,11 @@ func Choose_Starting_Player():
 
 func Set_Hero_Card_Effect_Status():
 	if GameData.Current_Turn == "Player":
-		for card in GameData.Player.Frontline:
+		for card in GameData.Player.Fighter:
 			if card.Type == "Hero":
 				card.Effect_Active = true
 	else:
-		for card in GameData.Enemy.Frontline:
+		for card in GameData.Enemy.Fighter:
 			if card.Type == "Hero":
 				card.Effect_Active = true
 
@@ -232,9 +234,28 @@ func Resolve_Battle_Damage(Reinforcers_Opp, player, enemy):
 				GameData.Current_Step = "Capture"
 				SignalBus.emit_signal("Capture_Card", GameData.Target)
 
-func Capture_Card(attacking_player, Card_Captured):
+func Capture_Card(attacking_player, defending_player, Card_Captured, Destination_Array):
 	GameData.Cards_Captured_This_Turn.append(Card_Captured)
-	attacking_player.MedicalBay.append(Card_Captured)
+
+	# Append card to appropriate array
+	if Destination_Array == "MedBay":
+		attacking_player.MedicalBay.append(Card_Captured)
+	elif Destination_Array == "Graveyard":
+		defending_player.Graveyard.append(Card_Captured)
+	
+	# Remove card from appropriate array
+	var Parent_Name = Card_Captured.get_parent().name
+	if "Fighter" in Parent_Name:
+		defending_player.Fighter.erase(Card_Captured)
+	elif "EquipMagic" in Parent_Name:
+		defending_player.Equip_Magic.erase(Card_Captured)
+	elif "EquipTrap" in Parent_Name:
+		defending_player.Equip_Trap.erase(Card_Captured)
+	elif "R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name:
+		defending_player.Reinforcers.erase(Card_Captured)
+	elif "Backrow" in Parent_Name:
+		defending_player.Backrow.erase(Card_Captured)
+	
 
 func Get_Destination_MedBay_on_Capture(Capture_Type) -> Node:
 	if Capture_Type == "Normal":
@@ -243,3 +264,15 @@ func Get_Destination_MedBay_on_Capture(Capture_Type) -> Node:
 	else:
 		var Destination_MedBay = Node_BMedBay if GameData.Current_Turn == "Player" else Node_WMedBay
 		return Destination_MedBay
+
+func Get_Destination_Graveyard_on_Capture(Capture_Type) -> Node:
+	if Capture_Type == "Normal":
+		var Destination_Graveyard = Node_BGraveyard if GameData.Current_Turn == "Player" else Node_WGraveyard
+		return Destination_Graveyard
+	else:
+		var Destination_Graveyard = Node_WGraveyard if GameData.Current_Turn == "Player" else Node_BGraveyard
+		return Destination_Graveyard
+
+func Get_Field_Card_Slot(Side, Slot):
+	var Field_Card_Slot = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/" + Side + Slot)
+	return Field_Card_Slot

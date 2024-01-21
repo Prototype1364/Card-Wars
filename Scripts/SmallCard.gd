@@ -59,6 +59,7 @@ func Update_Attacks_Remaining(Role):
 func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
+	var combined_medbays = player.MedicalBay + enemy.MedicalBay
 	
 	var card_sources = {
 	"TurnHand": player.Hand,
@@ -67,12 +68,21 @@ func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
 	"TurnMedBay": player.MedicalBay,
 	"TurnGraveyard": player.Graveyard,
 	"TurnBanished": player.Banished,
+	"TurnFighter": player.Fighter,
+	"TurnReinforcers": player.Reinforcement,
+	"TurnEquipMagic": player.Equip_Magic,
+	"TurnEquipTrap": player.Equip_Trap,
 	"NonTurnHand": enemy.Hand,
 	"NonTurnMainDeck": enemy.Deck,
 	"NonTurnTechDeck": enemy.Tech_Deck,
 	"NonTurnMedBay": enemy.MedicalBay,
 	"NonTurnGraveyard": enemy.Graveyard,
-	"NonTurnBanished": enemy.Banished}
+	"NonTurnBanished": enemy.Banished,
+	"NonTurnFighter": player.Fighter,
+	"NonTurnReinforcers": player.Reinforcement,
+	"NonTurnEquipMagic": player.Equip_Magic,
+	"NonTurnEquipTrap": player.Equip_Trap,
+	"AllMedBays": combined_medbays}
 
 	if card_sources.has(Source):
 		Name = card_sources[Source][Card_Index].Name
