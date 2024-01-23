@@ -149,6 +149,7 @@ func _on_confirm_button_pressed():
 				Source_MedBay.remove_child(Card_Node)
 				Destination_Hand.add_child(Card_Node)
 				Dueler_Opp.MedicalBay.erase(Card_Node)
+				Dueler_Opp.Hand.append(Card_Node)
 			else:
 				var Card_Node = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay").get_child(Card_Index)
 				var Source_MedBay = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay")
@@ -157,6 +158,43 @@ func _on_confirm_button_pressed():
 				Source_MedBay.remove_child(Card_Node)
 				Destination_Hand.add_child(Card_Node)
 				Dueler.MedicalBay.erase(Card_Node)
+				Dueler.Hand.append(Card_Node)
+	elif Effect_Card.Anchor_Text == "Resurrection":
+		var Card_Index = $ScrollContainer/Effect_Target_List.get_children().find(Card_Selected)
+
+		if Card_Index != -1:
+			var Card_Node = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay").get_child(Card_Index)
+
+			# Check for open field slots
+			var Fighter_Open = true if Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "Fighter").get_child_count() == 0 else false
+			var R1_Open = true if Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "R1").get_child_count() == 0 else false
+			var R2_Open = true if Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "R2").get_child_count() == 0 else false
+			var R3_Open = true if Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "R3").get_child_count() == 0 else false
+
+			# Set proper field slot or hand source/destination
+			var Source_MedBay = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay")
+			var Destination_Slot = "Fighter" if Fighter_Open else "R1" if R1_Open else "R2" if R2_Open else "R3" if R3_Open else "Hand"
+			var Destination_Node = null
+			if Destination_Slot != "Hand":
+				Destination_Node = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + Destination_Slot)
+			else:
+				Destination_Node = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
+
+			# Update MedBay/Hand
+			Source_MedBay.remove_child(Card_Node)
+			Destination_Node.add_child(Card_Node)
+
+			# Update Dueler Arrays
+			var Dueler = GameData.Player if Side == "W" else GameData.Enemy
+			Dueler.MedicalBay.erase(Card_Node)
+			match Destination_Slot:
+				"Fighter":
+					Dueler.Fighter.append(Card_Node)
+				"R1", "R2", "R3":
+					Dueler.Reinforcement.append(Card_Node)
+				"Hand":
+					Dueler.Hand.append(Card_Node)
+
 	
 
 	# Queue free the Card Selector scene from the scene tree

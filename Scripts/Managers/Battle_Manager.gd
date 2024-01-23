@@ -124,7 +124,7 @@ func Update_Game_Turn():
 
 
 """--------------------------------- Utility Functions ---------------------------------"""
-func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main"):
+func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main", Draw_At_Index = -1):
 	var player = GameData.Player if Turn_Player == "Player" else GameData.Enemy
 	var Deck_ID
 	if Deck_Type == "Main":
@@ -132,11 +132,38 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main"):
 	elif Deck_Type == "Tech":
 		Deck_ID = "WTechDeck" if Turn_Player == "Player" else "BTechDeck"
 	
+	# Allows for single draws of specific cards
+	if Draw_At_Index != -1:
+		var InstanceCard = BC.Instantiate_Card()
+		if Deck_Type == "Main":
+			BC.Draw_Card(player, Draw_At_Index)
+			InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnMainDeck")
+			InstanceCard.Set_Card_Visuals()
+			BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
+			InstanceCard.Update_Data()
+			DC.Pop_Deck(player, "Main", Draw_At_Index)
+
+			# Activate Advance Tech Card Effect when Drawn
+			if InstanceCard.Type == "Special":
+				BC.Activate_Summon_Effects(InstanceCard)
+
+		elif Deck_Type == "Tech":
+			InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnTechDeck")
+			InstanceCard.Set_Card_Visuals()
+			BF.Add_Card_Node_To_Tech_Zone(Deck_ID, InstanceCard)
+			InstanceCard.Update_Data()
+			DC.Pop_Deck(player, "Tech", Draw_At_Index)
+
+			# Activate Tech Effect
+			BC.Activate_Summon_Effects(InstanceCard)
+		
+		return
+	
 	for _i in range(Cards_To_Draw):
 		var InstanceCard = BC.Instantiate_Card()
 		if Deck_Type == "Main":
 			BC.Draw_Card(player)
-			InstanceCard.Set_Card_Variables(-1, "TurnMainDeck")
+			InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnMainDeck")
 			InstanceCard.Set_Card_Visuals()
 			BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
 			InstanceCard.Update_Data()
@@ -147,7 +174,7 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main"):
 				BC.Activate_Summon_Effects(InstanceCard)
 
 		elif Deck_Type == "Tech":
-			InstanceCard.Set_Card_Variables(-1, "TurnTechDeck")
+			InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnTechDeck")
 			InstanceCard.Set_Card_Visuals()
 			BF.Add_Card_Node_To_Tech_Zone(Deck_ID, InstanceCard)
 			InstanceCard.Update_Data()

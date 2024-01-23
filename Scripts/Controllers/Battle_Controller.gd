@@ -61,8 +61,8 @@ func Instantiate_Card() -> Node:
 
 	return InstanceCard
 
-func Draw_Card(Turn_Player):
-	Turn_Player.Hand.append(Turn_Player.Deck[-1])
+func Draw_Card(Turn_Player, Card_Index = -1):
+	Turn_Player.Hand.append(Turn_Player.Deck[Card_Index])
 
 func Reset_Reposition_Card_Variables():
 	GameData.Chosen_Card = null
@@ -188,9 +188,10 @@ func Choose_Starting_Player():
 	
 	# Flip field (if Black goes first)
 	if random_number == 2:
-		SignalBus.emit_signal("Flip_Field", $Playmat)
-		SignalBus.emit_signal("Flip_Duelist_HUDs", $HUD_W, $HUD_B)
-		SignalBus.emit_signal("Update_HUD_GameState", $HUD_GameState)
+		var Switch_Sides_Button = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/SwitchSides")
+		Switch_Sides_Button.emit_signal("pressed")
+		SignalBus.emit_signal("Flip_Duelist_HUDs")
+		SignalBus.emit_signal("Update_HUD_GameState")
 
 func Set_Hero_Card_Effect_Status():
 	if GameData.Current_Turn == "Player":

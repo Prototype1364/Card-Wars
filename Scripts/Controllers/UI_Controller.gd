@@ -12,9 +12,8 @@ var Node_Deck_Count_BMain = Engine.get_main_loop().get_current_scene().get_node(
 var Node_Deck_Count_BTech = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/BTechDeckCardCount")
 
 func _ready(): 
-	var _HV1 = SignalBus.connect("Flip_Field", Callable(self, "_on_SwitchSides_pressed"))
-	var _HV2 = SignalBus.connect("Flip_Duelist_HUDs", Callable(self, "Flip_Duelist_HUDs"))
-	var _HV3 = SignalBus.connect("Update_HUD_GameState", Callable(self, "Update_HUD_GameState"))
+	var _HV1 = SignalBus.connect("Flip_Duelist_HUDs", Callable(self, "Flip_Duelist_HUDs"))
+	var _HV2 = SignalBus.connect("Update_HUD_GameState", Callable(self, "Update_HUD_GameState"))
 	
 	Update_HUD_GameState()
 	Update_HUD_Duelist(get_node("/root/SceneHandler/Battle/HUD_W"), GameData.Player)

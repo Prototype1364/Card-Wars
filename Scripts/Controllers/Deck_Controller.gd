@@ -30,11 +30,11 @@ func Create_Advance_Tech_Card():
 func Shuffle_Deck(player):
 	player.Deck.shuffle()
 
-func Pop_Deck(Dueler, Deck_Type = "Main"):
+func Pop_Deck(Dueler, Deck_Type = "Main", pop_index = -1):
 	if Deck_Type == "Main":
-		Dueler.Deck.pop_back()
+		Dueler.Deck.pop_at(pop_index)
 	elif Deck_Type == "Tech":
-		Dueler.Tech_Deck.pop_back()
+		Dueler.Tech_Deck.pop_at(pop_index)
 
 func Reload_Deck(Deck_ID, MedBay_ID):
 	if len(Deck_ID) == 0 and len(MedBay_ID) > 0:

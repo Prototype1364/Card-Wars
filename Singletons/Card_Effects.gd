@@ -430,8 +430,8 @@ func Guardian(card):
 	var Reinforcers = Get_Field_Card_Data("Reinforcers Opponent")
 	
 	if Valid_Card and GameData.Target in Reinforcers:
-		GameData.Target.Health += (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus)
-		GameData.Attacker.Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus)
+		GameData.Target.Health += (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus - (GameData.Target.Fusion_Level - 1))
+		GameData.Attacker.Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus - (GameData.Target.Fusion_Level - 1))
 		GameData.Target.Update_Data()
 		GameData.Attacker.Update_Data()
 
@@ -439,17 +439,28 @@ func Humiliator(card):
 	pass		
 
 func Inspiration(card):
-	pass
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+
+	if Valid_Card and card.Effect_Active:
+		var Dueler = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+		var Dueler_Str = "Player" if GameData.Current_Turn == "Player" else "Enemy"
+		var Card_Index = Dice_Roll(Dueler.Tech_Deck.size()) - 1 # -1 to account for 0-indexing
+
+		# Add selected Tech card to Tech Zone & update Dueler's Tech_Zone Array (Tech_Deck is updated in BC.Pop_Deck func which is called in the Draw_Card signal handler)
+		if Dueler.Tech_Deck.size() > 0:
+			Dueler.Tech_Zone.append(Dueler.Tech_Deck[Card_Index])
+			SignalBus.emit_signal("Draw_Card", Dueler_Str, 1, "Tech", Card_Index)
 
 func Invincibility(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	
 	card.Invincible == true if Valid_Card else false
 
-func Juggernaut(card): # NOTE: This is just a strictly better effect than the current implementation of TailorMade (since it repeats every turn instead of just on summon)
+func Juggernaut(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+
 	if Valid_Card:
-		card.ATK_Bonus += card.ATK_Bonus
+		card.Attack *= 2
 		card.Update_Data()
 
 func Mimic(card):
@@ -505,7 +516,36 @@ func Retribution(card):
 		Fighter_Opp.Update_Data()
 
 func Spawn(card):
-	pass
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+
+	if Valid_Card and card.Effect_Active:
+		# Add Token to card
+		card.Tokens += 1
+		card.Update_Token_Info()
+
+		# Reduce Fighter_Opp's Health by 1 for every Token on card and capture if applicable
+		var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
+		
+		if Fighter_Opp != null:
+			Fighter_Opp.Health -= card.Tokens
+			Fighter_Opp.Update_Data()
+
+			if Fighter_Opp.Health <= 0:
+				SignalBus.emit_signal("Capture_Card", Fighter_Opp)
+	
+	# Neutralize damage taken using spawned tokens as shields. Barrage attacks will destroy tokens simultaneously.
+	elif On_Field(card) && Valid_Effect_Type(card):
+		if GameData.Current_Step == "Damage":
+			if card == GameData.Target and card.Tokens > 0:
+				var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
+				if GameData.Attacker.Multi_Strike == false:
+					GameData.Target.Health += (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus - (GameData.Target.Fusion_Level - 1))
+					card.Tokens -= 1
+				else:
+					GameData.Target.Health += (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus - (GameData.Target.Fusion_Level - 1))
+					card.Tokens = 0
+				GameData.Target.Update_Data()
+				card.Update_Token_Info()
 
 func Tailor_Made(card): # Currently just doubles ATK_Bonus when summoned (instead of Equip-specific stat boosts, like Hephestus' effect did originally). Eric claims more thinking needs to be done on this effect due to lameness.
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -536,7 +576,14 @@ func Blade_Song(card):
 		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 
 func Deep_Pit(card):
-	pass
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+
+	if Valid_Card and card.Tokens > 0 and GameData.Cards_Summoned_This_Turn.size() > 0:
+		for i in range(len(GameData.Cards_Summoned_This_Turn)):
+			var Parent_Name = GameData.Cards_Summoned_This_Turn[i].get_parent().name
+			if "Fighter" in Parent_Name:
+				SignalBus.emit_signal("Capture_Card", GameData.Cards_Summoned_This_Turn[i], "Inverted")
+				break
 
 func Disable(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -661,10 +708,46 @@ func Morale_Boost(card):
 		Dueler.Graveyard.append(card)
 
 func Prayer(card):
-	pass
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+
+	if Valid_Card and card.Effect_Active:
+		var Fighter = Get_Field_Card_Data("Fighter")
+		var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
+		var roll_result = Dice_Roll(6)
+
+		match roll_result:
+			1:
+				if Fighter_Opp != null:
+					Fighter_Opp.Attack += 3
+					Fighter_Opp.Update_Data()
+			2:
+				if Fighter != null:
+					Fighter.Attack += 3
+					Fighter.Update_Data()
+			3:
+				if Fighter_Opp != null:
+					Fighter_Opp.Health = Fighter_Opp.Revival_Health
+					Fighter_Opp.Update_Data()
+			4:
+				if Fighter != null:
+					Fighter.Health = Fighter.Revival_Health
+					Fighter.Update_Data()
+			5:
+				if Fighter != null:
+					Fighter.Paralysis = true
+			6:
+				if Fighter != null:
+					Fighter.Invincible = true
 
 func Resurrection(card):
-	pass
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	
+	if Valid_Card and card.Effect_Active:
+		var Card_Selector = load("res://Scenes/SupportScenes/card_selector.tscn").instantiate()
+		var Battle_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle")
+		Battle_Scene.add_child(Card_Selector)
+		Card_Selector.Determine_Card_List("MedBay", "TurnMedBay")
+		Card_Selector.Set_Effect_Card(card)
 
 func Runetouched(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false

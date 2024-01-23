@@ -50,8 +50,6 @@ signal Summon_Affordable
 
 signal Summon_Set_Pressed
 
-signal Flip_Field
-
 signal Flip_Duelist_HUDs
 
 signal Update_HUD_GameState
