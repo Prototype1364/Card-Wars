@@ -770,8 +770,6 @@ func Sword(card):
 		Fighter.Update_Data()
 
 """--------------------------------- Tech Effects ---------------------------------"""
-# Note: Eliminating the Valid_Card check here means the effect will only ever trigger once.
-# I'm not sure if this was how we wanted it to be for Tech Cards, but if not we can just add the check back in.
 func Fire(card):
 	if card.Effect_Active:
 		var Side = "W" if GameData.Current_Turn == "Player" else "B"
