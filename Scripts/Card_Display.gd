@@ -47,8 +47,12 @@ func LookAtCard(CardNode, FrameData, ArtData, NameData, AttackData, CostData, He
 				else:
 					$Description.text = SelectedCard.Short_Description
 			if SelectedCard.Type == "Normal" or SelectedCard.Type == "Hero":
-				$Attack.text = str(max(AttackData, 0))
-				$Health.text = str(max(HealthData, 0))
+				if GameData.FocusedCardParentName.left(1) == "W":
+					$Attack.text = str(max(SelectedCard.Attack + SelectedCard.ATK_Bonus + GameData.Player.Field_ATK_Bonus, 0))
+					$Health.text = str(max(SelectedCard.Health + SelectedCard.Health_Bonus + GameData.Player.Field_Health_Bonus, 0))
+				else:
+					$Attack.text = str(max(SelectedCard.Attack + SelectedCard.ATK_Bonus + GameData.Enemy.Field_ATK_Bonus, 0))
+					$Health.text = str(max(SelectedCard.Health + SelectedCard.Health_Bonus + GameData.Enemy.Field_Health_Bonus, 0))
 				$Attribute.texture = Attribute_Texture
 			else:
 				$Attack.text = ""
