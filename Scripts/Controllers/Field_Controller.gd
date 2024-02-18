@@ -130,6 +130,7 @@ func Play_Card(Base_Node, Side, Net_Cost):
 	
 	# Reparents Previous Equip Card Node (if applicable)
 	if Equip_Slot.get_child_count() > 0 and Reparent_Variables[2].Attribute == "Equip":
+		Dueler.Graveyard.append(Equip_Slot.get_child(0))
 		Reparent_Nodes(Equip_Slot.get_child(0), Graveyard)
 	
 	Reparent_Nodes(Reparent_Variables[2], Reparent_Variables[1])
@@ -139,6 +140,7 @@ func Play_Card(Base_Node, Side, Net_Cost):
 		
 	# Ensures that card summoned to Equip slot is not immediately sent to Graveyard.
 	if GameData.Chosen_Card.Type == "Magic" and not ("Equip" in GameData.Chosen_Card.get_parent().name) and GameData.Chosen_Card.Is_Set == false:
+		Dueler.Graveyard.append(Reparent_Variables[2])
 		Reparent_Nodes(Reparent_Variables[2], Graveyard)
 	
 	# Updates Card Summoned This Turn Array

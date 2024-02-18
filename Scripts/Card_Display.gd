@@ -7,7 +7,7 @@ func _ready():
 	var _HV1 = SignalBus.connect("LookAtCard", Callable(self, "LookAtCard"))
 	var _HV2 = SignalBus.connect("NotLookingAtCard", Callable(self, "NotLookingAtCard"))
 
-func LookAtCard(CardNode, FrameData, ArtData, NameData, AttackData, CostData, HealthData, AttributeData):
+func LookAtCard(CardNode, FrameData, ArtData, NameData, CostData, AttributeData):
 	SelectedCard = CardNode
 	self.visible = true
 	

@@ -2,6 +2,12 @@ extends Node
 
 class_name DeckController
 
+func Create_Card(cardPasscode):
+	for card in GameData.CardData:
+		if card["Passcode"] == cardPasscode:
+			var Created_Card = Card.new(card["CardType"], card["CardArt"], card["CardName"], card["CardType"], card["EffectType"], card["AnchorText"], card["ResolveSide"], card["ResolvePhase"], card["ResolveStep"], card["Attribute"], card["Description"], card["ShortDescription"], card["Attack"], 0, 0, card["Cost"], card["Health"], 0, 0, card["SpecialEditionText"], card["Rarity"], card["Passcode"], card["DeckCapacity"], 0, false, false, 1, false, false, false, false, false, false, false, false, "Game")
+			return Created_Card
+
 func Create_Deck(Deck_List, Current_Duelist):
 	for card in GameData.CardData:
 		if card["Passcode"] in GameData.Master_Deck_List["Decks"][Deck_List]:
@@ -20,7 +26,7 @@ func Create_Advance_Tech_Card():
 	for card in GameData.CardData:
 		if card["Passcode"] == 42489363:
 			Created_Card = Card.new(card["CardType"], card["CardArt"], card["CardName"], card["CardType"], card["EffectType"], card["AnchorText"], card["ResolveSide"], card["ResolvePhase"], card["ResolveStep"], card["Attribute"], card["Description"], card["ShortDescription"], card["Attack"], 0, 0, card["Cost"], card["Health"], 0, 0, card["SpecialEditionText"], card["Rarity"], card["Passcode"], card["DeckCapacity"], 0, false, false, 1, false, false, false, false, false, false, false, false, "Game")
-	
+
 	var random_number = Utils.RNGesus(1, 2)
 	if random_number == 1:
 		GameData.Player.Deck.append(Created_Card)

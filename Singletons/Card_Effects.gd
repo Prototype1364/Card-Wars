@@ -41,6 +41,7 @@ func Get_Field_Card_Data(Zone):
 	var Fighter
 	var Reinforcers = []
 	var Backrow_Cards = []
+	var MedBay_Cards = []
 	
 	if Zone == "Fighter":
 		var Fighter_Path = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Fighter")
@@ -80,6 +81,18 @@ func Get_Field_Card_Data(Zone):
 				if Card_To_Check.Type == "Trap":
 					Backrow_Cards.append(Backrow_Path_Opp.get_child(0))
 		return Backrow_Cards
+	elif Zone == "MedBay":
+		var MedBay_Path = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay")
+		if MedBay_Path.get_child_count() > 0:
+			for i in range(MedBay_Path.get_child_count()):
+				MedBay_Cards.append(MedBay_Path.get_child(i))
+		return MedBay_Cards
+	elif Zone == "MedBay Opponent":
+		var MedBay_Path_Opp = get_node("/root/SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opponent + "MedBay")
+		if MedBay_Path_Opp.get_child_count() > 0:
+			for i in range(MedBay_Path_Opp.get_child_count()):
+				MedBay_Cards.append(MedBay_Path_Opp.get_child(i))
+		return MedBay_Cards
 
 func Dice_Roll(d_type: int = 6):
 	var rng = RandomNumberGenerator.new()
@@ -185,7 +198,10 @@ func Ranged(card):
 		
 		if Ranged_On_Field:
 			Fighter.Target_Reinforcer = true
-			Fighter.Attacks_Remaining += 1
+			if Fighter.Relentless: # To account for the fact that relentless double the value of attacks remaining alterations
+				Fighter.Attacks_Remaining += 2
+			else:
+				Fighter.Attacks_Remaining += 1
 		else:
 			Fighter.Target_Reinforcer = false
 
@@ -196,9 +212,11 @@ func Scientist(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 
 	if Valid_Card:
-		var roll_result = Dice_Roll(12)
+		var roll_result = Dice_Roll(6)
+		var roll_result2 = Dice_Roll(6)
+		var sum_of_rolls = roll_result + roll_result2
 
-		if roll_result == 7:
+		if sum_of_rolls == 7:
 			var Dueler = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 			var Dueler_Str = "Player" if GameData.Current_Turn == "Player" else "Enemy"
 
@@ -328,7 +346,11 @@ func Barrage(card):
 func Behind_Enemy_Lines(card): # Name changed from Moonshot to be more descriptive of actual function.
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	
-	card.Direct_Attack == true if Valid_Card else false
+	if card.Effect_Active:
+		if Valid_Card:
+			card.Direct_Attack = true
+		else:
+			card.Direct_Attack = false
 
 func Conqueror(card):
 	pass
@@ -352,6 +374,9 @@ func Detonate(card):
 	else:
 		GameData.Auto_Spring_Traps = false	
 
+"""
+Make this effect a choice (eliminate the random element)
+"""
 func Disorient(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
@@ -477,6 +502,10 @@ func Paralysis(card):
 func Perfect_Copy(card):
 	pass
 
+"""
+Shouldn't this effect be periodic?
+Also, do we want to reimplement the Healing aspect of this effect now that we have the proper selector scene?
+"""
 func Poison(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Fighter = Get_Field_Card_Data("Fighter")
@@ -533,7 +562,7 @@ func Spawn(card):
 			if Fighter_Opp.Health <= 0:
 				SignalBus.emit_signal("Capture_Card", Fighter_Opp)
 	
-	# Neutralize damage taken using spawned tokens as shields. Barrage attacks will destroy tokens simultaneously.
+	# Neutralize damage taken using spawned tokens as shields. Barrage attacks will destroy all tokens simultaneously (and damage card).
 	elif On_Field(card) && Valid_Effect_Type(card):
 		if GameData.Current_Step == "Damage":
 			if card == GameData.Target and card.Tokens > 0:
@@ -542,18 +571,55 @@ func Spawn(card):
 					GameData.Target.Health += (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus - (GameData.Target.Fusion_Level - 1))
 					card.Tokens -= 1
 				else:
-					GameData.Target.Health += (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + enemy.Field_ATK_Bonus - (GameData.Target.Fusion_Level - 1))
 					card.Tokens = 0
 				GameData.Target.Update_Data()
 				card.Update_Token_Info()
 
-func Tailor_Made(card): # Currently just doubles ATK_Bonus when summoned (instead of Equip-specific stat boosts, like Hephestus' effect did originally). Eric claims more thinking needs to be done on this effect due to lameness.
+func Tailor_Made(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 
 	if Valid_Card and card.Effect_Active:
-		card.Effect_Active = false
-		card.ATK_Bonus += card.ATK_Bonus
-		card.Update_Data()
+		# Find all Equip cards
+		var options = []
+		for i in range(len(GameData.CardData)):
+			if (GameData.CardData[i]["CardType"] == "Magic" or GameData.CardData[i]["CardType"] == "Trap") and GameData.CardData[i]["Attribute"] == "Equip":
+				options.append(GameData.CardData[i])
+
+		# Choose 3 random cards from options array
+		var chosen_cards = []
+		for i in range(3):
+			var random_index = randi() % len(options)
+			chosen_cards.append(options[random_index])
+			options.pop_at(random_index)
+
+		# Instantiate and add chosen cards to Global_Card_Holder using passcode values from chosen_cards array
+		for i in range(len(chosen_cards)):
+			var BC = BattleController.new()
+			var DC = DeckController.new()
+			var InstanceCard = BC.Instantiate_Card()
+			var Destination_Deck = GameData.Global_Deck
+			var Equip_Card = DC.Create_Card(chosen_cards[i]["Passcode"])
+			Destination_Deck.append(Equip_Card)
+			InstanceCard.Set_Card_Variables(len(Destination_Deck) - 1, "AllCardsDB")
+			InstanceCard.Set_Card_Visuals()
+			Engine.get_main_loop().get_current_scene().get_node("Battle/Global_Card_Holder/").add_child(InstanceCard)
+			InstanceCard.Update_Data()
+
+		# Add Card Selector Scene
+		var Card_Selector = load("res://Scenes/SupportScenes/card_selector.tscn").instantiate()
+		var Battle_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle")
+		Battle_Scene.add_child(Card_Selector)
+		Card_Selector.Determine_Card_List("Global Cards", "AllCardsDB")
+		Card_Selector.Set_Effect_Card(card)
+
+		# Wait for the Confirm signal before clearing Global_Card_Holder array & Node
+		await SignalBus.Confirm
+
+		# Remove items from Global_Card_Holder array & Node
+		GameData.Global_Deck.clear()
+		var Global_Card_Holder = Engine.get_main_loop().get_current_scene().get_node("Battle/Global_Card_Holder/")
+		for i in range(Global_Card_Holder.get_child_count()):
+			Global_Card_Holder.get_child(0).queue_free()
 
 func Taunt(card):
 	pass
@@ -567,7 +633,7 @@ func Blade_Song(card):
 		var Card_Selector = load("res://Scenes/SupportScenes/card_selector.tscn").instantiate()
 		var Battle_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle")
 		Battle_Scene.add_child(Card_Selector)
-		Card_Selector.Determine_Card_List("Graveyard", "TurnGraveyard", "Graveyard")
+		Card_Selector.Determine_Card_List("Graveyard", "TurnGraveyard", "Graveyard", "Equip")
 		Card_Selector.Set_Effect_Card(card)
 
 		# Reparent Nodes
@@ -575,6 +641,9 @@ func Blade_Song(card):
 		var Destination_Node = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Graveyard")
 		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 
+"""
+Deep Pit functions properly but is not removed from the field after activation.
+"""
 func Deep_Pit(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 
@@ -678,7 +747,17 @@ func Last_Stand(card):
 func Miraculous_Recovery(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 
-	if Valid_Card and card.Effect_Active:
+	# Check if there are any cards in the MedBay
+	var MedBay = Get_Field_Card_Data("MedBay")
+	var MedBay_Opp = Get_Field_Card_Data("MedBay Opponent")
+	var MedBay_Cards = []
+	var MedBay_Cards_Opp = []
+	if MedBay != null:
+		MedBay_Cards.append(MedBay)
+	if MedBay_Opp != null:
+		MedBay_Cards_Opp.append(MedBay_Opp)
+
+	if Valid_Card and card.Effect_Active and len(MedBay_Cards + MedBay_Cards_Opp) > 0:
 		var Card_Selector = load("res://Scenes/SupportScenes/card_selector.tscn").instantiate()
 		var Battle_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle")
 		Battle_Scene.add_child(Card_Selector)

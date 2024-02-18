@@ -680,6 +680,12 @@ offset_bottom = 659.0
 grow_horizontal = 1
 grow_vertical = 1
 
+[node name="Global_Card_Holder" type="Control" parent="."]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
 [connection signal="gui_input" from="Playmat" to="." method="_on_Playmat_gui_input"]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WFighter" to="." method="_on_Card_Slot_pressed" binds= ["WFighter"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WEquipTrap" to="." method="_on_Card_Slot_pressed" binds= ["WEquipTrap"]]

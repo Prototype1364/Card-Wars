@@ -4,6 +4,7 @@ var CardData
 var Master_Deck_List
 
 # Duel Data
+var Global_Deck = []
 var Victor
 var Current_Turn = "Player"
 var Turn_Counter = 1
@@ -19,8 +20,8 @@ var Attacks_To_Launch = 0
 var Attacker
 var Target
 var For_Honor_And_Glory = false
-var Player = Duelist.new("Player",100,50,0,0,0,0,0,0,0,0,false,[],[],[],[],[],[],[],[],[],[],[],[])
-var Enemy = Duelist.new("Enemy",100,50,0,0,0,0,0,0,0,0,false,[],[],[],[],[],[],[],[],[],[],[],[])
+var Player = Duelist.new("Player",100,0,0,0,0,0,0,0,0,0,false,[],[],[],[],[],[],[],[],[],[],[],[])
+var Enemy = Duelist.new("Enemy",100,0,0,0,0,0,0,0,0,0,false,[],[],[],[],[],[],[],[],[],[],[],[])
 
 # Focus Card variables
 var FocusedCardName = ""

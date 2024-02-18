@@ -58,7 +58,7 @@ func Update_Game_State(State_To_Change):
 
 func Update_Game_Step():
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"	
 	
 	# Call required funcs at appropriate Steps (and contain step values within bounds of current Phase)
 	if GameData.Current_Step in EFFECT_STEPS: # Ensures that Card Effects are resolved when appropriate (moved to first if statement to ensure effects are resolved before step is handled [important for Damage step-related card efffects])
@@ -111,6 +111,7 @@ func Update_Game_Turn():
 		Conduct_End_Phase()
 		if GameData.Victor == null:
 			BC.Reset_Turn_Variables(PHASES, STEPS)
+			BC.Reset_Attacks_Remaining()
 			BC.Set_Turn_Player()
 			UI._on_SwitchSides_pressed()
 			UI.Flip_Duelist_HUDs()
@@ -247,7 +248,7 @@ func Setup_Game():
 	
 	# Draw Opening Hands
 	GameData.Current_Step = "Draw"
-	Draw_Card(GameData.Current_Turn, 35)
+	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
 	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"

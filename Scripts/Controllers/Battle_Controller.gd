@@ -135,7 +135,7 @@ func Activate_Summon_Effects(Chosen_Card):
 func Check_For_Targets(Fighter_Opp):
 	var player = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	
-	if len(Fighter_Opp) == 0:
+	if len(Fighter_Opp) == 0 or GameData.Attacker.Direct_Attack:
 		GameData.Target = player
 	
 	GameData.Current_Step = "Target"
@@ -148,7 +148,7 @@ func Direct_Attack_Automation():
 	# Signal emitted twice to ensure that Damage Step is conducted following successful Target selection
 	SignalBus.emit_signal("Update_GameState", "Step")
 	SignalBus.emit_signal("Update_GameState", "Step")
-	if player.Valid_Attackers == 0:
+	if player.Valid_Attackers == 0 or GameData.Attacker.Direct_Attack:
 		# Move to End Phase (no captures will happen following direct attack)
 		SignalBus.emit_signal("Update_GameState", "Phase")
 		# Attempt to End Turn (works if no discards are necessary)
@@ -176,6 +176,15 @@ func Reset_Turn_Variables(PHASES, STEPS):
 	GameData.Current_Step = STEPS[0]
 	GameData.Attacker = null
 	GameData.Target = null
+
+func Reset_Attacks_Remaining():
+	var Fighter = GameData.Player.Fighter if GameData.Current_Turn == "Player" else GameData.Enemy.Fighter
+	var Reinforcers = GameData.Player.Reinforcement if GameData.Current_Turn == "Player" else GameData.Enemy.Reinforcement
+
+	if len(Fighter) > 0:
+		Fighter[0].Update_Attacks_Remaining("Reset")
+	for i in len(Reinforcers):
+		Reinforcers[i].Update_Attacks_Remaining("Reset")
 
 func Set_Turn_Player():
 	if GameData.Turn_Counter != 1: # Ensures that the program doesn't switch the Turn_Player on the first Opening Phase of the Game.
@@ -256,7 +265,6 @@ func Capture_Card(attacking_player, defending_player, Card_Captured, Destination
 		defending_player.Reinforcers.erase(Card_Captured)
 	elif "Backrow" in Parent_Name:
 		defending_player.Backrow.erase(Card_Captured)
-	
 
 func Get_Destination_MedBay_on_Capture(Capture_Type) -> Node:
 	if Capture_Type == "Normal":

@@ -82,7 +82,8 @@ func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
 	"NonTurnReinforcers": player.Reinforcement,
 	"NonTurnEquipMagic": player.Equip_Magic,
 	"NonTurnEquipTrap": player.Equip_Trap,
-	"AllMedBays": combined_medbays}
+	"AllMedBays": combined_medbays,
+	"AllCardsDB": GameData.Global_Deck}
 
 	if card_sources.has(Source):
 		Name = card_sources[Source][Card_Index].Name
@@ -189,7 +190,7 @@ func Update_Token_Info():
 func focusing():
 	GameData.FocusedCardName = self.name
 	GameData.FocusedCardParentName = self.get_parent().name
-	SignalBus.emit_signal("LookAtCard", self, Frame, Art, Name, Attack, Cost, Health, Attribute)
+	SignalBus.emit_signal("LookAtCard", self, Frame, Art, Name, Cost, Attribute)
 
 func defocusing():
 	GameData.FocusedCardName = ""

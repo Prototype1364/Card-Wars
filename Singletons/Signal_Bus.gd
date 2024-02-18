@@ -36,10 +36,6 @@ signal Advance_Phase
 
 signal Advance_Turn
 
-
-
-
-"""NEW SIGNALS"""
 signal Activate_Summon_Effects
 
 signal Resolve_Card_Effects

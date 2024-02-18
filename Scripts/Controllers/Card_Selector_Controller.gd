@@ -2,13 +2,14 @@ extends Control
 
 var Current_Scene = Engine.get_main_loop().get_current_scene()
 var Card_Selected = null
+var Card_ID = null
 var Effect_Card = null
 var Card_Slot = null
 
 func _ready():
 	var _HV1 = SignalBus.connect("EffectTargetSelected", Callable(self, "On_Card_Selection"))
 
-func Determine_Card_List(selection_type, Card_Source, slot = null):
+func Determine_Card_List(selection_type, Card_Source, slot = null, Desired_Attribute = null):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 	var Selection_Source = []
@@ -45,6 +46,8 @@ func Determine_Card_List(selection_type, Card_Source, slot = null):
 		"All MedBays":
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "MedBay"))
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "MedBay"))
+		"Global Cards":
+			Selection_Source.append(Current_Scene.get_node("Battle/Global_Card_Holder"))
 
 
 	# Populate the list of cards to choose from
@@ -52,7 +55,11 @@ func Determine_Card_List(selection_type, Card_Source, slot = null):
 	for source in Selection_Source:
 		if source.get_child_count() > 0:
 			for i in source.get_children():
-				Card_List.append(i)
+				if Desired_Attribute != null:
+					if i.Attribute == Desired_Attribute:
+						Card_List.append(i)
+				else:
+					Card_List.append(i)
 	
 	if len(Card_List) == 0:
 		return
@@ -77,6 +84,7 @@ func Populate_Card_Options_List(Card_List, Card_Source):
 
 func On_Card_Selection(card):
 	Card_Selected = card
+	Card_ID = card.name
 
 func Set_Effect_Card(card):
 	Effect_Card = card
@@ -138,11 +146,15 @@ func _on_confirm_button_pressed():
 				Destination_Hand.add_child(Card_Node)
 	elif Effect_Card.Anchor_Text == "Miraculous_Recovery":
 		var Card_Index = $ScrollContainer/Effect_Target_List.get_children().find(Card_Selected)
-
+		
 		if Card_Index != -1:
 			var player_MedBay_Size = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay").get_child_count()
 			if Card_Index > player_MedBay_Size - 1:
-				var Card_Node = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay").get_child(Card_Index - player_MedBay_Size)
+				var Array_Of_Card_Names = []
+				for i in Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay").get_children():
+					Array_Of_Card_Names.append(i.name)
+				var Inner_Card_Index = Array_Of_Card_Names.find(Card_ID)
+				var Card_Node = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay").get_child(Inner_Card_Index)
 				var Source_MedBay = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay")
 				var Destination_Hand = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
 				var Dueler_Opp = GameData.Enemy if Side == "W" else GameData.Player
@@ -151,7 +163,11 @@ func _on_confirm_button_pressed():
 				Dueler_Opp.MedicalBay.erase(Card_Node)
 				Dueler_Opp.Hand.append(Card_Node)
 			else:
-				var Card_Node = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay").get_child(Card_Index)
+				var Array_Of_Card_Names = []
+				for i in Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay").get_children():
+					Array_Of_Card_Names.append(i.name)
+				var Inner_Card_Index = Array_Of_Card_Names.find(Card_ID)
+				var Card_Node = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay").get_child(Inner_Card_Index)
 				var Source_MedBay = Current_Scene.get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay")
 				var Destination_Hand = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
 				var Dueler = GameData.Player if Side == "W" else GameData.Enemy
@@ -194,9 +210,26 @@ func _on_confirm_button_pressed():
 					Dueler.Reinforcement.append(Card_Node)
 				"Hand":
 					Dueler.Hand.append(Card_Node)
+	elif Effect_Card.Anchor_Text == "Tailor_Made":
+		# Find index of card in current hand (Defaults to last card in hand if no card is selected)
+		var Card_Index = $ScrollContainer/Effect_Target_List.get_children().find(Card_Selected)
 
+		if Card_Index != -1:
+			var Card_Node = Current_Scene.get_node("Battle/Global_Card_Holder").get_child(Card_Index)
+			print(Card_Index)
+			print(Card_Node.Name)
+
+			# Move Card to proper hand
+			var Source_Node = Engine.get_main_loop().get_current_scene().get_node("Battle/Global_Card_Holder/")
+			var Destination_Hand = Current_Scene.get_node("Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
+
+			# Update Hands
+			Source_Node.remove_child(Card_Node)
+			Destination_Hand.add_child(Card_Node)
 	
-
+	# Emit signal to confirm card selection
+	SignalBus.emit_signal("Confirm")
+	
 	# Queue free the Card Selector scene from the scene tree
 	var Card_Selector_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle/CardSelector")
 	Card_Selector_Scene.queue_free()
