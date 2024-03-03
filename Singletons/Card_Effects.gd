@@ -133,24 +133,26 @@ func Creature(card):
 		# Get Field Card Data for Fighter and Reinforcers
 		var Fighter = Get_Field_Card_Data("Fighter")
 		var Cards_On_Field = Get_Field_Card_Data("Reinforcers")
-		Cards_On_Field.append(Fighter) # Required to do in two steps due to the fact that append returns null
+		if Fighter != null:
+			Cards_On_Field.append(Fighter) # Required to do in two steps due to the fact that append returns null
 
 		# Check if a copy of the card exists on the field
-		for i in Cards_On_Field:
-			if i.Name == card.Name and i != card:
-				# Perform Fusion Summon
-				i.Attack += card.Attack
-				i.Health += card.Health
-				i.Fusion_Level += 1
-				i.Update_Data()
+		if Cards_On_Field.size() > 0:
+			for i in Cards_On_Field:
+				if i.Name == card.Name and i != card:
+					# Perform Fusion Summon
+					i.Attack += card.Attack
+					i.Health += card.Health
+					i.Fusion_Level += 1
+					i.Update_Data()
 
-				# Reparent Nodes (to MedBay)
-				var Side = "W" if GameData.Current_Turn == "Player" else "B"
-				var Destination_Node = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Banished")
-				SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
+					# Reparent Nodes (to MedBay)
+					var Side = "W" if GameData.Current_Turn == "Player" else "B"
+					var Destination_Node = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Banished")
+					SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 
-				# End loop
-				break
+					# End loop
+					break
 
 func Cryptid(card):
 	pass
@@ -257,7 +259,7 @@ func Support(card):
 			card.Update_Data()
 
 			# Capture card if it dies
-			if card.Health <= 0:
+			if card.Get_Total_Health() <= 0:
 				SignalBus.emit_signal("Capture_Card", card, "Inverted")
 
 func Titan(card):
@@ -308,6 +310,9 @@ func Wizard(card):
 		var Button_Selector_Scene = load("res://Scenes/SupportScenes/Button_Selector.tscn").instantiate()
 		var Card_Scene = Engine.get_main_loop().get_current_scene().get_node(card.get_path())
 		Card_Scene.add_child(Button_Selector_Scene)
+		
+		Button_Selector_Scene.Get_Active_Card_Effects()
+		Button_Selector_Scene.Add_Buttons()
 
 		# Wait for the Confirm signal to be emitted using await
 		await SignalBus.Confirm
@@ -341,7 +346,8 @@ func Atrocity(card):
 func Barrage(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	
-	card.Multi_Strike == true if Valid_Card else false
+	if Valid_Card:
+		card.Multi_Strike = true
 
 func Behind_Enemy_Lines(card): # Name changed from Moonshot to be more descriptive of actual function.
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -363,16 +369,11 @@ func Defiance(card):
 
 func Detonate(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 		
 	if Valid_Card:
-		GameData.Auto_Spring_Traps = true
 		var Trap_Cards = Get_Field_Card_Data("Traps")
-		var Battle_Script = load("res://Scripts/Controllers/Battle_Controller.gd").new()
 		for i in range(len(Trap_Cards)):
-			Battle_Script.Activate_Set_Card(Side, Trap_Cards[i])
-	else:
-		GameData.Auto_Spring_Traps = false	
+			Trap_Cards[i].Tokens += 1
 
 """
 Make this effect a choice (eliminate the random element)
@@ -406,10 +407,15 @@ func Expansion(card):
 	pass
 
 func Faithful(card):
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var Valid_Card = true if On_Field(card) && Valid_Effect_Type(card) else false
 	var Reinforcers = Get_Field_Card_Data("Reinforcers")
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Parent_Name = card.get_parent().name.left(1)
 	
-	card.Immortal == true if Valid_Card and Reinforcers.size() >= 3 else false
+	if (Valid_Card and Reinforcers.size() >= 3) and Side == Parent_Name:
+		card.Immortal = true
+	elif (Reinforcers.size() < 3 or On_Field(card) == false) and Side == Parent_Name:
+		card.Immortal = false
 
 func For_Honor_And_Glory(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -479,7 +485,10 @@ func Inspiration(card):
 func Invincibility(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	
-	card.Invincible == true if Valid_Card else false
+	if Valid_Card:
+		card.Invincible = true
+	elif On_Field(card) == false or Valid_Effect_Type(card) == false:
+		card.Invincible = false
 
 func Juggernaut(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -502,18 +511,130 @@ func Paralysis(card):
 func Perfect_Copy(card):
 	pass
 
-"""
-Shouldn't this effect be periodic?
-Also, do we want to reimplement the Healing aspect of this effect now that we have the proper selector scene?
-"""
 func Poison(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	var Fighter = Get_Field_Card_Data("Fighter")
-	
-	if Valid_Card and card.Effect_Active and card == Fighter:
-		GameData.Target.Burn_Damage += card.Toxicity
-		GameData.Target.Health -= GameData.Target.Burn_Damage
-		GameData.Target.Update_Data()
+
+	if Valid_Card and card.Effect_Active:
+		# Add Button_Selector scene as child of card to allow for selection
+		var Button_Selector_Scene = load("res://Scenes/SupportScenes/Button_Selector.tscn").instantiate()
+		var Card_Scene = Engine.get_main_loop().get_current_scene().get_node(card.get_path())
+		Card_Scene.add_child(Button_Selector_Scene)
+
+		# Choose to Heal or Poison a Target
+		Button_Selector_Scene.Get_Custom_Options(['Heal', 'Poison'])
+		Button_Selector_Scene.Add_Buttons()
+
+		# Wait for the Confirm signal to be emitted using await
+		await SignalBus.Confirm
+
+		# Get Chosen Effect text
+		var chosen_effect = Button_Selector_Scene.Get_Text()
+
+		if chosen_effect == "Heal":
+			# Populate Cards_On_Field array
+			var Fighter = Get_Field_Card_Data("Fighter")
+			var Reinforcers = Get_Field_Card_Data("Reinforcers")
+			var Cards_On_Field = Reinforcers
+			if Fighter != null:
+				Cards_On_Field.append(Fighter) # Required to do in two steps due to the fact that append returns null
+			
+			# Load Card Selector Scene if more than 1 target is available
+			if Cards_On_Field.size() > 1:
+				# Create a popup scene to allow the selection of the target to heal
+				var Card_Selector = load("res://Scenes/SupportScenes/card_selector.tscn").instantiate()
+				var Battle_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle")
+				Battle_Scene.add_child(Card_Selector)
+				Card_Selector.Determine_Card_List("Field (All)", "TurnField")
+				Card_Selector.Set_Effect_Card(card)
+
+				# Wait for the Confirm signal to be emitted using await
+				await SignalBus.Confirm
+
+				# Get Chosen Target
+				var chosen_target = Card_Selector.Get_Card()
+				var Valid_Target = false
+
+				# Find parent of chosen_target
+				if chosen_target.name == Fighter.name:
+					chosen_target = Fighter
+					Valid_Target = true
+				else:
+					for i in range(len(Reinforcers)):
+						if chosen_target.name == Reinforcers[i].name:
+							chosen_target = Reinforcers[i]
+							Valid_Target = true
+							break
+
+				# Resolve Effect if chosen_target is valid
+				if Valid_Target:
+					chosen_target.Health += card.Toxicity
+					chosen_target.Update_Data()
+			else: # Automates selection process if only 1 target is available
+				if Cards_On_Field.size() > 0:
+					Cards_On_Field[0].Health += card.Toxicity
+					Cards_On_Field[0].Update_Data()
+		elif chosen_effect == "Poison":
+			# Populate Cards_On_Field array
+			var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
+			var Reinforcers_Opp = Get_Field_Card_Data("Reinforcers Opponent")
+			var Cards_On_Field = Reinforcers_Opp
+			if Fighter_Opp != null:
+				Cards_On_Field.append(Fighter_Opp) # Required to do in two steps due to the fact that append returns null
+			
+			# Load Card Selector Scene if more than 1 target is available
+			if Cards_On_Field.size() > 1:
+				# Create a popup scene to allow the selection of the target to poison
+				var Card_Selector = load("res://Scenes/SupportScenes/card_selector.tscn").instantiate()
+				var Battle_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle")
+				Battle_Scene.add_child(Card_Selector)
+				Card_Selector.Determine_Card_List("Opponent Field (All)", "NonTurnField")
+				Card_Selector.Set_Effect_Card(card)
+
+				# Wait for the Confirm signal to be emitted using await
+				await SignalBus.Confirm
+
+				# Get Chosen Target
+				var chosen_target = Card_Selector.Get_Card()
+				var Valid_Target = false
+
+				# Find parent of chosen_target
+				if chosen_target.name == Fighter_Opp.name:
+					chosen_target = Fighter_Opp
+					Valid_Target = true
+				else:
+					for i in range(len(Reinforcers_Opp)):
+						if chosen_target.name == Reinforcers_Opp[i].name:
+							chosen_target = Reinforcers_Opp[i]
+							Valid_Target = true
+							break
+
+				# Resolve Effect if chosen_target is valid
+				if Valid_Target:
+					chosen_target.Burn_Damage += card.Toxicity
+					chosen_target.Health -= chosen_target.Burn_Damage
+					chosen_target.Update_Data()
+
+					# Capture card if it dies
+					if chosen_target.Get_Total_Health() <= 0 and chosen_target.Immortal == false:
+						SignalBus.emit_signal("Capture_Card", chosen_target, "Inverted")
+			else: # Automates selection process if only 1 target is available
+				var Fighter = Get_Field_Card_Data("Fighter")
+				if Cards_On_Field.size() > 0:
+					if Fighter != null:
+						if Valid_Card and card.Effect_Active and card == Fighter:
+							Cards_On_Field[0].Burn_Damage += card.Toxicity
+							Cards_On_Field[0].Health -= Cards_On_Field[0].Burn_Damage
+							Cards_On_Field[0].Update_Data()
+
+							# Capture card if it dies
+							if Cards_On_Field[0].Get_Total_Health() <= 0 and Cards_On_Field[0].Immortal == false:
+								SignalBus.emit_signal("Capture_Card", Cards_On_Field[0], "Inverted")
+		
+		# Remove Scene
+		Button_Selector_Scene.Remove_Scene()
+
+		# Ensures that the effect is only used once per turn (after the turn it was first summoned)
+		card.Effect_Active = false
 
 func Reformation(card):
 	pass
@@ -559,7 +680,7 @@ func Spawn(card):
 			Fighter_Opp.Health -= card.Tokens
 			Fighter_Opp.Update_Data()
 
-			if Fighter_Opp.Health <= 0:
+			if Fighter_Opp.Get_Total_Health() <= 0:
 				SignalBus.emit_signal("Capture_Card", Fighter_Opp)
 	
 	# Neutralize damage taken using spawned tokens as shields. Barrage attacks will destroy all tokens simultaneously (and damage card).
@@ -641,17 +762,16 @@ func Blade_Song(card):
 		var Destination_Node = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Graveyard")
 		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 
-"""
-Deep Pit functions properly but is not removed from the field after activation.
-"""
 func Deep_Pit(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var Side = "B" if GameData.Current_Turn == "Player" else "W"
 
 	if Valid_Card and card.Tokens > 0 and GameData.Cards_Summoned_This_Turn.size() > 0:
 		for i in range(len(GameData.Cards_Summoned_This_Turn)):
 			var Parent_Name = GameData.Cards_Summoned_This_Turn[i].get_parent().name
 			if "Fighter" in Parent_Name:
 				SignalBus.emit_signal("Capture_Card", GameData.Cards_Summoned_This_Turn[i], "Inverted")
+				SignalBus.emit_signal("Activate_Set_Card", Side, card) # Duelist Arrays are updated here
 				break
 
 func Disable(card):
@@ -706,12 +826,11 @@ func Heart_of_the_Underdog(card):
 		if damage_dealt >= GameData.Target.Health and damage_dealt < GameData.Target.Health + 7: # Ensures trap only activates when it would save the Target from Capture
 			var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 			var Destination_Node = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "Graveyard")
-			var player = GameData.Player if card.get_parent().name.left(1) == "W" else GameData.Enemy
 			GameData.Target.Health += 7
 			GameData.Target.Update_Data()
 
 			SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
-			player.Graveyard.append(card)
+			SignalBus.emit_signal("Activate_Set_Card", Side_Opp, card) # Duelist Arrays are updated here
 
 func Last_Stand(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false

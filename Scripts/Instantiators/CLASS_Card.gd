@@ -32,7 +32,7 @@ var Effect_Active # Primarily used to determine if cards with Summon Effects hav
 var Fusion_Level # Refers to the number of cards it is Fused with (defaults to 1 as it'll allow for easier multiplication of Attack/Health stats). Knights of the Round Table is the first card to have this ability.
 var Attack_As_Reinforcement # Refers to a card's ability to launch an attack from a Reinforcement slot. Mongols (when led by Ghenghis Khan) is the first card to have this ability.
 var Immortal # Refers to whether a card can be captured with 0 HP. Demeter (in SAP version) is the first card to have this effect.
-var Invincible # Refers to a card that cannot be captured in Battle. It must be defeated by a Hero/Magic/Trap/Tech card's effects. "The Level Beyond" is the first card to have this ability.
+var Invincible # Refers to a card that cannot take Battle Damage. It must be defeated by a Hero/Magic/Trap/Tech card's effects. "The Level Beyond" is the first card to have this ability.
 var Relentless # Refers to a card that gains double bonus on any alteration to its Attacks_Remaining variable (including the turn reset). King Leonidas was the first card to have this ability.
 var Multi_Strike # Refers to a card's ability to deal damage to cards in the opponent's Reinforcement zone (Zeus is the first card to have this ability).
 var Target_Reinforcer # Refers to a card's ability to choose to target an opponent in a reinforcement slot instead of the opposing Fighter (Poseidon is the first card to have this ability).

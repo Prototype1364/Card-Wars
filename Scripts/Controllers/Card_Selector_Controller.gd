@@ -25,6 +25,11 @@ func Determine_Card_List(selection_type, Card_Source, slot = null, Desired_Attri
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "TechDeck"))
 		"Field":
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + slot))
+		"Field (All)":
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "Fighter"))
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "R1"))
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "R2"))
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "R3"))
 		"MedBay":
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "MedBay"))
 		"Graveyard":
@@ -37,6 +42,11 @@ func Determine_Card_List(selection_type, Card_Source, slot = null, Desired_Attri
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "TechDeck"))
 		"Opponent Field":
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + slot))
+		"Opponent Field (All)":
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "Fighter"))
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "R1"))
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "R2"))
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "R3"))
 		"Opponent MedBay":
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "MedBay"))
 		"Opponent Graveyard":
@@ -68,23 +78,31 @@ func Determine_Card_List(selection_type, Card_Source, slot = null, Desired_Attri
 
 func Populate_Card_Options_List(Card_List, Card_Source):
 	for i in len(Card_List):
-		if Card_List[i].Frame == "Special":
-			continue
-		else:
-			var original = Card_List[i]
-			var copy = original.duplicate()
-			$ScrollContainer/Effect_Target_List.add_child(copy)
-			for n in original.get_property_list():
-				var PropertyName = n["name"]
-				var value = original.get_indexed(PropertyName)
-				copy.set_indexed(PropertyName,value)
-			copy.Set_Card_Variables(i, Card_Source)
-			copy.Set_Card_Visuals()
-			copy.Update_Data()
+		var original = Card_List[i]
+		var copy = original.duplicate()
+		$ScrollContainer/Effect_Target_List.add_child(copy)
+		for n in original.get_property_list():
+			var PropertyName = n["name"]
+			var value = original.get_indexed(PropertyName)
+			copy.set_indexed(PropertyName,value)
+		copy.Set_Card_Variables(i, Card_Source)
+		copy.Set_Card_Visuals()
+		copy.Update_Data()
+		
+		# Hides Advance Tech Card from list (but still spawns it to ensure correct card is chosen from Card_Selector scene)
+		if original.Frame == "Special":
+			copy.visible = false
+		
+		# Hide Button Selector Scene if present
+		if copy.has_node("ButtonSelector"):
+			copy.get_node("ButtonSelector").visible = false
 
 func On_Card_Selection(card):
 	Card_Selected = card
 	Card_ID = card.name
+
+func Get_Card():
+	return Card_Selected
 
 func Set_Effect_Card(card):
 	Effect_Card = card

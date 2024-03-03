@@ -290,6 +290,7 @@ func Conduct_Opening_Phase():
 func Conduct_Standby_Phase():
 	# Standby Phase (Effect -> Token)
 	BC.Set_Hero_Card_Effect_Status() # Sets the Effect_Active of all Periodic-style Hero cards on the turn player's field == True
+	BC.Resolve_Burn_Damage() # Resolves Burn Damage from any active Burn Effects
 	Update_Game_State("Step")
 	Add_Tokens()
 	Update_Game_State("Phase")
@@ -401,6 +402,9 @@ func Conduct_End_Phase():
 		print("VICTORY")
 		print(GameData.Victor + " wins!")
 		return
+
+	# HACK: Close out any card effects that are still stuck awaiting the Confirm signal
+	SignalBus.emit_signal("Confirm")
 	
 	# End Step
 	GameData.Current_Step = "End"

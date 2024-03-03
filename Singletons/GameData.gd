@@ -38,7 +38,6 @@ var CardSwitched = ""
 # Card Effect Resolution variables
 var Resolve_On_Opposing_Card = false
 var Muggle_Mode = false
-var Auto_Spring_Traps = false
 
 # Variable used to name Card nodes
 var CardCounter = 0

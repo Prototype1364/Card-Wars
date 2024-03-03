@@ -6,8 +6,6 @@ extends Control
 
 func _ready():
 	var _HV1 = SignalBus.connect("Button_Selected", Callable(self, "On_Button_Selection"))
-	Get_Active_Card_Effects()
-	Add_Buttons()
 
 func Get_Active_Card_Effects():
 	var active_effects_dict = {}
@@ -15,6 +13,14 @@ func Get_Active_Card_Effects():
 
 	for card in active_decks:
 		active_effects_dict[card.Anchor_Text] = true
+
+	Active_Effects = active_effects_dict.keys()
+
+func Get_Custom_Options(options):
+	var active_effects_dict = {}
+	
+	for option in options:
+		active_effects_dict[option] = true
 
 	Active_Effects = active_effects_dict.keys()
 

@@ -212,10 +212,40 @@ func Set_Hero_Card_Effect_Status():
 			if card.Type == "Hero":
 				card.Effect_Active = true
 
+func Resolve_Burn_Damage():
+	var Cards_On_Field_Player = GameData.Player.Fighter + GameData.Player.Reinforcement
+	var Cards_On_Field_Enemy = GameData.Enemy.Fighter + GameData.Enemy.Reinforcement
+	var Cards_On_Either_Field = Cards_On_Field_Player + Cards_On_Field_Enemy
+
+	# Loop through all cards on appropriate side of field and apply burn damage
+	if GameData.Current_Turn == "Player":
+		for i in range(len(Cards_On_Field_Enemy)):
+			Cards_On_Field_Enemy[i].Health -= Cards_On_Field_Enemy[i].Burn_Damage
+			Cards_On_Field_Enemy[i].Update_Data()
+	else:
+		for i in range(len(Cards_On_Field_Player)):
+			Cards_On_Field_Player[i].Health -= Cards_On_Field_Player[i].Burn_Damage
+			Cards_On_Field_Player[i].Update_Data()
+
+	# Check all cards on field for 0 health and capture them if needed
+	for i in range(len(Cards_On_Either_Field)):
+		print(Cards_On_Either_Field[i].Name + " has " + str(Cards_On_Either_Field[i].Get_Total_Health()) + " health.")
+		if Cards_On_Either_Field[i].Get_Total_Health() <= 0 and Cards_On_Either_Field[i].Immortal == false:
+			SignalBus.emit_signal("Capture_Card", Cards_On_Either_Field[i])
+
 func Activate_Set_Card(Chosen_Card):
-	if (Chosen_Card.Type == "Magic" and GameData.Muggle_Mode == false) or ((Chosen_Card.Type == "Trap" and (Chosen_Card.Tokens > 0 or GameData.Auto_Spring_Traps))):
+	if (Chosen_Card.Type == "Magic" and GameData.Muggle_Mode == false) or ((Chosen_Card.Type == "Trap" and Chosen_Card.Tokens > 0)):
 		var AnchorText = Chosen_Card.Anchor_Text
 		CardEffects.call(AnchorText, Chosen_Card)
+
+		# Reparent Nodes & Update Dueler Arrays
+		var Player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+		var Side = "W" if GameData.Current_Turn == "Player" else "B"
+		var Source_Node = Chosen_Card
+		var Destination_Node = Node_BGraveyard if Side == "W" else Node_WGraveyard
+		Player.Graveyard.append(Chosen_Card)
+		Player.Backrow.erase(Chosen_Card)
+		SignalBus.emit_signal("Reparent_Nodes", Source_Node, Destination_Node)
 
 func Resolve_Battle_Damage(Reinforcers_Opp, player, enemy):
 	if GameData.Attacker != null and GameData.Target != null: # Ensures no error is thrown when func is called with empty player field.
@@ -234,13 +264,13 @@ func Resolve_Battle_Damage(Reinforcers_Opp, player, enemy):
 						for i in range(len(Reinforcers_Opp)):
 							Reinforcers_Opp[i].Health -= (GameData.Attacker.Attack + GameData.Attacker.ATK_Bonus + player.Field_ATK_Bonus - (GameData.Target.Fusion_Level - 1))
 							Reinforcers_Opp[i].Update_Data()
-							if Reinforcers_Opp[i].Health <= 0 and Reinforcers_Opp[i].Immortal == false:
+							if Reinforcers_Opp[i].Get_Total_Health() <= 0 and Reinforcers_Opp[i].Immortal == false:
 								GameData.Current_Step = "Capture"
 								SignalBus.emit_signal("Capture_Card", Reinforcers_Opp[i])
 								GameData.Current_Step = "Damage"
 			
 			# Capture Step
-			if GameData.Target.Health <= 0 and GameData.Target.Immortal == false:
+			if GameData.Target.Get_Total_Health() <= 0 and GameData.Target.Immortal == false:
 				GameData.Current_Step = "Capture"
 				SignalBus.emit_signal("Capture_Card", GameData.Target)
 
@@ -262,7 +292,7 @@ func Capture_Card(attacking_player, defending_player, Card_Captured, Destination
 	elif "EquipTrap" in Parent_Name:
 		defending_player.Equip_Trap.erase(Card_Captured)
 	elif "R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name:
-		defending_player.Reinforcers.erase(Card_Captured)
+		defending_player.Reinforcement.erase(Card_Captured)
 	elif "Backrow" in Parent_Name:
 		defending_player.Backrow.erase(Card_Captured)
 

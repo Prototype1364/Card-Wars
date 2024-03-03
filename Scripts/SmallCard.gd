@@ -60,6 +60,8 @@ func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
 	var combined_medbays = player.MedicalBay + enemy.MedicalBay
+	var non_turn_field = enemy.Fighter + enemy.Reinforcement if GameData.Current_Turn == "Player" else player.Fighter + player.Reinforcement
+	var turn_field = player.Fighter + player.Reinforcement if GameData.Current_Turn == "Player" else enemy.Fighter + enemy.Reinforcement
 	
 	var card_sources = {
 	"TurnHand": player.Hand,
@@ -83,6 +85,8 @@ func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
 	"NonTurnEquipMagic": player.Equip_Magic,
 	"NonTurnEquipTrap": player.Equip_Trap,
 	"AllMedBays": combined_medbays,
+	"NonTurnField": non_turn_field,
+	"TurnField": turn_field,
 	"AllCardsDB": GameData.Global_Deck}
 
 	if card_sources.has(Source):
@@ -124,7 +128,7 @@ func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
 		Paralysis = card_sources[Source][Card_Index].Paralysis
 		Direct_Attack = card_sources[Source][Card_Index].Direct_Attack
 		Owner = card_sources[Source][Card_Index].Owner
-		
+	
 	if "Tech" in Source:
 		Cost_Path = null
 	else:
@@ -255,6 +259,10 @@ func _on_FocusSensor_pressed(): # FIXME: Might need to be split into multiple fu
 		GameData.CardFrom = Parent_Name
 		GameData.CardMoved = self.name
 
+	# Allows user to re-open card Effect scenes during turn
+	if Parent_Name.left(1) == Side:
+		CardEffects.call(Anchor_Text, self)
+
 func Valid_Attacker_Selection(Reposition_Zones, Reinforcement_Zones, Parent_Name, Side) -> bool:
 	if (Reposition_Zones[0] in Parent_Name or (Attack_As_Reinforcement == true and Reinforcement_Zones.has(Parent_Name))) and Parent_Name.left(1) == Side and Paralysis == false:
 		return true
@@ -315,3 +323,22 @@ func _on_Hide_Action_Buttons_pressed(_event):
 		$Action_Button_Container/Summon.visible = false
 		$Action_Button_Container/Set.visible = false
 		$Action_Button_Container/Target.visible = false
+
+func Get_Total_Health():
+	var Dueler = null
+	var Total_Health = 0
+	var Parent_Name = self.get_parent().name
+	var Player_Field_Slot_Names = ["WFighter", "WR1", "WR2", "WR3"]
+	var Enemy_Field_Slot_Names = ["BFighter", "BR1", "BR2", "BR3"]
+	
+	if Parent_Name in Player_Field_Slot_Names:
+		Dueler = GameData.Player
+	elif Parent_Name in Enemy_Field_Slot_Names:
+		Dueler = GameData.Enemy
+
+	if Dueler != null:
+		Total_Health = Health + Health_Bonus + Dueler.Field_Health_Bonus
+	else:
+		Total_Health = Health + Health_Bonus
+
+	return Total_Health

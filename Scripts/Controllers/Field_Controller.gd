@@ -26,6 +26,7 @@ func Reparent_Nodes(Source_Node, Destination_Node):
 	Source_Node.set_position(Vector2.ZERO)
 	Source_Node.get_parent().remove_child(Source_Node)
 	Destination_Node.add_child(Source_Node)
+	Source_Node.set_position(Vector2.ZERO)
 
 func Set_Focus_Neighbors(Focus_To_Set, Side, Node_To_Set_For):
 	if Focus_To_Set == "Hand":
