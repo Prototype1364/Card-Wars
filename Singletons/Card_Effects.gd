@@ -337,11 +337,12 @@ func Atrocity(card):
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 	var MedBay_Opp = Battle_Scene.get_node("Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay")
 	
-	if Valid_Card and MedBay_Opp.get_child_count() > 0:
+	if Valid_Card and MedBay_Opp.get_child_count() > 0 and card.Effect_Active:
 		var Card_Selector = load("res://Scenes/SupportScenes/card_selector.tscn").instantiate()
 		Battle_Scene.add_child(Card_Selector)
 		Card_Selector.Determine_Card_List("Opponent MedBay", "NonTurnMedBay")
 		Card_Selector.Set_Effect_Card(card)
+		card.Effect_Active = false
 
 func Barrage(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -375,28 +376,62 @@ func Detonate(card):
 		for i in range(len(Trap_Cards)):
 			Trap_Cards[i].Tokens += 1
 
-"""
-Make this effect a choice (eliminate the random element)
-"""
 func Disorient(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Fighter_Opp = Get_Field_Card_Data("Fighter Opponent")
 	var Reinforcers_Opp = Get_Field_Card_Data("Reinforcers Opponent")
-	
+
 	if Fighter_Opp != null:
-		if Valid_Card and Reinforcers_Opp.size() > 0:
-			# Randomly Choose Replacement Reinforcer
-			var rng = RandomNumberGenerator.new()
-			rng.randomize()
-			var roll_result = rng.randi_range(0,Reinforcers_Opp.size() - 1)
-			
-			# Reparent Nodes
-			var Fighter_Parent = Fighter_Opp.get_parent()
-			var Reinforcer_Parent = Reinforcers_Opp[roll_result].get_parent()
-			Fighter_Parent.remove_child(Fighter_Opp)
-			Reinforcer_Parent.remove_child(Reinforcers_Opp[roll_result])
-			Fighter_Parent.add_child(Reinforcers_Opp[roll_result])
-			Reinforcer_Parent.add_child(Fighter_Opp)
+		if Valid_Card:
+			# Load Card Selector Scene if more than 1 target is available
+			if Reinforcers_Opp.size() > 1:
+				# Create a popup scene to allow the selection of the target to switch
+				var Card_Selector = load("res://Scenes/SupportScenes/card_selector.tscn").instantiate()
+				var Battle_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle")
+				Battle_Scene.add_child(Card_Selector)
+				Card_Selector.Determine_Card_List("Opponent Reinforcers", "NonTurnReinforcers")
+				Card_Selector.Set_Effect_Card(card)
+
+				# Wait for the Confirm signal to be emitted using await
+				await SignalBus.Confirm
+
+				# Get Chosen Target
+				var chosen_target = Card_Selector.Get_Card()
+				var Valid_Target = false
+
+				# Find original copy of chosen_target
+				for i in range(len(Reinforcers_Opp)):
+					if chosen_target.name == Reinforcers_Opp[i].name:
+						chosen_target = Reinforcers_Opp[i]
+						Valid_Target = true
+						break
+
+				# Resolve Effect, Reparent Nodes, and Update Dueler Arrays
+				if Valid_Target:
+					var Dueler_Opp = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
+					var Fighter_Parent = Fighter_Opp.get_parent()
+					var Reinforcer_Parent = chosen_target.get_parent()
+					Dueler_Opp.Fighter.erase(Fighter_Opp)
+					Dueler_Opp.Fighter.append(chosen_target)
+					Dueler_Opp.Reinforcement.erase(chosen_target)
+					Dueler_Opp.Reinforcement.append(Fighter_Opp)
+					Fighter_Parent.remove_child(Fighter_Opp)
+					Reinforcer_Parent.remove_child(chosen_target)
+					Fighter_Parent.add_child(chosen_target)
+					Reinforcer_Parent.add_child(Fighter_Opp)
+			else: # Automates selection process if only 1 target is available
+				if Reinforcers_Opp.size() > 0:
+					var Dueler_Opp = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
+					var Fighter_Parent = Fighter_Opp.get_parent()
+					var Reinforcer_Parent = Reinforcers_Opp[0].get_parent()
+					Dueler_Opp.Fighter.erase(Fighter_Opp)
+					Dueler_Opp.Fighter.append(Reinforcers_Opp[0])
+					Dueler_Opp.Reinforcement.erase(Reinforcers_Opp[0])
+					Dueler_Opp.Reinforcement.append(Fighter_Opp)
+					Fighter_Parent.remove_child(Fighter_Opp)
+					Reinforcer_Parent.remove_child(Reinforcers_Opp[0])
+					Fighter_Parent.add_child(Reinforcers_Opp[0])
+					Reinforcer_Parent.add_child(Fighter_Opp)
 
 func Earthbound(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false

@@ -80,13 +80,13 @@ func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
 	"NonTurnMedBay": enemy.MedicalBay,
 	"NonTurnGraveyard": enemy.Graveyard,
 	"NonTurnBanished": enemy.Banished,
-	"NonTurnFighter": player.Fighter,
-	"NonTurnReinforcers": player.Reinforcement,
-	"NonTurnEquipMagic": player.Equip_Magic,
-	"NonTurnEquipTrap": player.Equip_Trap,
+	"NonTurnFighter": enemy.Fighter,
+	"NonTurnReinforcers": enemy.Reinforcement,
+	"NonTurnEquipMagic": enemy.Equip_Magic,
+	"NonTurnEquipTrap": enemy.Equip_Trap,
 	"AllMedBays": combined_medbays,
-	"NonTurnField": non_turn_field,
 	"TurnField": turn_field,
+	"NonTurnField": non_turn_field,
 	"AllCardsDB": GameData.Global_Deck}
 
 	if card_sources.has(Source):
@@ -218,7 +218,7 @@ func _on_FocusSensor_pressed(): # FIXME: Might need to be split into multiple fu
 					CardEffects.call(Anchor_Text, self)
 			elif "Hand" in Parent_Name:
 				$Action_Button_Container/Summon.visible = true
-				$Action_Button_Container/Set.visible = true
+				$Action_Button_Container/Set.visible = true if Type == "Trap" else false
 			elif Parent_Name in Reposition_Zones and GameData.Chosen_Card == null:
 				GameData.Chosen_Card = self
 			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene

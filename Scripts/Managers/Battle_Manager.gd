@@ -82,6 +82,8 @@ func Update_Game_Step():
 		GameData.Current_Step = STEPS[STEPS.find(GameData.Current_Step) + 1]
 
 func Update_Game_Phase():
+	var Dueler = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+
 	if PHASES.find(GameData.Current_Phase) + 1 >= len(PHASES): # Ensures game doesn't crash when trying to advance to a non-existent Phase.
 		return
 	elif GameData.Turn_Counter == 1 and PHASES.find(GameData.Current_Phase) == 2: # Skips Battle Phase on first turn of game
@@ -95,6 +97,10 @@ func Update_Game_Phase():
 	# Ensures that Attacks to Launch is set at start of each Battle Phase
 	if GameData.Current_Phase == "Battle Phase":
 		Set_Attacks_To_Launch()
+	
+	# Skips Battle Phase if no cards are in player's Fighter/Reinforcement slots
+	if GameData.Current_Phase == "Battle Phase" and len(Dueler.Fighter) + len(Dueler.Reinforcement) == 0:
+		Update_Game_Phase()
 
 func Update_Game_Turn():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"

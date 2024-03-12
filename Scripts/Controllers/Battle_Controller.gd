@@ -229,7 +229,6 @@ func Resolve_Burn_Damage():
 
 	# Check all cards on field for 0 health and capture them if needed
 	for i in range(len(Cards_On_Either_Field)):
-		print(Cards_On_Either_Field[i].Name + " has " + str(Cards_On_Either_Field[i].Get_Total_Health()) + " health.")
 		if Cards_On_Either_Field[i].Get_Total_Health() <= 0 and Cards_On_Either_Field[i].Immortal == false:
 			SignalBus.emit_signal("Capture_Card", Cards_On_Either_Field[i])
 

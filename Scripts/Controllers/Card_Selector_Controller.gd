@@ -30,6 +30,10 @@ func Determine_Card_List(selection_type, Card_Source, slot = null, Desired_Attri
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "R1"))
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "R2"))
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "R3"))
+		"Reinforcers":
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "R1"))
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "R2"))
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "R3"))
 		"MedBay":
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side + "MedBay"))
 		"Graveyard":
@@ -44,6 +48,10 @@ func Determine_Card_List(selection_type, Card_Source, slot = null, Desired_Attri
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + slot))
 		"Opponent Field (All)":
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "Fighter"))
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "R1"))
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "R2"))
+			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "R3"))
+		"Opponent Reinforcers":
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "R1"))
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "R2"))
 			Selection_Source.append(Current_Scene.get_node("Battle/Playmat/CardSpots/" + "NonHands/" + Side_Opp + "R3"))
