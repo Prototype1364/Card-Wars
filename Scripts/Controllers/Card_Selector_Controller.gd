@@ -89,6 +89,10 @@ func Populate_Card_Options_List(Card_List, Card_Source):
 		var original = Card_List[i]
 		var copy = original.duplicate()
 		$ScrollContainer/Effect_Target_List.add_child(copy)
+		for n in original.get_property_list():
+			var PropertyName = n["name"]
+			var value = original.get_indexed(PropertyName)
+			copy.set_indexed(PropertyName,value)
 		copy.Set_Card_Variables(i, Card_Source)
 		copy.Set_Card_Visuals()
 		copy.Update_Data()
