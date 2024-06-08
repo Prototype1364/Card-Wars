@@ -39,6 +39,7 @@ var Multi_Strike
 var Target_Reinforcer
 var Paralysis
 var Direct_Attack
+var Effects_Disabled
 var Owner
 
 func _ready():
@@ -127,6 +128,7 @@ func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
 		Multi_Strike = card_sources[Source][Card_Index].Multi_Strike
 		Paralysis = card_sources[Source][Card_Index].Paralysis
 		Direct_Attack = card_sources[Source][Card_Index].Direct_Attack
+		Effects_Disabled = card_sources[Source][Card_Index].Effects_Disabled
 		Owner = card_sources[Source][Card_Index].Owner
 	
 	if "Tech" in Source:
@@ -217,7 +219,7 @@ func _on_FocusSensor_pressed(): # FIXME: Might need to be split into multiple fu
 					GameData.Current_Card_Effect_Step = "Clicked"
 					CardEffects.call(Anchor_Text, self)
 			elif "Hand" in Parent_Name:
-				$Action_Button_Container/Summon.visible = true
+				$Action_Button_Container/Summon.visible = true if Type != "Trap" else false
 				$Action_Button_Container/Set.visible = true if Type == "Trap" else false
 			elif Parent_Name in Reposition_Zones and GameData.Chosen_Card == null:
 				GameData.Chosen_Card = self
@@ -283,19 +285,22 @@ func _on_Summon_Set_pressed(Mode):
 			GameData.CardFrom = Parent_Name
 			GameData.CardMoved = self.name
 			SignalBus.emit_signal("Summon_Set_Pressed", slot_name)
+		else:
+			$Action_Button_Container/Summon.visible = false
+			$Action_Button_Container/Set.visible = false
+			SignalBus.emit_signal("Summon_Set_Pressed", "Backrow")
 	
 	elif "Hand" in Parent_Name and Mode == "Set":
 		GameData.Summon_Mode = "Set"
 		self.Is_Set = true
+		$Action_Button_Container/Summon.visible = false
+		$Action_Button_Container/Set.visible = false
+		SignalBus.emit_signal("Summon_Set_Pressed", "Backrow")
 	
 	elif "Backrow" in Parent_Name and Mode == "Summon":
+		$Action_Button_Container/Summon.visible = false
 		$Action_Button_Container/Summon.text = "Summon"
 		SignalBus.emit_signal("Activate_Set_Card", Side, self)
-	
-	GameData.CardFrom = Parent_Name
-	GameData.CardMoved = self.name
-	$Action_Button_Container/Summon.visible = false
-	$Action_Button_Container/Set.visible = false
 
 func _on_Target_pressed():
 	GameData.Target = self

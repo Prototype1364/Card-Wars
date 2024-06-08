@@ -343,8 +343,10 @@ func Wizard(card):
 		# Get Disabled Effect text
 		var disabled_effect = Button_Selector_Scene.Get_Text()
 
-		# Add Disabled Effect to Disabled_Effects list
+		# Add Disabled Effect to Disabled_Effects list & this card's Disabled_Effects list
 		GameData.Disabled_Effects.append(disabled_effect)
+		card.Effects_Disabled.append(disabled_effect)
+
 		
 		# Remove Scene
 		Button_Selector_Scene.Remove_Scene()
@@ -992,7 +994,20 @@ func Miraculous_Recovery(card):
 	if MedBay_Opp != null:
 		MedBay_Cards_Opp.append(MedBay_Opp)
 
-	if Valid_Card and card.Effect_Active and len(MedBay_Cards + MedBay_Cards_Opp) > 0:
+	# Loop through both medbays and remove any cards that have the name 'Advance Tech'
+	for i in range(len(MedBay_Cards)):
+		for j in range(len(MedBay_Cards[i])):
+			if MedBay_Cards[i][j].Name == "Activate Technology":
+				MedBay_Cards[i].erase(MedBay_Cards[i][j])
+				break
+	for i in range(len(MedBay_Cards_Opp)):
+		for j in range(len(MedBay_Cards_Opp[i])):
+			if MedBay_Cards_Opp[i][j].Name == "Activate Technology":
+				MedBay_Cards_Opp[i].erase(MedBay_Cards_Opp[i][j])
+				break
+
+	# Resolve Effect
+	if Valid_Card and card.Effect_Active and len(MedBay_Cards[0] + MedBay_Cards_Opp[0]) > 0:
 		var Card_Selector = load("res://Scenes/SupportScenes/Card_Selector.tscn").instantiate()
 		var Battle_Scene = Engine.get_main_loop().get_current_scene().get_node("Battle")
 		Battle_Scene.add_child(Card_Selector)

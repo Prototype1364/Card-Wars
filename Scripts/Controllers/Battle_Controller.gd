@@ -61,8 +61,8 @@ func Instantiate_Card() -> Node:
 
 	return InstanceCard
 
-func Draw_Card(Turn_Player, Card_Index = -1):
-	Turn_Player.Hand.append(Turn_Player.Deck[Card_Index])
+func Draw_Card(Turn_Player, InstanceCard):
+	Turn_Player.Hand.append(InstanceCard)
 
 func Reset_Reposition_Card_Variables():
 	GameData.Chosen_Card = null
@@ -294,6 +294,12 @@ func Capture_Card(attacking_player, defending_player, Card_Captured, Destination
 		defending_player.Reinforcement.erase(Card_Captured)
 	elif "Backrow" in Parent_Name:
 		defending_player.Backrow.erase(Card_Captured)
+
+	# Remove effects disabled by the captured card
+	if Card_Captured.Effects_Disabled != []:
+		for i in range(len(Card_Captured.Effects_Disabled)):
+			GameData.Disabled_Effects.erase(Card_Captured.Effects_Disabled[i])
+		Card_Captured.Effects_Disabled = []
 
 func Get_Destination_MedBay_on_Capture(Capture_Type) -> Node:
 	if Capture_Type == "Normal":

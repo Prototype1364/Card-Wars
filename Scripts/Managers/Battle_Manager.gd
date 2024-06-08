@@ -143,11 +143,11 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main", Draw_At_Index
 	if Draw_At_Index != -1:
 		var InstanceCard = BC.Instantiate_Card()
 		if Deck_Type == "Main":
-			BC.Draw_Card(player, Draw_At_Index)
 			InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnMainDeck")
 			InstanceCard.Set_Card_Visuals()
 			BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
 			InstanceCard.Update_Data()
+			BC.Draw_Card(player, InstanceCard)
 			DC.Pop_Deck(player, "Main", Draw_At_Index)
 
 			# Activate Advance Tech Card Effect when Drawn
@@ -169,11 +169,11 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main", Draw_At_Index
 	for _i in range(Cards_To_Draw):
 		var InstanceCard = BC.Instantiate_Card()
 		if Deck_Type == "Main":
-			BC.Draw_Card(player)
 			InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnMainDeck")
 			InstanceCard.Set_Card_Visuals()
 			BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
 			InstanceCard.Update_Data()
+			BC.Draw_Card(player, InstanceCard)
 			DC.Pop_Deck(player)
 
 			# Activate Advance Tech Card Effect when Drawn
@@ -427,7 +427,8 @@ func Discard_Card(Side):
 	BF.Set_Focus_Neighbors("Field",Side,CardMoved)
 	BF.Set_Focus_Neighbors("Hand",Side,get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand"))
 	
-	# Update Duelist's MedicalBay Array
+	# Update Duelist's Hand & MedicalBay Array
+	player.Hand.erase(CardMoved)
 	player.MedicalBay.append(CardMoved)
 	
 	# Resets GameData variables for next movement.

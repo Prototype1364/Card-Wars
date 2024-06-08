@@ -38,6 +38,7 @@ var Multi_Strike # Refers to a card's ability to deal damage to cards in the opp
 var Target_Reinforcer # Refers to a card's ability to choose to target an opponent in a reinforcement slot instead of the opposing Fighter (Poseidon is the first card to have this ability).
 var Paralysis # Refers to a card's ability to launch an attack. Lancelot is the first card to utilize this Attribute (there's a 1/3 chance that his effect will result in him being unable to attack during that turn's Battle Phase).
 var Direct_Attack
+var Effects_Disabled # A list of all effects disabled by this card.
 var Owner # Refers to the card's original Owner (Player or Enemy). Used as part of Mordred's Hero card effect.
 
 func _init(Card_Frame, Card_Art, Card_Name, Card_Type, Card_EffectType, Card_Anchor_Text, Card_Resolve_Side, Card_Resolve_Phase, Card_Resolve_Step, Card_Attribute, Card_Description, Card_Short_Description, Card_Attack, Card_ATK_Bonus, Card_Toxicity, Card_Cost, Card_Health, Card_Health_Bonus, Card_Burn_Damage, Card_Special_Edition_Text, Card_Rarity, Card_Passcode, Card_Deck_Capacity, Card_Tokens, Card_Is_Set, Card_Effect_Active, Card_Fusion_Level, Card_Attack_As_Reinforcement, Card_Immortal, Card_Invincible, Card_Relentless, Card_Multi_Strike, Card_Target_Reinforcer, Card_Paralysis, Card_Direct_Attack, Card_Owner):
@@ -78,4 +79,5 @@ func _init(Card_Frame, Card_Art, Card_Name, Card_Type, Card_EffectType, Card_Anc
 	Direct_Attack = Card_Direct_Attack
 	Toxicity = Card_Toxicity
 	Burn_Damage = Card_Burn_Damage
+	Effects_Disabled = []
 	Owner = Card_Owner

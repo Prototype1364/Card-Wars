@@ -191,11 +191,23 @@ func Clear_MedBay(Base_Node):
 	for i in Base_Node.get_children():
 		Base_Node.remove_child(i)
 
+func Find_Open_Slot(Base_Node, Zone):
+	var Zone_Count = Get_Zone_Count(Zone)
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	
+	for i in range(0, Zone_Count):
+		var Parent = Base_Node.get_node(Side + Zone) if Zone_Count == 1 else Base_Node.get_node(Side + Zone + str(i + 1))
+		if Parent.get_child_count() == 0:
+			return Parent.get_path()
+	return null
 
 #######################################
 # SIGNAL FUNCTIONS
 #######################################
 func _on_Card_Slot_pressed(Base_Node, slot_name):
+	if slot_name == "Backrow":
+		slot_name = Find_Open_Slot(Base_Node, slot_name)
+
 	if GameData.Chosen_Card != null:
 		if "Hand" in GameData.Chosen_Card.get_parent().name and GameData.Current_Step == "Main" and GameData.Summon_Mode != "":
 			GameData.Summon_Mode = ""
