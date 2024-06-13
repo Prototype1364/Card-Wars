@@ -19,9 +19,9 @@ Button/styles/normal = SubResource("StyleBoxFlat_oxnm1")
 [node name="CardSelector" type="Control"]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 532.5
+offset_left = 992.5
 offset_top = 380.0
-offset_right = 532.5
+offset_right = 992.5
 offset_bottom = 380.0
 size_flags_horizontal = 4
 script = ExtResource("1_i7mxe")

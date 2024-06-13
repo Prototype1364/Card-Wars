@@ -12,7 +12,8 @@ func Get_Active_Card_Effects():
 	var active_decks = GameData.Player.Deck + GameData.Enemy.Deck
 
 	for card in active_decks:
-		active_effects_dict[card.Anchor_Text] = true
+		if card.Anchor_Text not in GameData.Disabled_Effects:
+			active_effects_dict[card.Anchor_Text] = true
 
 	Active_Effects = active_effects_dict.keys()
 

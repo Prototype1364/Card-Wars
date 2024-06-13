@@ -26,6 +26,7 @@ var MedicalBay
 var Graveyard
 var Banished
 var Tech_Zone
+var Deck_Reloaded
 
 func _init(Duelist_Name, Duelist_LP, Duelist_Summon_Crests, Duelist_Tokens, Duelist_Field_ATK_Bonus, Duelist_Field_Health_Bonus, Duelist_Summon_Crest_Roll_Bonus, Duelist_Cost_Discount_Normal, Duelist_Cost_Discount_Hero, Duelist_Cost_Discount_Magic, Duelist_Cost_Discount_Trap, Duelist_Relentless, Duelist_Deck, Duelist_Tech_Deck, Duelist_Hand, Duelist_Fighter, Duelist_Equip_Magic, Duelist_Equip_Trap, Duelist_Reinforcement, Duelist_Backrow, Duelist_MedicalBay, Duelist_Graveyard, Duelist_Banished, Duelist_Tech_Zone):
 	Name = Duelist_Name
@@ -53,6 +54,7 @@ func _init(Duelist_Name, Duelist_LP, Duelist_Summon_Crests, Duelist_Tokens, Duel
 	Graveyard = Duelist_Graveyard
 	Banished = Duelist_Banished
 	Tech_Zone = Duelist_Tech_Zone
+	Deck_Reloaded = false
 
 func Update_Summon_Crests(roll_result):
 	Summon_Crests += roll_result

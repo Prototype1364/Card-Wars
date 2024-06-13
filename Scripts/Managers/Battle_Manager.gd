@@ -29,13 +29,14 @@ func _ready():
 	var _HV9 = SignalBus.connect("Update_HUD_Duelist", Callable(self, "Update_HUD_Duelist"))
 	var _HV10 = SignalBus.connect("Summon_Affordable", Callable(self, "Summon_Affordable"))
 	var _HV11 = SignalBus.connect("Summon_Set_Pressed", Callable(self, "_on_Card_Slot_pressed"))
-	var _HV12 = SignalBus.connect("Clear_MedBay", Callable(self, "Clear_MedBay"))
+	var _HV12 = SignalBus.connect("Reload_Deck", Callable(self, "Reload_Deck"))
 	var _HV13 = SignalBus.connect("Resolve_Card_Effects", Callable(self, "Resolve_Card_Effects"))
 	var _HV14 = SignalBus.connect("Reposition_Field_Cards", Callable(self, "Reposition_Field_Cards"))
 	var _HV15 = SignalBus.connect("Reset_Reposition_Card_Variables", Callable(self, "Reset_Reposition_Card_Variables"))
 	var _HV16 = SignalBus.connect("Play_Card", Callable(self, "Play_Card"))
 	var _HV17 = SignalBus.connect("Draw_Card", Callable(self, "Draw_Card"))
 	var _HV18 = SignalBus.connect("Reparent_Nodes", Callable(self, "Reparent_Nodes"))
+	var _HV19 = SignalBus.connect("Shuffle_Deck", Callable(self, "Shuffle_Deck"))
 	
 	Setup_Game()
 
@@ -139,56 +140,74 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main", Draw_At_Index
 	elif Deck_Type == "Tech":
 		Deck_ID = "WTechDeck" if Turn_Player == "Player" else "BTechDeck"
 	
-	# Allows for single draws of specific cards
-	if Draw_At_Index != -1:
-		var InstanceCard = BC.Instantiate_Card()
-		if Deck_Type == "Main":
-			InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnMainDeck")
-			InstanceCard.Set_Card_Visuals()
-			BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
-			InstanceCard.Update_Data()
-			BC.Draw_Card(player, InstanceCard)
-			DC.Pop_Deck(player, "Main", Draw_At_Index)
+	if player.Deck_Reloaded == false:
+		# Allows for single draws of specific cards
+		if Draw_At_Index != -1:
+			var InstanceCard = BC.Instantiate_Card()
+			if Deck_Type == "Main":
+				InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnMainDeck")
+				InstanceCard.Set_Card_Visuals()
+				BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
+				InstanceCard.Update_Data()
+				BC.Draw_Card(player, InstanceCard)
+				DC.Pop_Deck(player, "Main", Draw_At_Index)
 
-			# Activate Advance Tech Card Effect when Drawn
-			if InstanceCard.Type == "Special":
+				# Activate Advance Tech Card Effect when Drawn
+				if InstanceCard.Type == "Special":
+					BC.Activate_Summon_Effects(InstanceCard)
+
+			elif Deck_Type == "Tech":
+				InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnTechDeck")
+				InstanceCard.Set_Card_Visuals()
+				BF.Add_Card_Node_To_Tech_Zone(Deck_ID, InstanceCard)
+				InstanceCard.Update_Data()
+				DC.Pop_Deck(player, "Tech", Draw_At_Index)
+
+				# Activate Tech Effect
 				BC.Activate_Summon_Effects(InstanceCard)
-
-		elif Deck_Type == "Tech":
-			InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnTechDeck")
-			InstanceCard.Set_Card_Visuals()
-			BF.Add_Card_Node_To_Tech_Zone(Deck_ID, InstanceCard)
-			InstanceCard.Update_Data()
-			DC.Pop_Deck(player, "Tech", Draw_At_Index)
-
-			# Activate Tech Effect
-			BC.Activate_Summon_Effects(InstanceCard)
+			
+			return
 		
-		return
-	
-	for _i in range(Cards_To_Draw):
-		var InstanceCard = BC.Instantiate_Card()
-		if Deck_Type == "Main":
-			InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnMainDeck")
-			InstanceCard.Set_Card_Visuals()
-			BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
-			InstanceCard.Update_Data()
-			BC.Draw_Card(player, InstanceCard)
-			DC.Pop_Deck(player)
+		for _i in range(Cards_To_Draw):
+			var InstanceCard = BC.Instantiate_Card()
+			if Deck_Type == "Main":
+				InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnMainDeck")
+				InstanceCard.Set_Card_Visuals()
+				BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
+				InstanceCard.Update_Data()
+				BC.Draw_Card(player, InstanceCard)
+				DC.Pop_Deck(player)
 
-			# Activate Advance Tech Card Effect when Drawn
-			if InstanceCard.Type == "Special":
+				# Activate Advance Tech Card Effect when Drawn
+				if InstanceCard.Type == "Special":
+					BC.Activate_Summon_Effects(InstanceCard)
+
+			elif Deck_Type == "Tech":
+				InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnTechDeck")
+				InstanceCard.Set_Card_Visuals()
+				BF.Add_Card_Node_To_Tech_Zone(Deck_ID, InstanceCard)
+				InstanceCard.Update_Data()
+				DC.Pop_Deck(player, "Tech")
+
+				# Activate Tech Effect
 				BC.Activate_Summon_Effects(InstanceCard)
+	else:
+		if Draw_At_Index != -1:
+			var card_drawn = DC.Pop_Deck(player, Deck_Type, Draw_At_Index)
+			BC.Draw_Card(player, card_drawn)
+			BF.Add_Card_Node_To_Hand(Deck_ID, card_drawn, true)
+			card_drawn.Set_Card_Visuals()
 
-		elif Deck_Type == "Tech":
-			InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnTechDeck")
-			InstanceCard.Set_Card_Visuals()
-			BF.Add_Card_Node_To_Tech_Zone(Deck_ID, InstanceCard)
-			InstanceCard.Update_Data()
-			DC.Pop_Deck(player, "Tech")
+			if card_drawn.Type == "Special":
+				BC.Activate_Summon_Effects(card_drawn)
+		else:
+			var top_card = DC.Pop_Deck(player)
+			BC.Draw_Card(player, top_card)
+			BF.Add_Card_Node_To_Hand(Deck_ID, top_card, true)
+			top_card.Set_Card_Visuals()
 
-			# Activate Tech Effect
-			BC.Activate_Summon_Effects(InstanceCard)
+			if top_card.Type == "Special":
+				BC.Activate_Summon_Effects(top_card)
 
 func Add_Tokens():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
@@ -246,8 +265,8 @@ func Setup_Game():
 	DC.Create_Deck("Arthurian", "Player")
 	DC.Create_Deck("Olympians", "Enemy")
 	DC.Create_Advance_Tech_Card()
-	DC.Shuffle_Deck(GameData.Player)
-	DC.Shuffle_Deck(GameData.Enemy)
+	Shuffle_Deck(GameData.Player)
+	Shuffle_Deck(GameData.Enemy)
 	
 	# Set Turn Player for First Turn
 	BC.Choose_Starting_Player()
@@ -394,9 +413,7 @@ func Conduct_End_Phase():
 	UI.Update_HUD_GameState()
 	
 	# Check for required Reload
-	DC.Reload_Deck(player.Deck, player.MedicalBay)
-	DC.Shuffle_Deck(player)
-	UI.Update_Deck_Counts()
+	DC.Reload_Deck_Array(player.Deck, player.MedicalBay)
 	
 	# Effect Step
 	GameData.Current_Step = "Effect"
@@ -440,12 +457,16 @@ func Discard_Card(Side):
 	if GameData.Current_Step == "Discard":
 		Update_Game_Turn()
 
-func Clear_MedBay():
+func Reload_Deck():
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var Side = "W" if player == GameData.Player else "B"
 	var Node_MedBay = get_node("Playmat/CardSpots/NonHands/" + Side + "MedBay")
 	
-	BF.Clear_MedBay(Node_MedBay)
+	BF.Reload_Deck(Node_MedBay)
+
+func Shuffle_Deck(player):
+	DC.Shuffle_Deck(player)
+	UI.Update_Deck_Counts()
 
 
 

@@ -137,14 +137,33 @@ func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
 		Cost_Path = load("res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png") if card_sources[Source][Card_Index].Type != "Special" else null
 
 func Set_Card_Visuals():
-	if Frame != "Special":
-		$Frame.texture = load("res://Assets/Cards/Frame/Small_Frame_" + Frame + ".png")
-		$CostContainer/Cost.texture = Cost_Path
-		$ArtContainer/Art.texture = Art
-		$Attack.text = str(Attack)
-		$Health.text = str(Health)
-	else: # Card is the Advance Tech card (Has no Cost or custom Art).
-		$Frame.texture = load("res://Assets/Cards/Frame/Small_Advance_Tech_Card.png")
+	var Parent = get_parent()
+
+	if Parent == null:
+		if Frame != "Special":
+			$Frame.texture = load("res://Assets/Cards/Frame/Small_Frame_" + Frame + ".png")
+			$CostContainer/Cost.texture = Cost_Path
+			$ArtContainer/Art.texture = Art
+			$Attack.text = str(Attack)
+			$Health.text = str(Health)
+		else: # Card is the Advance Tech card (Has no Cost or custom Art).
+			$Frame.texture = load("res://Assets/Cards/Frame/Small_Advance_Tech_Card.png")
+	else:
+		if "Deck" in Parent.name:
+			$Frame.texture = load("res://Assets/Cards/Frame/Small_Card_Back.png")
+			$CostContainer/Cost.texture = null
+			$ArtContainer/Art.texture = null
+			$Attack.text = ""
+			$Health.text = ""
+		else:
+			if Frame != "Special":
+				$Frame.texture = load("res://Assets/Cards/Frame/Small_Frame_" + Frame + ".png")
+				$CostContainer/Cost.texture = Cost_Path
+				$ArtContainer/Art.texture = Art
+				$Attack.text = str(Attack)
+				$Health.text = str(Health)
+			else: # Card is the Advance Tech card (Has no Cost or custom Art).
+				$Frame.texture = load("res://Assets/Cards/Frame/Small_Advance_Tech_Card.png")
 
 func Update_Data():
 	var Parent_Name = get_parent().name
@@ -196,7 +215,8 @@ func Update_Token_Info():
 func focusing():
 	GameData.FocusedCardName = self.name
 	GameData.FocusedCardParentName = self.get_parent().name
-	SignalBus.emit_signal("LookAtCard", self, Frame, Art, Name, Cost, Attribute)
+	if "Deck" not in self.get_parent().name:
+		SignalBus.emit_signal("LookAtCard", self, Frame, Art, Name, Cost, Attribute)
 
 func defocusing():
 	GameData.FocusedCardName = ""
@@ -218,9 +238,16 @@ func _on_FocusSensor_pressed(): # FIXME: Might need to be split into multiple fu
 				if int(Passcode) in GameData.FUSION_CARDS: # Fusion summon
 					GameData.Current_Card_Effect_Step = "Clicked"
 					CardEffects.call(Anchor_Text, self)
+			elif "Hand" in Parent_Name and Type == "Trap":
+				if self.Attribute == "Equip":
+					$Action_Button_Container/Summon.visible = true
+					$Action_Button_Container/Set.visible = false
+				else:
+					$Action_Button_Container/Summon.visible = false
+					$Action_Button_Container/Set.visible = true
 			elif "Hand" in Parent_Name:
-				$Action_Button_Container/Summon.visible = true if Type != "Trap" else false
-				$Action_Button_Container/Set.visible = true if Type == "Trap" else false
+				$Action_Button_Container/Summon.visible = true 
+				$Action_Button_Container/Set.visible = true
 			elif Parent_Name in Reposition_Zones and GameData.Chosen_Card == null:
 				GameData.Chosen_Card = self
 			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene

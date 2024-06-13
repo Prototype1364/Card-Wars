@@ -4,17 +4,20 @@ class_name FieldController
 
 var Node_CardSpots = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots")
 
-func Add_Card_Node_To_Hand(Deck_ID, InstanceCard, Base_Node = Node_CardSpots):
+func Add_Card_Node_To_Hand(Deck_ID, InstanceCard, Deck_Reloaded = false, Base_Node = Node_CardSpots):
 	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var Hand = Base_Node.get_node(Deck_ID.left(1) + "HandScroller/" + Deck_ID.left(1) + "Hand")
 	
-	if "MainDeck" in Deck_ID and GameData.Current_Step == "Draw":
-		if player.Deck[-1].get_class() == "Control":
-			Hand.add_child(player.Deck[-1])
-		else:
-			SignalBus.emit_signal("Reset_Reposition_Card_Variables")
-			Hand.add_child(InstanceCard)
-			Set_Focus_Neighbors("Hand", Deck_ID.left(1), Hand)
+	if Deck_Reloaded == false:
+		if "MainDeck" in Deck_ID and GameData.Current_Step == "Draw":
+			if player.Deck[-1].get_class() == "Control":
+				Hand.add_child(player.Deck[-1])
+			else:
+				SignalBus.emit_signal("Reset_Reposition_Card_Variables")
+				Hand.add_child(InstanceCard)
+				Set_Focus_Neighbors("Hand", Deck_ID.left(1), Hand)
+	else:
+		Reparent_Nodes(InstanceCard, Hand)
 
 func Add_Card_Node_To_Tech_Zone(Deck_ID, InstanceCard, Base_Node = Node_CardSpots):
 	var TechZone = Base_Node.get_node("NonHands/" + Deck_ID.left(1) + "TechZone")
@@ -122,10 +125,12 @@ func Reposition_Field_Cards(Side) -> void:
 
 func Play_Card(Base_Node, Side, Net_Cost):
 	var Dueler = GameData.Player if GameData.CardTo.name.left(1) == "W" else GameData.Enemy
+	var Enemy = GameData.Enemy if GameData.CardTo.name.left(1) == "W" else GameData.Player
 	var Reparent_Variables = [GameData.Chosen_Card.get_parent(), GameData.CardTo, GameData.Chosen_Card]
 	var Equip_Slot = Base_Node.get_node(Side + "EquipMagic") if Reparent_Variables[2].Type == "Magic" else Base_Node.get_node(Side + "EquipTrap")
 	var Graveyard = Base_Node.get_node(Side + "Graveyard")
 	var Parent_Name = GameData.CardTo.name
+	var Source_Name = GameData.Chosen_Card.get_parent().name
 	
 	Dueler.Summon_Crests -= Net_Cost
 	
@@ -167,6 +172,12 @@ func Play_Card(Base_Node, Side, Net_Cost):
 		Dueler.Reinforcement.append(GameData.Chosen_Card)
 	elif "Backrow" in Parent_Name:
 		Dueler.Backrow.append(GameData.Chosen_Card)
+
+	# Erase card from appropriate array
+	if Source_Name.left(1) == Side:
+		Dueler.Hand.erase(GameData.Chosen_Card)
+	elif Source_Name.left(1) != Side:
+		Enemy.Hand.erase(GameData.Chosen_Card)
 	
 	# Resets GameData variables for next movement.
 	SignalBus.emit_signal("Reset_Reposition_Card_Variables")
@@ -187,9 +198,30 @@ func Activate_Set_Card(Side, Chosen_Card):
 	else:
 		Reparent_Nodes(Chosen_Card, Graveyard)
 
-func Clear_MedBay(Base_Node):
-	for i in Base_Node.get_children():
-		Base_Node.remove_child(i)
+func Reload_Deck(MedBay):
+	# Reparent Nodes from MedBay to MainDeck (Base_Node is Medbay)
+	var Dueler = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var MainDeck = Node_CardSpots.get_node("NonHands/" + Side + "MainDeck")
+
+	# Shuffle Deck
+	SignalBus.emit_signal("Shuffle_Deck", Dueler)
+	await Engine.get_main_loop().create_timer(0.05) # Wait for 0.05 seconds to ensure deck is shuffled before continuing (can't await SignalBus signals since this script isn't attached to a node on the node tree) (E is dubious, since what we're awaiting isn't even a timeout.)
+
+	# Reparents all children of MedBay to MainDeck
+	for i in MedBay.get_children():
+		Reparent_Nodes(i, MainDeck)
+
+	# Reorder MainDeck Children to match Deck Array order
+	for i in range(MainDeck.get_child_count()):
+		MainDeck.move_child(Dueler.Deck[i], i)
+
+	# Set Card Visuals for MainDeck
+	for i in range(MainDeck.get_child_count()):
+		MainDeck.get_child(i).Set_Card_Visuals()
+
+	# Resets Deck Reloaded variable
+	Dueler.Deck_Reloaded = true
 
 func Find_Open_Slot(Base_Node, Zone):
 	var Zone_Count = Get_Zone_Count(Zone)

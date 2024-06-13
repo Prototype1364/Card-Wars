@@ -50,7 +50,11 @@ signal Flip_Duelist_HUDs
 
 signal Update_HUD_GameState
 
-signal Clear_MedBay
+signal Reload_Deck
+
+signal Shuffle_Deck
+
+signal Deck_Shuffled
 
 signal Reset_Reposition_Card_Variables
 
