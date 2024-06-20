@@ -1216,3 +1216,29 @@ func The_Wheel(card):
 		Dueler.Update_Cost_Discount_Trap(-1)
 
 		SignalBus.emit_signal("Update_HUD_Duelist", Node_To_Update, Dueler)
+
+
+"""--------------------------------- Unused Effects ---------------------------------"""
+func Cannon(card):
+	pass
+
+func Death_Ray(card):
+	pass
+
+func Fists(card):
+	pass
+
+func Gun(card):
+	pass
+
+func Missile_Launcher(card):
+	pass
+
+func Power_Up(card):
+	pass
+
+func Rock(card):
+	pass
+
+func Rocket_Launcher(card):
+	pass

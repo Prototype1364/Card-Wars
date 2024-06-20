@@ -13,7 +13,7 @@ config_version=5
 config/name="Card-Wars"
 run/main_scene="res://Scenes/MainScenes/SceneHandler.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
-config/icon="res://icon.svg"
+boot_splash/show_image=false
 
 [autoload]
 

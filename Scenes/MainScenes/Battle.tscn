@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://68q4dnvhm7uq"]
+[gd_scene load_steps=9 format=3 uid="uid://68q4dnvhm7uq"]
 
 [ext_resource type="PackedScene" uid="uid://devk1wrlprsu3" path="res://Scenes/SupportScenes/Battle_HUD_GameState.tscn" id="1"]
 [ext_resource type="Script" path="res://Scripts/Managers/Battle_Manager.gd" id="1_gcaxc"]
@@ -8,7 +8,6 @@
 [ext_resource type="Texture2D" uid="uid://cb427o5cck4ub" path="res://Assets/Playmat/Large Empty Slot.png" id="5"]
 [ext_resource type="Texture2D" uid="uid://cnsdmsj43x3t0" path="res://Assets/Playmat/Switch Button.png" id="6"]
 [ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="8"]
-[ext_resource type="PackedScene" uid="uid://cocpwyqsydvrn" path="res://Scenes/SupportScenes/Pile_Scroller.tscn" id="9"]
 
 [node name="Battle" type="Control"]
 layout_mode = 3
@@ -667,18 +666,6 @@ grow_vertical = 1
 offset_left = 15.0
 offset_right = 755.0
 offset_bottom = 71.0
-
-[node name="Pile_Scroller" parent="." instance=ExtResource("9")]
-visible = false
-anchors_preset = 0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_left = 828.0
-offset_top = 439.0
-offset_right = 1683.0
-offset_bottom = 659.0
-grow_horizontal = 1
-grow_vertical = 1
 
 [node name="Global_Card_Holder" type="Control" parent="."]
 visible = false

@@ -308,6 +308,8 @@ func _on_Summon_Set_pressed(Mode):
 		GameData.Summon_Mode = "Summon"
 		# Automatically move Equip card to appropriate Equip slot
 		if self.Attribute == "Equip":
+			$Action_Button_Container/Summon.visible = false
+			$Action_Button_Container/Set.visible = false
 			var slot_name = Side + "Equip" + self.Type
 			GameData.CardFrom = Parent_Name
 			GameData.CardMoved = self.name

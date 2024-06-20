@@ -115,7 +115,7 @@ func Get_Card():
 func Set_Effect_Card(card):
 	Effect_Card = card
 
-func _on_confirm_button_pressed():	
+func _on_confirm_button_pressed():
 	# Emit signal to confirm card selection
 	SignalBus.emit_signal("Confirm")
 	
