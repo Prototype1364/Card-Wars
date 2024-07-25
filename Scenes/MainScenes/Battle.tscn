@@ -1,13 +1,18 @@
-[gd_scene load_steps=9 format=3 uid="uid://68q4dnvhm7uq"]
+[gd_scene load_steps=14 format=3 uid="uid://68q4dnvhm7uq"]
 
 [ext_resource type="PackedScene" uid="uid://devk1wrlprsu3" path="res://Scenes/SupportScenes/Battle_HUD_GameState.tscn" id="1"]
 [ext_resource type="Script" path="res://Scripts/Managers/Battle_Manager.gd" id="1_gcaxc"]
 [ext_resource type="PackedScene" uid="uid://dnao8q2vpkwj4" path="res://Scenes/SupportScenes/Battle_HUD_Duelist.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://340nlxwjl4l8" path="res://Scenes/SupportScenes/BigCard.tscn" id="3"]
+[ext_resource type="Script" path="res://Scripts/Controllers/Field_Controller.gd" id="3_82yqu"]
 [ext_resource type="Texture2D" uid="uid://dooubax078kvf" path="res://Assets/Playmat/BoardImage.png" id="4"]
 [ext_resource type="Texture2D" uid="uid://cb427o5cck4ub" path="res://Assets/Playmat/Large Empty Slot.png" id="5"]
+[ext_resource type="Script" path="res://Scripts/Controllers/Deck_Controller.gd" id="5_75704"]
 [ext_resource type="Texture2D" uid="uid://cnsdmsj43x3t0" path="res://Assets/Playmat/Switch Button.png" id="6"]
 [ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="8"]
+[ext_resource type="Script" path="res://Scripts/Controllers/Input_Controller.gd" id="8_0dbaf"]
+[ext_resource type="Script" path="res://Scripts/Controllers/Battle_Controller.gd" id="9_2am0q"]
+[ext_resource type="Script" path="res://Scripts/Controllers/UI_Controller.gd" id="9_6bayr"]
 
 [node name="Battle" type="Control"]
 layout_mode = 3
@@ -20,6 +25,7 @@ offset_top = -648.0
 offset_right = 1920.0
 offset_bottom = 1080.0
 texture = ExtResource("4")
+script = ExtResource("9_2am0q")
 
 [node name="CardSpots" type="Control" parent="Playmat"]
 anchors_preset = 0
@@ -28,6 +34,7 @@ offset_top = 243.0
 offset_right = 1866.0
 offset_bottom = 1486.0
 pivot_offset = Vector2(446, 621)
+script = ExtResource("3_82yqu")
 
 [node name="BHandScroller" type="ScrollContainer" parent="Playmat/CardSpots"]
 clip_contents = false
@@ -66,6 +73,7 @@ focus_neighbor_bottom = NodePath("../../NonHands/WFighter")
 anchors_preset = 0
 offset_right = 892.0
 offset_bottom = 1238.0
+script = ExtResource("5_75704")
 
 [node name="WFighter" type="Button" parent="Playmat/CardSpots/NonHands"]
 layout_mode = 0
@@ -530,7 +538,7 @@ layout_mode = 0
 offset_left = 858.0
 offset_top = 1185.0
 offset_right = 918.0
-offset_bottom = 1235.0
+offset_bottom = 1238.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("8")
 theme_override_font_sizes/font_size = 45
@@ -543,7 +551,7 @@ layout_mode = 0
 offset_left = 147.0
 offset_top = 1185.0
 offset_right = 207.0
-offset_bottom = 1235.0
+offset_bottom = 1238.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("8")
 theme_override_font_sizes/font_size = 45
@@ -556,7 +564,7 @@ layout_mode = 0
 offset_left = 33.0
 offset_top = 56.0
 offset_right = 93.0
-offset_bottom = 106.0
+offset_bottom = 109.0
 rotation = 3.14159
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("8")
@@ -570,7 +578,7 @@ layout_mode = 0
 offset_left = 743.0
 offset_top = 56.0
 offset_right = 818.0
-offset_bottom = 106.0
+offset_bottom = 109.0
 rotation = 3.14159
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("8")
@@ -620,6 +628,7 @@ tooltip_text = "Controls board position."
 max_value = 648.0
 value = 648.0
 rounded = true
+script = ExtResource("8_0dbaf")
 
 [node name="CardExaminer" type="Control" parent="."]
 anchors_preset = 0
@@ -641,7 +650,18 @@ offset_bottom = -2.0
 grow_horizontal = 1
 grow_vertical = 1
 
-[node name="HUD_W" parent="." instance=ExtResource("2")]
+[node name="Global_Card_Holder" type="Control" parent="."]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="UI" type="Node" parent="."]
+script = ExtResource("9_6bayr")
+
+[node name="Duelists" type="Node" parent="UI"]
+
+[node name="HUD_W" parent="UI/Duelists" instance=ExtResource("2")]
 anchors_preset = 0
 anchor_right = 0.0
 anchor_bottom = 0.0
@@ -652,7 +672,7 @@ offset_bottom = 1080.0
 grow_horizontal = 1
 grow_vertical = 1
 
-[node name="HUD_B" parent="." instance=ExtResource("2")]
+[node name="HUD_B" parent="UI/Duelists" instance=ExtResource("2")]
 anchors_preset = 0
 anchor_right = 0.0
 anchor_bottom = 0.0
@@ -662,16 +682,12 @@ offset_bottom = 71.0
 grow_horizontal = 1
 grow_vertical = 1
 
-[node name="HUD_GameState" parent="." instance=ExtResource("1")]
+[node name="HUD" type="Node" parent="UI"]
+
+[node name="HUD_GameState" parent="UI/HUD" instance=ExtResource("1")]
 offset_left = 15.0
 offset_right = 755.0
 offset_bottom = 71.0
-
-[node name="Global_Card_Holder" type="Control" parent="."]
-visible = false
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
 
 [connection signal="gui_input" from="Playmat" to="." method="_on_Playmat_gui_input"]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WFighter" to="." method="_on_Card_Slot_pressed" binds= ["WFighter"]]
@@ -684,8 +700,12 @@ offset_bottom = 40.0
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WBackrow2" to="." method="_on_Card_Slot_pressed" binds= ["WBackrow2"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WBackrow3" to="." method="_on_Card_Slot_pressed" binds= ["WBackrow3"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WTechZone" to="." method="_on_Card_Slot_pressed" binds= ["WTechZone"]]
+[connection signal="child_entered_tree" from="Playmat/CardSpots/NonHands/WTechDeck" to="UI" method="Update_Deck_Counts" binds= ["WTech"]]
+[connection signal="child_exiting_tree" from="Playmat/CardSpots/NonHands/WTechDeck" to="UI" method="Update_Deck_Counts" binds= ["WTech"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WTechDeck" to="." method="_on_Card_Slot_pressed" binds= ["WTechDeck"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WMedBay" to="." method="_on_Card_Slot_pressed" binds= ["WMedBay"]]
+[connection signal="child_entered_tree" from="Playmat/CardSpots/NonHands/WMainDeck" to="UI" method="Update_Deck_Counts" binds= ["WMain"]]
+[connection signal="child_exiting_tree" from="Playmat/CardSpots/NonHands/WMainDeck" to="UI" method="Update_Deck_Counts" binds= ["WMain"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WMainDeck" to="." method="_on_Card_Slot_pressed" binds= ["WMainDeck"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WBanished" to="." method="_on_Card_Slot_pressed" binds= ["WBanished"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/WGraveyard" to="." method="_on_Card_Slot_pressed" binds= ["WGraveyard"]]
@@ -699,8 +719,12 @@ offset_bottom = 40.0
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/BBackrow2" to="." method="_on_Card_Slot_pressed" binds= ["BBackrow2"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/BBackrow3" to="." method="_on_Card_Slot_pressed" binds= ["BBackrow3"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/BTechZone" to="." method="_on_Card_Slot_pressed" binds= ["BTechZone"]]
+[connection signal="child_entered_tree" from="Playmat/CardSpots/NonHands/BTechDeck" to="UI" method="Update_Deck_Counts" binds= ["BTech"]]
+[connection signal="child_exiting_tree" from="Playmat/CardSpots/NonHands/BTechDeck" to="UI" method="Update_Deck_Counts" binds= ["BTech"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/BTechDeck" to="." method="_on_Card_Slot_pressed" binds= ["BTechDeck"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/BMedBay" to="." method="_on_Card_Slot_pressed" binds= ["BMedBay"]]
+[connection signal="child_entered_tree" from="Playmat/CardSpots/NonHands/BMainDeck" to="UI" method="Update_Deck_Counts" binds= ["BMain"]]
+[connection signal="child_exiting_tree" from="Playmat/CardSpots/NonHands/BMainDeck" to="UI" method="Update_Deck_Counts" binds= ["BMain"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/BMainDeck" to="." method="_on_Card_Slot_pressed" binds= ["BMainDeck"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/BBanished" to="." method="_on_Card_Slot_pressed" binds= ["BBanished"]]
 [connection signal="pressed" from="Playmat/CardSpots/NonHands/BGraveyard" to="." method="_on_Card_Slot_pressed" binds= ["BGraveyard"]]

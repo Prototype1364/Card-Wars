@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://dnao8q2vpkwj4"]
+[gd_scene load_steps=5 format=3 uid="uid://dnao8q2vpkwj4"]
 
 [ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="2"]
+[ext_resource type="Script" path="res://Scripts/Controllers/Duelist_Controller.gd" id="2_gjubj"]
 [ext_resource type="Texture2D" uid="uid://crysab8v8l518" path="res://Assets/Playmat/Playmat_Duelist_HUD_Holder.png" id="3_8q6kb"]
 
 [sub_resource type="Theme" id="Theme_l313w"]
@@ -18,6 +19,7 @@ offset_bottom = -1009.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("Theme_l313w")
+script = ExtResource("2_gjubj")
 
 [node name="BG" type="TextureRect" parent="."]
 layout_mode = 0

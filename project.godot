@@ -21,6 +21,10 @@ SignalBus="*res://Singletons/Signal_Bus.gd"
 GameData="*res://Singletons/GameData.gd"
 CardEffects="*res://Singletons/Card_Effects.gd"
 
+[debug]
+
+gdscript/warnings/unused_parameter=0
+
 [display]
 
 window/size/viewport_width=1920
