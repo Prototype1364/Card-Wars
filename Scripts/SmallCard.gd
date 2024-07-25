@@ -29,7 +29,7 @@ var Deck_Capacity
 var Tokens
 var Token_Path = preload("res://Scenes/SupportScenes/Token_Card.tscn")
 var Is_Set
-var Effect_Active
+var Can_Activate_Effect
 var Fusion_Level
 var Attack_As_Reinforcement
 var Immortal
@@ -57,84 +57,84 @@ func Update_Attacks_Remaining(Role):
 	else:
 		Attacks_Remaining = 1 if Relentless == false else 2
 
-func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
-	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
-	var combined_medbays = player.MedicalBay + enemy.MedicalBay
-	var non_turn_field = enemy.Fighter + enemy.Reinforcement if GameData.Current_Turn == "Player" else player.Fighter + player.Reinforcement
-	var turn_field = player.Fighter + player.Reinforcement if GameData.Current_Turn == "Player" else enemy.Fighter + enemy.Reinforcement
+# func Set_Card_Variables(Card_Index = -1, Source = "TurnMainDeck"):
+#	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+#	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
+#	var combined_medbays = player.MedicalBay + enemy.MedicalBay
+#	var non_turn_field = enemy.Fighter + enemy.Reinforcement if GameData.Current_Turn == "Player" else player.Fighter + player.Reinforcement
+#	var turn_field = player.Fighter + player.Reinforcement if GameData.Current_Turn == "Player" else enemy.Fighter + enemy.Reinforcement
 	
-	var card_sources = {
-	"TurnHand": player.Hand,
-	"TurnMainDeck": player.Deck,
-	"TurnTechDeck": player.Tech_Deck,
-	"TurnMedBay": player.MedicalBay,
-	"TurnGraveyard": player.Graveyard,
-	"TurnBanished": player.Banished,
-	"TurnFighter": player.Fighter,
-	"TurnReinforcers": player.Reinforcement,
-	"TurnEquipMagic": player.Equip_Magic,
-	"TurnEquipTrap": player.Equip_Trap,
-	"NonTurnHand": enemy.Hand,
-	"NonTurnMainDeck": enemy.Deck,
-	"NonTurnTechDeck": enemy.Tech_Deck,
-	"NonTurnMedBay": enemy.MedicalBay,
-	"NonTurnGraveyard": enemy.Graveyard,
-	"NonTurnBanished": enemy.Banished,
-	"NonTurnFighter": enemy.Fighter,
-	"NonTurnReinforcers": enemy.Reinforcement,
-	"NonTurnEquipMagic": enemy.Equip_Magic,
-	"NonTurnEquipTrap": enemy.Equip_Trap,
-	"AllMedBays": combined_medbays,
-	"TurnField": turn_field,
-	"NonTurnField": non_turn_field,
-	"AllCardsDB": GameData.Global_Deck}
+#	var card_sources = {
+#	"TurnHand": player.Hand,
+#	#"TurnMainDeck": player.Deck,
+#	"TurnTechDeck": player.Tech_Deck,
+#	"TurnMedBay": player.MedicalBay,
+#	"TurnGraveyard": player.Graveyard,
+#	"TurnBanished": player.Banished,
+#	"TurnFighter": player.Fighter,
+#	"TurnReinforcers": player.Reinforcement,
+#	"TurnEquipMagic": player.Equip_Magic,
+#	"TurnEquipTrap": player.Equip_Trap,
+#	"NonTurnHand": enemy.Hand,
+#	"NonTurnMainDeck": enemy.Deck,
+#	"NonTurnTechDeck": enemy.Tech_Deck,
+#	"NonTurnMedBay": enemy.MedicalBay,
+#	"NonTurnGraveyard": enemy.Graveyard,
+#	"NonTurnBanished": enemy.Banished,
+#	"NonTurnFighter": enemy.Fighter,
+#	"NonTurnReinforcers": enemy.Reinforcement,
+#	"NonTurnEquipMagic": enemy.Equip_Magic,
+#	"NonTurnEquipTrap": enemy.Equip_Trap,
+#	"AllMedBays": combined_medbays,
+#	"TurnField": turn_field,
+#	"NonTurnField": non_turn_field,
+#	"AllCardsDB": GameData.Global_Deck}
 
-	if card_sources.has(Source):
-		Name = card_sources[Source][Card_Index].Name
-		Frame = card_sources[Source][Card_Index].Frame
-		Type = card_sources[Source][Card_Index].Type
-		Effect_Type = card_sources[Source][Card_Index].Effect_Type
-		Anchor_Text = card_sources[Source][Card_Index].Anchor_Text
-		Resolve_Side = card_sources[Source][Card_Index].Resolve_Side
-		Resolve_Phase = card_sources[Source][Card_Index].Resolve_Phase
-		Resolve_Step = card_sources[Source][Card_Index].Resolve_Step
-		if typeof(card_sources[Source][Card_Index].Art) == TYPE_STRING:
-			Art = load(card_sources[Source][Card_Index].Art) if card_sources[Source][Card_Index].Art != "res://Assets/Cards/Art/Special_Activate_Technology.png" else null
-		Attribute = card_sources[Source][Card_Index].Attribute
-		Description = card_sources[Source][Card_Index].Description
-		Short_Description = card_sources[Source][Card_Index].Short_Description
-		Attacks_Remaining = card_sources[Source][Card_Index].Attacks_Remaining
-		Attack = card_sources[Source][Card_Index].Attack if card_sources[Source][Card_Index].Attack != null else ""
-		ATK_Bonus = card_sources[Source][Card_Index].ATK_Bonus
-		Toxicity = card_sources[Source][Card_Index].Toxicity
-		Cost = card_sources[Source][Card_Index].Cost
-		Health = card_sources[Source][Card_Index].Health if card_sources[Source][Card_Index].Health != null else ""
-		Health_Bonus = card_sources[Source][Card_Index].Health_Bonus
-		Burn_Damage = card_sources[Source][Card_Index].Burn_Damage
-		Revival_Health = Health
-		Special_Edition_Text = card_sources[Source][Card_Index].Special_Edition_Text
-		Rarity = card_sources[Source][Card_Index].Rarity
-		Passcode = card_sources[Source][Card_Index].Passcode
-		Deck_Capacity = card_sources[Source][Card_Index].Deck_Capacity
-		Tokens = card_sources[Source][Card_Index].Tokens
-		Is_Set = card_sources[Source][Card_Index].Is_Set
-		Effect_Active = card_sources[Source][Card_Index].Effect_Active
-		Fusion_Level = card_sources[Source][Card_Index].Fusion_Level
-		Attack_As_Reinforcement = card_sources[Source][Card_Index].Attack_As_Reinforcement
-		Immortal = card_sources[Source][Card_Index].Immortal
-		Invincible = card_sources[Source][Card_Index].Invincible
-		Relentless = card_sources[Source][Card_Index].Relentless
-		Multi_Strike = card_sources[Source][Card_Index].Multi_Strike
-		Paralysis = card_sources[Source][Card_Index].Paralysis
-		Direct_Attack = card_sources[Source][Card_Index].Direct_Attack
-		Effects_Disabled = card_sources[Source][Card_Index].Effects_Disabled
-		Owner = card_sources[Source][Card_Index].Owner
+	# if card_sources.has(Source):
+	# 	Name = card_sources[Source][Card_Index].Name
+	# 	Frame = card_sources[Source][Card_Index].Frame
+	# 	Type = card_sources[Source][Card_Index].Type
+	# 	Effect_Type = card_sources[Source][Card_Index].Effect_Type
+	# 	Anchor_Text = card_sources[Source][Card_Index].Anchor_Text
+	# 	Resolve_Side = card_sources[Source][Card_Index].Resolve_Side
+	# 	Resolve_Phase = card_sources[Source][Card_Index].Resolve_Phase
+	# 	Resolve_Step = card_sources[Source][Card_Index].Resolve_Step
+	# 	if typeof(card_sources[Source][Card_Index].Art) == TYPE_STRING:
+	# 		Art = load(card_sources[Source][Card_Index].Art) if card_sources[Source][Card_Index].Art != "res://Assets/Cards/Art/Special_Activate_Technology.png" else null
+	# 	Attribute = card_sources[Source][Card_Index].Attribute
+	# 	Description = card_sources[Source][Card_Index].Description
+	# 	Short_Description = card_sources[Source][Card_Index].Short_Description
+	# 	Attacks_Remaining = card_sources[Source][Card_Index].Attacks_Remaining
+	# 	Attack = card_sources[Source][Card_Index].Attack if card_sources[Source][Card_Index].Attack != null else ""
+	# 	ATK_Bonus = card_sources[Source][Card_Index].ATK_Bonus
+	# 	Toxicity = card_sources[Source][Card_Index].Toxicity
+	# 	Cost = card_sources[Source][Card_Index].Cost
+	# 	Health = card_sources[Source][Card_Index].Health if card_sources[Source][Card_Index].Health != null else ""
+	# 	Health_Bonus = card_sources[Source][Card_Index].Health_Bonus
+	# 	Burn_Damage = card_sources[Source][Card_Index].Burn_Damage
+	# 	Revival_Health = Health
+	# 	Special_Edition_Text = card_sources[Source][Card_Index].Special_Edition_Text
+	# 	Rarity = card_sources[Source][Card_Index].Rarity
+	# 	Passcode = card_sources[Source][Card_Index].Passcode
+	# 	Deck_Capacity = card_sources[Source][Card_Index].Deck_Capacity
+	# 	Tokens = card_sources[Source][Card_Index].Tokens
+	# 	Is_Set = card_sources[Source][Card_Index].Is_Set
+	# 	Can_Activate_Effect = card_sources[Source][Card_Index].Can_Activate_Effect
+	# 	Fusion_Level = card_sources[Source][Card_Index].Fusion_Level
+	# 	Attack_As_Reinforcement = card_sources[Source][Card_Index].Attack_As_Reinforcement
+	# 	Immortal = card_sources[Source][Card_Index].Immortal
+	# 	Invincible = card_sources[Source][Card_Index].Invincible
+	# 	Relentless = card_sources[Source][Card_Index].Relentless
+	# 	Multi_Strike = card_sources[Source][Card_Index].Multi_Strike
+	# 	Paralysis = card_sources[Source][Card_Index].Paralysis
+	# 	Direct_Attack = card_sources[Source][Card_Index].Direct_Attack
+	# 	Effects_Disabled = card_sources[Source][Card_Index].Effects_Disabled
+	# 	Owner = card_sources[Source][Card_Index].Owner
 	
-	if "Tech" in Source:
-		Cost_Path = null
-	else:
-		Cost_Path = load("res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png") if card_sources[Source][Card_Index].Type != "Special" else null
+	# if "Tech" in Source:
+	# 	Cost_Path = null
+	# else:
+	# 	Cost_Path = load("res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png") if card_sources[Source][Card_Index].Type != "Special" else null
 
 func Set_Card_Visuals():
 	var Parent = get_parent()
@@ -191,7 +191,7 @@ func Reset_Stats_On_Capture():
 
 func Reset_Variables_After_Flip_Summon():
 	Is_Set = false
-	Effect_Active = false # Ensures effects aren't triggered from Graveyard.
+	Can_Activate_Effect = false # Ensures effects aren't triggered from Graveyard.
 	Tokens = 0
 	Update_Token_Info()
 

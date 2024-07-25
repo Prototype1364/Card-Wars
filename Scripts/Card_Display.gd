@@ -1,6 +1,7 @@
 extends Control
 
 var SelectedCard
+@onready var BM = get_tree().get_root().get_node("SceneHandler/Battle")
 
 func _ready():
 	# Setup Signal_Bus functionality. Note: Holder Variables (_HV) serve to eliminate Debugger warnings.
@@ -33,6 +34,7 @@ func LookAtCard(CardNode, FrameData, ArtData, NameData, CostData, AttributeData)
 				Text_Outline_Color = Color("1f8742")
 			
 			$Frame.texture = Frame_Texture
+			$ArtContainer/Art.texture = load(ArtData) # ImageContainer/CardImage of BigCard scene MUST REMAIN as a TEXTURE_BUTTON node type as it allows for auto-expansion of image proportions, thus cutting Eric's card art work in half.
 			$CostContainer/Cost.texture = Cost_Texture
 			$NameContainer/Name.text = NameData
 			$NameContainer/Name.set("theme_override_colors/font_outline_color", Text_Outline_Color)
@@ -48,11 +50,11 @@ func LookAtCard(CardNode, FrameData, ArtData, NameData, CostData, AttributeData)
 					$Description.text = SelectedCard.Short_Description
 			if SelectedCard.Type == "Normal" or SelectedCard.Type == "Hero":
 				if GameData.FocusedCardParentName.left(1) == "W":
-					$Attack.text = str(max(SelectedCard.Attack + SelectedCard.ATK_Bonus + GameData.Player.Field_ATK_Bonus, 0))
-					$Health.text = str(max(SelectedCard.Health + SelectedCard.Health_Bonus + GameData.Player.Field_Health_Bonus, 0))
+					$Attack.text = str(max(SelectedCard.Attack + SelectedCard.ATK_Bonus + BM.Player.Field_ATK_Bonus, 0))
+					$Health.text = str(max(SelectedCard.Health + SelectedCard.Health_Bonus + BM.Player.Field_Health_Bonus, 0))
 				else:
-					$Attack.text = str(max(SelectedCard.Attack + SelectedCard.ATK_Bonus + GameData.Enemy.Field_ATK_Bonus, 0))
-					$Health.text = str(max(SelectedCard.Health + SelectedCard.Health_Bonus + GameData.Enemy.Field_Health_Bonus, 0))
+					$Attack.text = str(max(SelectedCard.Attack + SelectedCard.ATK_Bonus + BM.Enemy.Field_ATK_Bonus, 0))
+					$Health.text = str(max(SelectedCard.Health + SelectedCard.Health_Bonus + BM.Enemy.Field_Health_Bonus, 0))
 				$Attribute.texture = Attribute_Texture
 			else:
 				$Attack.text = ""
@@ -60,6 +62,7 @@ func LookAtCard(CardNode, FrameData, ArtData, NameData, CostData, AttributeData)
 				$Attribute.texture = null
 		else: # Card is Advance Tech card
 			$Frame.texture = load("res://Assets/Cards/Frame/Large_Advance_Tech_Card.png")
+			$ArtContainer/Art.texture = null
 			$CostContainer/Cost.texture = null
 			$NameContainer/Name.text = ""
 			$Description.text = ""
@@ -67,8 +70,5 @@ func LookAtCard(CardNode, FrameData, ArtData, NameData, CostData, AttributeData)
 			$Health.text = ""
 			$Attribute.texture = null
 		
-		# ImageContainer/CardImage of BigCard scene MUST REMAIN as a TEXTURE_BUTTON node type as it allows for auto-expansion of image proportions, thus cutting Eric's card art work in half.
-		$ArtContainer/Art.texture = ArtData
-
 func NotLookingAtCard():
 	self.visible = false

@@ -54,8 +54,6 @@ signal Reload_Deck
 
 signal Shuffle_Deck
 
-signal Deck_Shuffled
-
 signal Reset_Reposition_Card_Variables
 
 signal EffectTargetSelected
@@ -65,3 +63,5 @@ signal Confirm
 signal Button_Selected
 
 signal Draw_Card
+
+signal READY

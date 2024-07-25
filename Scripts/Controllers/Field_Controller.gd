@@ -1,29 +1,6 @@
 extends Node
 
-class_name FieldController
-
-var Node_CardSpots = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots")
-
-func Add_Card_Node_To_Hand(Deck_ID, InstanceCard, Deck_Reloaded = false, Base_Node = Node_CardSpots):
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
-	var Hand = Base_Node.get_node(Deck_ID.left(1) + "HandScroller/" + Deck_ID.left(1) + "Hand")
-	
-	if Deck_Reloaded == false:
-		if "MainDeck" in Deck_ID and GameData.Current_Step == "Draw":
-			if player.Deck[-1].get_class() == "Control":
-				Hand.add_child(player.Deck[-1])
-			else:
-				SignalBus.emit_signal("Reset_Reposition_Card_Variables")
-				Hand.add_child(InstanceCard)
-				Set_Focus_Neighbors("Hand", Deck_ID.left(1), Hand)
-	else:
-		Reparent_Nodes(InstanceCard, Hand)
-
-func Add_Card_Node_To_Tech_Zone(Deck_ID, InstanceCard, Base_Node = Node_CardSpots):
-	var TechZone = Base_Node.get_node("NonHands/" + Deck_ID.left(1) + "TechZone")
-	InstanceCard.set_position(Vector2.ZERO) # Choosing to manually set position here instead of calling Reparent_Nodes() because InstanceCard has no parent (SourceNode) yet.
-	TechZone.add_child(InstanceCard)
-	Set_Focus_Neighbors("Field", Deck_ID.left(1), TechZone)
+@onready var BM = get_tree().get_root().get_node("SceneHandler/Battle")
 
 func Reparent_Nodes(Source_Node, Destination_Node):
 	Source_Node.set_position(Vector2.ZERO)
@@ -124,19 +101,15 @@ func Reposition_Field_Cards(Side) -> void:
 	SignalBus.emit_signal("Reset_Reposition_Card_Variables")
 
 func Play_Card(Base_Node, Side, Net_Cost):
-	var Dueler = GameData.Player if GameData.CardTo.name.left(1) == "W" else GameData.Enemy
-	var Enemy = GameData.Enemy if GameData.CardTo.name.left(1) == "W" else GameData.Player
+	var Dueler = BM.Player if GameData.CardTo.name.left(1) == "W" else BM.Enemy
 	var Reparent_Variables = [GameData.Chosen_Card.get_parent(), GameData.CardTo, GameData.Chosen_Card]
 	var Equip_Slot = Base_Node.get_node(Side + "EquipMagic") if Reparent_Variables[2].Type == "Magic" else Base_Node.get_node(Side + "EquipTrap")
 	var Graveyard = Base_Node.get_node(Side + "Graveyard")
-	var Parent_Name = GameData.CardTo.name
-	var Source_Name = GameData.Chosen_Card.get_parent().name
 	
 	Dueler.Summon_Crests -= Net_Cost
 	
 	# Reparents Previous Equip Card Node (if applicable)
 	if Equip_Slot.get_child_count() > 0 and Reparent_Variables[2].Attribute == "Equip":
-		Dueler.Graveyard.append(Equip_Slot.get_child(0))
 		Reparent_Nodes(Equip_Slot.get_child(0), Graveyard)
 	
 	Reparent_Nodes(Reparent_Variables[2], Reparent_Variables[1])
@@ -146,7 +119,6 @@ func Play_Card(Base_Node, Side, Net_Cost):
 		
 	# Ensures that card summoned to Equip slot is not immediately sent to Graveyard.
 	if GameData.Chosen_Card.Type == "Magic" and not ("Equip" in GameData.Chosen_Card.get_parent().name) and GameData.Chosen_Card.Is_Set == false:
-		Dueler.Graveyard.append(Reparent_Variables[2])
 		Reparent_Nodes(Reparent_Variables[2], Graveyard)
 	
 	# Updates Card Summoned This Turn Array
@@ -160,30 +132,12 @@ func Play_Card(Base_Node, Side, Net_Cost):
 
 	# Update Card Data
 	GameData.Chosen_Card.Update_Data()
-
-	# Append card to appropriate array when a card is played
-	if "Fighter" in Parent_Name:
-		Dueler.Fighter.append(GameData.Chosen_Card)
-	elif "EquipMagic" in Parent_Name:
-		Dueler.Equip_Magic.append(GameData.Chosen_Card)
-	elif "EquipTrap" in Parent_Name:
-		Dueler.Equip_Trap.append(GameData.Chosen_Card)
-	elif "R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name:
-		Dueler.Reinforcement.append(GameData.Chosen_Card)
-	elif "Backrow" in Parent_Name:
-		Dueler.Backrow.append(GameData.Chosen_Card)
-
-	# Erase card from appropriate array
-	if Source_Name.left(1) == Side:
-		Dueler.Hand.erase(GameData.Chosen_Card)
-	elif Source_Name.left(1) != Side:
-		Enemy.Hand.erase(GameData.Chosen_Card)
 	
 	# Resets GameData variables for next movement.
 	SignalBus.emit_signal("Reset_Reposition_Card_Variables")
 	
 	# Updates Duelist HUD (Places at end of func so that summon effects resolve before update)
-	SignalBus.emit_signal("Update_HUD_Duelist", Base_Node.get_parent().get_parent().get_parent().get_node("HUD_" + Side), Dueler)
+	SignalBus.emit_signal("Update_HUD_Duelist", Base_Node.get_parent().get_parent().get_parent().get_node("UI/Duelists/HUD_" + Side), Dueler)
 
 func Activate_Set_Card(Side, Chosen_Card):
 	# Replaces current Equip card with activated card & Reparents appropriate Nodes
@@ -200,9 +154,9 @@ func Activate_Set_Card(Side, Chosen_Card):
 
 func Reload_Deck(MedBay):
 	# Reparent Nodes from MedBay to MainDeck (Base_Node is Medbay)
-	var Dueler = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var MainDeck = Node_CardSpots.get_node("NonHands/" + Side + "MainDeck")
+	var MainDeck = get_node("NonHands/" + Side + "MainDeck")
 
 	# Shuffle Deck
 	SignalBus.emit_signal("Shuffle_Deck", Dueler)
@@ -214,7 +168,8 @@ func Reload_Deck(MedBay):
 
 	# Reorder MainDeck Children to match Deck Array order
 	for i in range(MainDeck.get_child_count()):
-		MainDeck.move_child(Dueler.Deck[i], i)
+		pass
+		#MainDeck.move_child(Dueler.Deck[i], i)
 
 	# Set Card Visuals for MainDeck
 	for i in range(MainDeck.get_child_count()):

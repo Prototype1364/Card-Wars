@@ -85,16 +85,16 @@ func Determine_Card_List(selection_type, Card_Source, slot = null, Desired_Attri
 	Populate_Card_Options_List(Card_List, Card_Source)
 
 func Populate_Card_Options_List(Card_List, Card_Source):
+	var DC = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands")
 	for i in len(Card_List):
 		var original = Card_List[i]
-		var copy = original.duplicate()
+		var copy = DC.Create_Card(original.Passcode)
+		copy.name = original.name
 		$ScrollContainer/Effect_Target_List.add_child(copy)
 		for n in original.get_property_list():
 			var PropertyName = n["name"]
 			var value = original.get_indexed(PropertyName)
 			copy.set_indexed(PropertyName,value)
-		copy.Set_Card_Variables(i, Card_Source)
-		copy.Set_Card_Visuals()
 		copy.Update_Data()
 		
 		# Hides Advance Tech Card from list (but still spawns it to ensure correct card is chosen from Card_Selector scene)
@@ -104,6 +104,9 @@ func Populate_Card_Options_List(Card_List, Card_Source):
 		# Hide Button Selector Scene if present
 		if copy.has_node("ButtonSelector"):
 			copy.get_node("ButtonSelector").visible = false
+		
+		# Fix Positioning Bug
+		copy.get_node("SmallCard").set_position(Vector2.ZERO)
 
 func On_Card_Selection(card):
 	Card_Selected = card

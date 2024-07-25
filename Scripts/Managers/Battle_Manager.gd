@@ -7,12 +7,13 @@ const EFFECT_STEPS = ["Effect", "Selection", "Damage", "Capture", "Discard"] # D
 const FUNC_STEPS = ["Damage"]
 
 # Import Dependencies
-@onready var BC = BattleController.new()
-@onready var CC = CombatantController.new() # Represents Duelist. Used Combatant due to Duelist class already being used AND DC alias already being used by DeckController.
-@onready var DC = DeckController.new()
-@onready var IC = InputController.new()
-@onready var UI = UIController.new()
-@onready var BF = FieldController.new()
+@onready var BC = $Playmat
+@onready var DC = $Playmat/CardSpots/NonHands
+@onready var IC = $BoardScroller
+@onready var UI = $UI
+@onready var BF = $Playmat/CardSpots
+@onready var Player = $UI/Duelists/HUD_W
+@onready var Enemy = $UI/Duelists/HUD_B
 
 
 """--------------------------------- Engine Functions ---------------------------------"""
@@ -40,6 +41,8 @@ func _ready():
 	
 	Setup_Game()
 
+	SignalBus.emit_signal("READY") # Temporary signal to ensure Card_Effects script functions as expected. See note in Card_Effects.gd for more info.
+
 
 
 """--------------------------------- GameState Functions ---------------------------------"""
@@ -58,7 +61,7 @@ func Update_Game_State(State_To_Change):
 	print(GameData.Current_Phase + " - " + GameData.Current_Step)
 
 func Update_Game_Step():
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var player = Player if GameData.Current_Turn == "Player" else Enemy
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"	
 	
 	# Call required funcs at appropriate Steps (and contain step values within bounds of current Phase)
@@ -83,8 +86,6 @@ func Update_Game_Step():
 		GameData.Current_Step = STEPS[STEPS.find(GameData.Current_Step) + 1]
 
 func Update_Game_Phase():
-	var Dueler = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
-
 	if PHASES.find(GameData.Current_Phase) + 1 >= len(PHASES): # Ensures game doesn't crash when trying to advance to a non-existent Phase.
 		return
 	elif GameData.Turn_Counter == 1 and PHASES.find(GameData.Current_Phase) == 2: # Skips Battle Phase on first turn of game
@@ -100,7 +101,11 @@ func Update_Game_Phase():
 		Set_Attacks_To_Launch()
 	
 	# Skips Battle Phase if no cards are in player's Fighter/Reinforcement slots
-	if GameData.Current_Phase == "Battle Phase" and len(Dueler.Fighter) + len(Dueler.Reinforcement) == 0:
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Fighter = BF.Get_Field_Card_Data($Playmat/CardSpots/NonHands, Side, "Fighter")
+	var Reinforcers = BF.Get_Field_Card_Data($Playmat/CardSpots/NonHands, Side, "R")
+
+	if GameData.Current_Phase == "Battle Phase" and Fighter == null and Reinforcers == null:
 		Update_Game_Phase()
 
 func Update_Game_Turn():
@@ -132,82 +137,17 @@ func Update_Game_Turn():
 
 
 """--------------------------------- Utility Functions ---------------------------------"""
-func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main", Draw_At_Index = -1):
-	var player = GameData.Player if Turn_Player == "Player" else GameData.Enemy
-	var Deck_ID
-	if Deck_Type == "Main":
-		Deck_ID = "WMainDeck" if Turn_Player == "Player" else "BMainDeck"
-	elif Deck_Type == "Tech":
-		Deck_ID = "WTechDeck" if Turn_Player == "Player" else "BTechDeck"
+func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main", Draw_At_Index = 0):
+	var player = Player if Turn_Player == "Player" else Enemy
 	
-	if player.Deck_Reloaded == false:
-		# Allows for single draws of specific cards
-		if Draw_At_Index != -1:
-			var InstanceCard = BC.Instantiate_Card()
-			if Deck_Type == "Main":
-				InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnMainDeck")
-				InstanceCard.Set_Card_Visuals()
-				BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
-				InstanceCard.Update_Data()
-				BC.Draw_Card(player, InstanceCard)
-				DC.Pop_Deck(player, "Main", Draw_At_Index)
+	for _i in range(Cards_To_Draw):
+		var Card_Info = BC.Draw_Card(player, Deck_Type + "Deck", Draw_At_Index)
+		BF.Reparent_Nodes(Card_Info['Card_Drawn'], Card_Info['Destination_Node'])
+		Card_Info['Card_Drawn'].Update_Data()
 
-				# Activate Advance Tech Card Effect when Drawn
-				if InstanceCard.Type == "Special":
-					BC.Activate_Summon_Effects(InstanceCard)
-
-			elif Deck_Type == "Tech":
-				InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnTechDeck")
-				InstanceCard.Set_Card_Visuals()
-				BF.Add_Card_Node_To_Tech_Zone(Deck_ID, InstanceCard)
-				InstanceCard.Update_Data()
-				DC.Pop_Deck(player, "Tech", Draw_At_Index)
-
-				# Activate Tech Effect
-				BC.Activate_Summon_Effects(InstanceCard)
-			
-			return
-		
-		for _i in range(Cards_To_Draw):
-			var InstanceCard = BC.Instantiate_Card()
-			if Deck_Type == "Main":
-				InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnMainDeck")
-				InstanceCard.Set_Card_Visuals()
-				BF.Add_Card_Node_To_Hand(Deck_ID, InstanceCard)
-				InstanceCard.Update_Data()
-				BC.Draw_Card(player, InstanceCard)
-				DC.Pop_Deck(player)
-
-				# Activate Advance Tech Card Effect when Drawn
-				if InstanceCard.Type == "Special":
-					BC.Activate_Summon_Effects(InstanceCard)
-
-			elif Deck_Type == "Tech":
-				InstanceCard.Set_Card_Variables(Draw_At_Index, "TurnTechDeck")
-				InstanceCard.Set_Card_Visuals()
-				BF.Add_Card_Node_To_Tech_Zone(Deck_ID, InstanceCard)
-				InstanceCard.Update_Data()
-				DC.Pop_Deck(player, "Tech")
-
-				# Activate Tech Effect
-				BC.Activate_Summon_Effects(InstanceCard)
-	else:
-		if Draw_At_Index != -1:
-			var card_drawn = DC.Pop_Deck(player, Deck_Type, Draw_At_Index)
-			BC.Draw_Card(player, card_drawn)
-			BF.Add_Card_Node_To_Hand(Deck_ID, card_drawn, true)
-			card_drawn.Set_Card_Visuals()
-
-			if card_drawn.Type == "Special":
-				BC.Activate_Summon_Effects(card_drawn)
-		else:
-			var top_card = DC.Pop_Deck(player)
-			BC.Draw_Card(player, top_card)
-			BF.Add_Card_Node_To_Hand(Deck_ID, top_card, true)
-			top_card.Set_Card_Visuals()
-
-			if top_card.Type == "Special":
-				BC.Activate_Summon_Effects(top_card)
+		# Activate Advance Tech Card Effect when Drawn
+		if Card_Info['Card_Drawn'].Type == "Special":
+			BC.Activate_Summon_Effects(Card_Info['Card_Drawn'])
 
 func Add_Tokens():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
@@ -240,7 +180,8 @@ func _input(event):
 	IC.Confirm(event)
 
 func Update_HUD_Duelist(Node_To_Update, Dueler):
-	UI.Update_HUD_Duelist(Node_To_Update, Dueler)
+	var Side = "W" if Dueler.Name == "Player" else "B"
+	UI.Update_HUD_Duelist(Dueler, Side)
 
 func Activate_Summon_Effects(Chosen_Card): # Play Card Supporter
 	BC.Activate_Summon_Effects(Chosen_Card)
@@ -261,12 +202,16 @@ func Reset_Reposition_Card_Variables():
 
 """--------------------------------- Setup Game Functions ---------------------------------"""
 func Setup_Game():
+	# Populate Duelist Data
+	BC.Set_Duelist_Data(Player, "Player", 50)
+	BC.Set_Duelist_Data(Enemy, "Enemy", 50)
+
 	# Populates & Shuffles Player/Enemy Decks
 	DC.Create_Deck("Arthurian", "Player")
 	DC.Create_Deck("Olympians", "Enemy")
 	DC.Create_Advance_Tech_Card()
-	Shuffle_Deck(GameData.Player)
-	Shuffle_Deck(GameData.Enemy)
+	Shuffle_Deck(Player)
+	Shuffle_Deck(Enemy)
 	
 	# Set Turn Player for First Turn
 	BC.Choose_Starting_Player()
@@ -275,14 +220,14 @@ func Setup_Game():
 	GameData.Current_Step = "Draw"
 	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
-	Draw_Card(GameData.Current_Turn, 5)
+	Draw_Card(GameData.Current_Turn, 35)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
 	GameData.Current_Step = "Start"
 	
 	# Update GUI
-	UI.Update_HUD_Duelist(get_node("HUD_W"), GameData.Player)
-	UI.Update_HUD_Duelist(get_node("HUD_B"), GameData.Enemy)
-	UI.Update_Deck_Counts()
+	UI.Update_HUD_GameState()
+	UI.Update_HUD_Duelist(Player, "W")
+	UI.Update_HUD_Duelist(Enemy, "B")
 	
 	# Set Turn Player
 	BC.Set_Turn_Player()
@@ -296,17 +241,16 @@ func Setup_Game():
 """--------------------------------- Opening Phase ---------------------------------"""
 func Conduct_Opening_Phase():
 	# Opening Phase (Start -> Draw -> Roll)
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var player = Player if GameData.Current_Turn == "Player" else Enemy
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Result
 	
 	Update_Game_State("Step")
 	Draw_Card(GameData.Current_Turn, 1)
-	UI.Update_Deck_Counts()
 	Update_Game_State("Step")
 	Result = Utils.Dice_Roll()
 	player.Update_Summon_Crests(Result)
-	UI.Update_HUD_Duelist(get_node("HUD_" + Side), player)
+	UI.Update_HUD_Duelist(player, Side)
 	Update_Game_State("Phase")
 
 
@@ -314,7 +258,7 @@ func Conduct_Opening_Phase():
 """--------------------------------- Standby Phase ---------------------------------"""
 func Conduct_Standby_Phase():
 	# Standby Phase (Effect -> Token)
-	BC.Set_Hero_Card_Effect_Status() # Sets the Effect_Active of all Periodic-style Hero cards on the turn player's field == True
+	BC.Set_Hero_Card_Effect_Status() # Sets the Can_Activate_Effect of all Periodic-style Hero cards on the turn player's field == True
 	BC.Resolve_Burn_Damage() # Resolves Burn Damage from any active Burn Effects
 	Update_Game_State("Step")
 	Add_Tokens()
@@ -332,7 +276,7 @@ func Conduct_Main_Phase():
 	pass
 
 func Play_Card(Base_Node, Side):
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
+	var player = Player if GameData.Current_Turn == "Player" else Enemy
 	var Card_Is_Valid = BC.Valid_Card(Base_Node.get_parent(), Side, GameData.Chosen_Card)
 	var Card_Net_Cost = BC.Calculate_Net_Cost(player, GameData.Chosen_Card)
 	var Destination_Is_Valid = BC.Valid_Destination(Side, GameData.CardTo, GameData.Chosen_Card)
@@ -356,17 +300,17 @@ func Conduct_Battle_Phase():
 
 func Resolve_Battle_Damage():
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
-	var enemy = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
+	var player = Player if GameData.Current_Turn == "Player" else Enemy
+	var enemy = Enemy if GameData.Current_Turn == "Player" else Player
 	var Reinforcers_Opp = BF.Get_Field_Card_Data($Playmat/CardSpots/NonHands, Side_Opp, "R")
 	
 	BC.Resolve_Battle_Damage(Reinforcers_Opp, player, enemy)
-	UI.Update_HUD_Duelist(get_node("HUD_" + Side_Opp), enemy)
+	UI.Update_HUD_Duelist(enemy, Side_Opp)
 	UI.Update_HUD_GameState()
 
 func Capture_Card(Card_Captured, Capture_Type = "Normal", Reset_Stats = true):
-	var attacking_player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
-	var defending_player = GameData.Enemy if GameData.Current_Turn == "Player" else GameData.Player
+	var attacking_player = Player if GameData.Current_Turn == "Player" else Enemy
+	var defending_player = Enemy if GameData.Current_Turn == "Player" else Player
 	var Destination_MedBay = BC.Get_Destination_MedBay_on_Capture(Capture_Type)
 	var Parent_Name = Card_Captured.get_parent().name
 	var Fighter_Captured = true if "Fighter" in Parent_Name else false
@@ -377,7 +321,7 @@ func Capture_Card(Card_Captured, Capture_Type = "Normal", Reset_Stats = true):
 
 	# Move Equips to Graveyard when Fighter is Captured
 	if Fighter_Captured:
-		var Side = "W" if defending_player == GameData.Player else "B"
+		var Side = "W" if defending_player == Player else "B"
 		var Equip_Magic_Slot = BC.Get_Field_Card_Slot(Side, "EquipMagic")
 		var Equip_Trap_Slot = BC.Get_Field_Card_Slot(Side, "EquipTrap")
 		var Graveyard = BC.Get_Destination_Graveyard_on_Capture(Capture_Type)
@@ -400,9 +344,7 @@ func Capture_Card(Card_Captured, Capture_Type = "Normal", Reset_Stats = true):
 
 """--------------------------------- End Phase ---------------------------------"""
 func Conduct_End_Phase():
-	# End Phase (Discard -> Reload -> Effect -> Victory -> End)
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
-	
+	# End Phase (Discard -> Reload -> Effect -> Victory -> End)	
 	# May/may not be needed depending on if Discard step remains an EFFECT step.
 	BC.Resolve_Card_Effects()
 	
@@ -413,7 +355,7 @@ func Conduct_End_Phase():
 	UI.Update_HUD_GameState()
 	
 	# Check for required Reload
-	DC.Reload_Deck_Array(player.Deck, player.MedicalBay)
+	pass
 	
 	# Effect Step
 	GameData.Current_Step = "Effect"
@@ -421,7 +363,7 @@ func Conduct_End_Phase():
 	
 	# Victory Step
 	GameData.Current_Step = "Victory"
-	if BC.Check_For_Victor_LP() or BC.Check_For_Victor_Deck_Out():
+	if BC.Check_For_Victor_LP():
 		print("VICTORY")
 		print(GameData.Victor + " wins!")
 		return
@@ -433,7 +375,6 @@ func Conduct_End_Phase():
 	GameData.Current_Step = "End"
 
 func Discard_Card(Side):
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
 	var CardMoved = get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand/" + str(GameData.CardMoved))
 	var MedBay = get_node("Playmat/CardSpots/NonHands/" + Side + "MedBay")
 	
@@ -444,9 +385,9 @@ func Discard_Card(Side):
 	BF.Set_Focus_Neighbors("Field",Side,CardMoved)
 	BF.Set_Focus_Neighbors("Hand",Side,get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand"))
 	
-	# Update Duelist's Hand & MedicalBay Array
-	player.Hand.erase(CardMoved)
-	player.MedicalBay.append(CardMoved)
+	# # Update Duelist's Hand & MedicalBay Array
+	# player.Hand.erase(CardMoved)
+	# player.MedicalBay.append(CardMoved)
 	
 	# Resets GameData variables for next movement.
 	BC.Reset_Reposition_Card_Variables()
@@ -458,15 +399,14 @@ func Discard_Card(Side):
 		Update_Game_Turn()
 
 func Reload_Deck():
-	var player = GameData.Player if GameData.Current_Turn == "Player" else GameData.Enemy
-	var Side = "W" if player == GameData.Player else "B"
+	var player = Player if GameData.Current_Turn == "Player" else Enemy
+	var Side = "W" if player.Name == "Player" else "B"
 	var Node_MedBay = get_node("Playmat/CardSpots/NonHands/" + Side + "MedBay")
 	
 	BF.Reload_Deck(Node_MedBay)
 
 func Shuffle_Deck(player):
 	DC.Shuffle_Deck(player)
-	UI.Update_Deck_Counts()
 
 
 
@@ -490,3 +430,4 @@ func _on_Next_Phase_pressed():
 
 func _on_End_Turn_pressed():
 	Update_Game_State("Turn")
+
