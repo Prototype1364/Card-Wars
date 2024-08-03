@@ -1,5 +1,7 @@
 extends Node
 
+@onready var BC = get_parent().get_parent()
+
 func Create_Card(cardPasscode):
 	for card in GameData.CardData:
 		if card["Passcode"] == cardPasscode:
@@ -36,7 +38,7 @@ func Create_Advance_Tech_Card():
 		if card["Passcode"] == 42489363:
 			Created_Card = Create_Card(card["Passcode"])
 
-	var random_number = Utils.RNGesus(1, 2)
+	var random_number = BC.RNGesus(1, 2)
 	var Deck_Node = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/WMainDeck") if random_number == 1 else Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/BMainDeck")
 	Deck_Node.add_child(Created_Card)
 
@@ -53,9 +55,9 @@ func Shuffle_Deck(player):
 	# Create a new array to shuffle the deck
 	var NewArray = []
 	for i in range(len(Deck)):
-		var random_number = Utils.RNGesus(0, len(Deck) - 1)
+		var random_number = BC.RNGesus(0, len(Deck) - 1)
 		while random_number in NewArray:
-			random_number = Utils.RNGesus(0, len(Deck) - 1)
+			random_number = BC.RNGesus(0, len(Deck) - 1)
 		NewArray.append(random_number)
 	
 	# Loop through the deck and shuffle the cards based on the new array

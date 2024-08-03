@@ -248,7 +248,7 @@ func Conduct_Opening_Phase():
 	Update_Game_State("Step")
 	Draw_Card(GameData.Current_Turn, 1)
 	Update_Game_State("Step")
-	Result = Utils.Dice_Roll()
+	Result = BC.Dice_Roll()
 	player.Update_Summon_Crests(Result)
 	UI.Update_HUD_Duelist(player, Side)
 	Update_Game_State("Phase")

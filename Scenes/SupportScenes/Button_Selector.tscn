@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/Controllers/Button_Selector_Controller.gd" id="1_avn8r"]
 
 [node name="ButtonSelector" type="Control"]
+top_level = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

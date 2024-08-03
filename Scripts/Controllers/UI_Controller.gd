@@ -1,8 +1,15 @@
 extends Node
 
-func _ready(): 
+var SelectedCard
+@onready var BM = get_tree().get_root().get_node("SceneHandler/Battle")
+@onready var BigCardNode = get_parent().get_node("CardExaminer/BigCard")
+
+func _ready():
+	# Setup Signal_Bus functionality. Note: Holder Variables (_HV) serve to eliminate Debugger warnings.
 	var _HV1 = SignalBus.connect("Flip_Duelist_HUDs", Callable(self, "Flip_Duelist_HUDs"))
 	var _HV2 = SignalBus.connect("Update_HUD_GameState", Callable(self, "Update_HUD_GameState"))
+	var _HV3 = SignalBus.connect("LookAtCard", Callable(self, "LookAtCard"))
+	var _HV4 = SignalBus.connect("NotLookingAtCard", Callable(self, "NotLookingAtCard"))
 
 
 
@@ -20,7 +27,6 @@ func Flip_Duelist_HUDs(HUD_W = $Duelists/HUD_W, HUD_B = $Duelists/HUD_B):
 	HUD_B.position = HUD_W_Pos
 
 func Update_Deck_Counts(_node, Deck_Source: String):
-	var BM = get_tree().get_root().get_node("SceneHandler/Battle")
 	var deck_node = BM.get_node("Playmat/CardSpots/NonHands/" + Deck_Source + "Deck")
 	var label_node = BM.get_node("Playmat/CardSpots/" + Deck_Source + "DeckCardCount")
 	label_node.text = str(len(deck_node.get_children()))
@@ -77,3 +83,71 @@ func Update_HUD_Duelist_Token(Dueler, Side):
 
 func _on_b_main_deck_child_entered_tree(node):
 	pass # Replace with function body.
+
+
+
+"""--------------------------------- Card Display Functions ---------------------------------"""
+func LookAtCard(CardNode, FrameData, ArtData, NameData, CostData, AttributeData):
+	SelectedCard = CardNode
+	BigCardNode.visible = true
+	
+	if SelectedCard != null:
+		if FrameData != "Special": # Card is NOT Advance Tech card
+			var Frame_Texture = load("res://Assets/Cards/Frame/Large_Frame_" + FrameData + ".png")
+			var Cost_Texture
+			if FrameData != "Tech":
+				Cost_Texture = load("res://Assets/Cards/Cost/Large/Large_Cost_" + FrameData + "_" + str(CostData) + ".png")
+			var Attribute_Texture
+			if SelectedCard.Type == "Normal" or SelectedCard.Type == "Hero":
+				Attribute_Texture = load("res://Assets/Cards/Attribute/Attribute_" + AttributeData + ".png")
+			var Text_Outline_Color
+			if FrameData == "Normal":
+				Text_Outline_Color = Color("676767")
+			elif FrameData == "Hero":
+				Text_Outline_Color = Color("cdaf2f")
+			elif FrameData == "Magic":
+				Text_Outline_Color = Color("7a51a0")
+			elif FrameData == "Trap":
+				Text_Outline_Color = Color("ff0000")
+			elif FrameData == "Tech":
+				Text_Outline_Color = Color("1f8742")
+			
+			BigCardNode.get_node("Frame").texture = Frame_Texture
+			BigCardNode.get_node("ArtContainer/Art").texture = load(ArtData) # ImageContainer/CardImage of BigCard scene MUST REMAIN as a TEXTURE_BUTTON node type as it allows for auto-expansion of image proportions, thus cutting Eric's card art work in half.
+			BigCardNode.get_node("CostContainer/Cost").texture = Cost_Texture
+			BigCardNode.get_node("NameContainer/Name").text = NameData
+			BigCardNode.get_node("NameContainer/Name").set("theme_override_colors/font_outline_color", Text_Outline_Color)
+			BigCardNode.get_node("Description").set("theme_override_colors/font_outline_color", Text_Outline_Color)
+			BigCardNode.get_node("Attack").set("theme_override_colors/font_outline_color", Text_Outline_Color)
+			BigCardNode.get_node("Health").set("theme_override_colors/font_outline_color", Text_Outline_Color)
+			if SelectedCard.Short_Description == null:
+				BigCardNode.get_node("Description").text = "This card has no Short Description."
+			else:
+				if SelectedCard.Anchor_Text != null:
+					BigCardNode.get_node("Description").text = "[" + SelectedCard.Anchor_Text + "] " + SelectedCard.Short_Description
+				else:
+					BigCardNode.get_node("Description").text = SelectedCard.Short_Description
+			if SelectedCard.Type == "Normal" or SelectedCard.Type == "Hero":
+				if GameData.FocusedCardParentName.left(1) == "W":
+					BigCardNode.get_node("Attack").text = str(max(SelectedCard.Attack + SelectedCard.ATK_Bonus + BM.Player.Field_ATK_Bonus, 0))
+					BigCardNode.get_node("Health").text = str(max(SelectedCard.Health + SelectedCard.Health_Bonus + BM.Player.Field_Health_Bonus, 0))
+				else:
+					BigCardNode.get_node("Attack").text = str(max(SelectedCard.Attack + SelectedCard.ATK_Bonus + BM.Enemy.Field_ATK_Bonus, 0))
+					BigCardNode.get_node("Health").text = str(max(SelectedCard.Health + SelectedCard.Health_Bonus + BM.Enemy.Field_Health_Bonus, 0))
+				BigCardNode.get_node("Attribute").texture = Attribute_Texture
+			else:
+				BigCardNode.get_node("Attack").text = ""
+				BigCardNode.get_node("Health").text = ""
+				BigCardNode.get_node("Attribute").texture = null
+		else: # Card is Advance Tech card
+			BigCardNode.get_node("Frame").texture = load("res://Assets/Cards/Frame/Large_Advance_Tech_Card.png")
+			BigCardNode.get_node("ArtContainer/Art").texture = null
+			BigCardNode.get_node("CostContainer/Cost").texture = null
+			BigCardNode.get_node("NameContainer/Name").text = ""
+			BigCardNode.get_node("Description").text = ""
+			BigCardNode.get_node("Attack").text = ""
+			BigCardNode.get_node("Health").text = ""
+			BigCardNode.get_node("Attribute").texture = null
+		
+func NotLookingAtCard():
+	BigCardNode.visible = false

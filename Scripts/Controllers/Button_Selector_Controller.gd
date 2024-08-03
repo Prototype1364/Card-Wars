@@ -3,9 +3,12 @@ extends Control
 @onready var Active_Effects = []
 @onready var trigger_card = get_parent()
 @onready var Selected_Button = null
+@onready var Grandparent_pos = get_parent().get_parent().global_position
 
 func _ready():
 	var _HV1 = SignalBus.connect("Button_Selected", Callable(self, "On_Button_Selection"))
+
+	position = Grandparent_pos
 
 func Get_Active_Card_Effects():
 	var active_effects_dict = {}

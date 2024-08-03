@@ -269,13 +269,13 @@ func set_tokens(value: int, context: String = "Initialize"):
 			Token_Container.remove_child(i)
 			i.queue_free()
 
-func set_is_set(_value: bool, context: String = "Initialize"):
+func set_is_set(context: String = "Initialize"):
 	if context == "Set":
 		Is_Set = true
 	else:
 		Is_Set = false
 
-func set_can_activate_effect(_value: bool):
+func set_can_activate_effect():
 	var Parent_Name: String = get_parent().name
 	var Side: String = "W" if GameData.Current_Turn == "Player" else "B"
 	var Resolvable_Side: bool = true if Resolve_Side == "Both" or Side == Parent_Name.left(1) else false
@@ -347,11 +347,10 @@ func Reset_Stats_On_Capture():
 	set_health_bonus(0)
 	set_burn_damage(0)
 
-func Valid_Attacker_Selection(Reposition_Zones, Reinforcement_Zones, Parent_Name, Side) -> bool:
-	if (Reposition_Zones[0] in Parent_Name or (Attack_As_Reinforcement == true and Reinforcement_Zones.has(Parent_Name))) and Parent_Name.left(1) == Side and Paralysis == false:
-		return true
-	else:
-		return false
+func Reset_Variables_After_Flip_Summon():
+	set_is_set()
+	set_can_activate_effect() # Ensures effects aren't triggered from the Graveyard
+	set_tokens(0, "Reset")
 
 func Update_Attacks_Remaining(Role):
 	if Role == "Attack":
@@ -380,9 +379,9 @@ func Get_Total_Health():
 
 # Signal-Related Functions
 func focusing():
-	GameData.FocusedCardName = self.name
-	GameData.FocusedCardParentName = self.get_parent().name
-	if "Deck" not in self.get_parent().name:
+	GameData.FocusedCardName = name
+	GameData.FocusedCardParentName = get_parent().name
+	if "Deck" not in get_parent().name:
 		SignalBus.emit_signal("LookAtCard", self, Frame, Art, Name, Cost, Attribute)
 
 func defocusing():
@@ -390,11 +389,10 @@ func defocusing():
 	GameData.FocusedCardParentName = ""
 	SignalBus.emit_signal("NotLookingAtCard")
 
-func on_FocusSensor_pressed(): # FIXME: Might need to be split into multiple functions to follow SOLID Principles
+func on_FocusSensor_pressed():
 	var Side: String = "W" if GameData.Current_Turn == "Player" else "B"
 	var Reposition_Zones: Array = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
-	var Reinforcement_Zones: Array = [Side + "R1", Side + "R2", Side + "R3"]
-	var Parent_Name: String = self.get_parent().name
+	var Parent_Name: String = get_parent().name
 	
 	match GameData.Current_Step:
 		"Main":
@@ -406,7 +404,7 @@ func on_FocusSensor_pressed(): # FIXME: Might need to be split into multiple fun
 					GameData.Current_Card_Effect_Step = "Clicked"
 					CardEffects.call(Anchor_Text, self)
 			elif "Hand" in Parent_Name and Type == "Trap":
-				if self.Attribute == "Equip":
+				if Attribute == "Equip":
 					$SmallCard/Action_Button_Container/Summon.visible = true
 					$SmallCard/Action_Button_Container/Set.visible = false
 				else:
@@ -420,7 +418,8 @@ func on_FocusSensor_pressed(): # FIXME: Might need to be split into multiple fun
 			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
 				SignalBus.emit_signal("EffectTargetSelected", self)
 		"Selection":
-			if Valid_Attacker_Selection(Reposition_Zones, Reinforcement_Zones, Parent_Name, Side):
+			set_can_attack()
+			if Can_Attack:
 				GameData.Attacker = self
 				SignalBus.emit_signal("Check_For_Targets")
 			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
@@ -432,7 +431,7 @@ func on_FocusSensor_pressed(): # FIXME: Might need to be split into multiple fun
 				SignalBus.emit_signal("EffectTargetSelected", self)
 		"Discard":
 			GameData.CardFrom = Parent_Name
-			GameData.CardMoved = self.name
+			GameData.CardMoved = name
 			if "Hand" in GameData.CardFrom:
 				SignalBus.emit_signal("Discard_Card", GameData.CardFrom.left(1))
 			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
@@ -442,10 +441,10 @@ func on_FocusSensor_pressed(): # FIXME: Might need to be split into multiple fun
 	if Reposition_Zones.has(Parent_Name) and GameData.Current_Step == "Main":
 		if GameData.CardFrom == "":
 			GameData.CardFrom = Parent_Name
-			GameData.CardMoved = self.name
+			GameData.CardMoved = name
 		elif GameData.CardFrom != "":
-			GameData.CardTo = self.get_parent()
-			GameData.CardSwitched = self.name
+			GameData.CardTo = get_parent()
+			GameData.CardSwitched = name
 			SignalBus.emit_signal("Reposition_Field_Cards", GameData.CardTo.name.left(1))
 	
 	# Allows Flip summoning of cards from backrow
@@ -453,7 +452,7 @@ func on_FocusSensor_pressed(): # FIXME: Might need to be split into multiple fun
 		$SmallCard/Action_Button_Container/Summon.text = "Flip"
 		$SmallCard/Action_Button_Container/Summon.visible = true
 		GameData.CardFrom = Parent_Name
-		GameData.CardMoved = self.name
+		GameData.CardMoved = name
 
 	# Allows user to re-open card Effect scenes during turn
 	if Parent_Name.left(1) == Side:
@@ -468,12 +467,12 @@ func _on_Summon_Set_pressed(Mode):
 	if "Hand" in Parent_Name and Mode == "Summon":
 		GameData.Summon_Mode = "Summon"
 		# Automatically move Equip card to appropriate Equip slot
-		if self.Attribute == "Equip":
+		if Attribute == "Equip":
 			$SmallCard/Action_Button_Container/Summon.visible = false
 			$SmallCard/Action_Button_Container/Set.visible = false
-			var slot_name: String = Side + "Equip" + self.Type
+			var slot_name: String = Side + "Equip" + Type
 			GameData.CardFrom = Parent_Name
-			GameData.CardMoved = self.name
+			GameData.CardMoved = name
 			SignalBus.emit_signal("Summon_Set_Pressed", slot_name)
 		else:
 			$SmallCard/Action_Button_Container/Summon.visible = false
@@ -482,7 +481,7 @@ func _on_Summon_Set_pressed(Mode):
 	
 	elif "Hand" in Parent_Name and Mode == "Set":
 		GameData.Summon_Mode = "Set"
-		self.Is_Set = true
+		Is_Set = true
 		$SmallCard/Action_Button_Container/Summon.visible = false
 		$SmallCard/Action_Button_Container/Set.visible = false
 		SignalBus.emit_signal("Summon_Set_Pressed", "Backrow")
@@ -518,12 +517,3 @@ func _on_Hide_Action_Buttons_pressed(_event):
 		$SmallCard/Action_Button_Container/Summon.visible = false
 		$SmallCard/Action_Button_Container/Set.visible = false
 		$SmallCard/Action_Button_Container/Target.visible = false
-
-
-# Card_Controller.gd:
-	# 1) setter/getter funcs for all variables
-	# 2) focusing() / defocusing() funcs
-	# 3) _on_FocusSensor_pressed()
-	# 4) card button related funcs (summon, set, target, hide)
-	# 5) text editors for card stat transfers, etc.
-	# 6) Add functions for setters that improved/replaced previous funcs (like Valid_Attacker_Selection, which is missing from this script intentionally.)

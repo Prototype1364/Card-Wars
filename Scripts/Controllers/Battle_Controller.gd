@@ -37,6 +37,15 @@ func Check_For_Victor_LP(player = BM.Player, enemy = BM.Enemy) -> bool:
 
 
 """--------------------------------- Unfilled Functions ---------------------------------"""
+func RNGesus(lower_bound, upper_bound) -> int:
+	var rng = RandomNumberGenerator.new()
+	var rnd_value = rng.randi_range(lower_bound, upper_bound)
+	return rnd_value
+
+func Dice_Roll() -> int:
+	var roll_result = RNGesus(1, 6)
+	return roll_result
+
 func Draw_Card(Turn_Player, Deck_Source = "MainDeck", Draw_At_Index = 0) -> Dictionary:
 	var Side = "W" if Turn_Player.Name == "Player" else "B"
 	var Deck_Path = Get_Node_Path(Deck_Source, Side)
@@ -206,7 +215,7 @@ func Set_Turn_Player():
 
 func Choose_Starting_Player():
 	var random_number = 1
-	#	var random_number = Utils.RNGesus(1, 2)
+	#	var random_number = RNGesus(1, 2)
 	GameData.Current_Turn = "Player" if random_number == 1 else "Enemy"
 	
 	# Flip field (if Black goes first)
