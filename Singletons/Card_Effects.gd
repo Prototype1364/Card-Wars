@@ -559,7 +559,7 @@ func Reincarnation(card):
 func Relentless(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	
-	card.Relentless == true if Valid_Card else false
+	card.Relentless = true if Valid_Card else false
 
 func Retribution(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
