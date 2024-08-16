@@ -5,12 +5,35 @@ extends Node
 func Create_Card(cardPasscode):
 	for card in GameData.CardData:
 		if card["Passcode"] == cardPasscode:
-			var Created_Card = Card.new(card["CardType"], card["CardArt"], card["CardName"], card["CardType"], card["EffectType"], card["AnchorText"], card["ResolveSide"], card["ResolvePhase"], card["ResolveStep"], card["Attribute"], card["Description"], card["ShortDescription"], card["Attack"], 0, card["Toxicity"], card["Cost"], card["Health"], 0, 0, card["SpecialEditionText"], card["Rarity"], card["Passcode"], card["DeckCapacity"], 0, false, false, 1, false, false, false, false, false, false, false, false, "Game")
+			var card_data = {
+				"Frame": card["CardType"],
+				"Art": card["CardArt"],
+				"Name": card["CardName"],
+				"Type": card["CardType"],
+				"Effect_Type": card["EffectType"],
+				"Anchor_Text": card["AnchorText"],
+				"Resolve_Side": card["ResolveSide"],
+				"Resolve_Phase": card["ResolvePhase"],
+				"Resolve_Step": card["ResolveStep"],
+				"Attribute": card["Attribute"],
+				"Description": card["Description"],
+				"Short_Description": card["ShortDescription"],
+				"Attack": card["Attack"],
+				"Toxicity": card["Toxicity"],
+				"Cost": card["Cost"],
+				"Health": card["Health"],
+				"Special_Edition_Text": card["SpecialEditionText"],
+				"Rarity": card["Rarity"],
+				"Passcode": card["Passcode"],
+				"Deck_Capacity": card["DeckCapacity"],
+			}
+			var Created_Card = Card.new(card_data)
 			var Card_Controller = load('Scenes/SupportScenes/SmallCard.tscn').instantiate()
 			Created_Card.add_child(Card_Controller)
 			Created_Card.name = "Card" + str(GameData.CardCounter)
 			GameData.CardCounter += 1
 			Created_Card.custom_minimum_size = Vector2(120,180)
+			Created_Card.add_to_group("Cards")
 			return Created_Card
 
 func Create_Deck(Deck_List, Current_Duelist):	
@@ -21,13 +44,9 @@ func Create_Deck(Deck_List, Current_Duelist):
 				var Side = "W" if Current_Duelist == "Player" else "B"
 				var Created_Card = Create_Card(card["Passcode"])
 
-				# Ensures that Tech cards go into the Tech Deck.
-				if Created_Card.Type == "Tech":
-					var Deck_Node = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "TechDeck")
-					Deck_Node.add_child(Created_Card)
-				else:
-					var Deck_Node = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/" + Side + "MainDeck")
-					Deck_Node.add_child(Created_Card)
+				# Ensures that cards go into the appriate Deck based on card type
+				var Deck_Node = get_node(Side + {"Tech": "TechDeck", "Hero": "HeroDeck"}.get(Created_Card.Type, "MainDeck"))
+				Deck_Node.add_child(Created_Card)
 				
 				# Fix Positioning Bug
 				Created_Card.get_node("SmallCard").set_position(Vector2.ZERO)
@@ -39,29 +58,25 @@ func Create_Advance_Tech_Card():
 			Created_Card = Create_Card(card["Passcode"])
 
 	var random_number = BC.RNGesus(1, 2)
-	var Deck_Node = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/WMainDeck") if random_number == 1 else Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/BMainDeck")
+	var Deck_Node = get_node("WMainDeck") if random_number == 1 else get_node("BMainDeck")
 	Deck_Node.add_child(Created_Card)
 
 	# Fix Positioning Bug
 	Created_Card.get_node("SmallCard").set_position(Vector2.ZERO)
 
-func Shuffle_Deck(player):
-	# Get the deck
-	var Deck = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/WMainDeck").get_children() if player.Name == "Player" else Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/BMainDeck").get_children()
-	var wMainDeck = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/WMainDeck")
-	var bMainDeck = Engine.get_main_loop().get_current_scene().get_node("Battle/Playmat/CardSpots/NonHands/BMainDeck")
-	var mainDeckUsed = wMainDeck if player.Name == "Player" else bMainDeck
+func Shuffle_Deck(player, Deck_Source = "MainDeck"):
+	var Deck = get_node("W" + Deck_Source) if player.Name == "Player" else get_node("B" + Deck_Source)
 	
 	# Create a new array to shuffle the deck
 	var NewArray = []
-	for i in range(len(Deck)):
-		var random_number = BC.RNGesus(0, len(Deck) - 1)
+	for i in range(Deck.get_child_count()):
+		var random_number = BC.RNGesus(0, Deck.get_child_count() - 1)
 		while random_number in NewArray:
-			random_number = BC.RNGesus(0, len(Deck) - 1)
+			random_number = BC.RNGesus(0, Deck.get_child_count() - 1)
 		NewArray.append(random_number)
 	
-	# Loop through the deck and shuffle the cards based on the new array
-	for i in range(len(Deck)):
+	# Loop through the deck and shuffle the cards based on the new array order
+	for i in range(Deck.get_child_count()):
 		var card_index = NewArray[i]
-		var card = mainDeckUsed.get_child(card_index)
-		mainDeckUsed.move_child(card, i)
+		var card = Deck.get_child(card_index)
+		Deck.move_child(card, i)

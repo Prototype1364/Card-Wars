@@ -14,8 +14,6 @@ signal Reposition_Field_Cards
 
 signal Play_Card
 
-signal Card_Summoned
-
 signal Activate_Set_Card
 
 signal Check_For_Targets
@@ -63,5 +61,9 @@ signal Confirm
 signal Button_Selected
 
 signal Draw_Card
+
+signal Sacrifice_Card
+
+signal Hero_Deck_Selected
 
 signal READY

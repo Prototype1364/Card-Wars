@@ -29,14 +29,7 @@ func Flip_Duelist_HUDs(HUD_W = $Duelists/HUD_W, HUD_B = $Duelists/HUD_B):
 func Update_Deck_Counts(_node, Deck_Source: String):
 	var deck_node = BM.get_node("Playmat/CardSpots/NonHands/" + Deck_Source + "Deck")
 	var label_node = BM.get_node("Playmat/CardSpots/" + Deck_Source + "DeckCardCount")
-	label_node.text = str(len(deck_node.get_children()))
-
-
-
-	#W_Main.text = str(GameData.Player.Deck.size())
-	#W_Tech.text = str(GameData.Player.Tech_Deck.size())
-	#B_Main.text = str(GameData.Enemy.Deck.size())
-	#B_Tech.text = str(GameData.Enemy.Tech_Deck.size())
+	label_node.text = str(len(deck_node.get_children()) - 1)
 
 func _on_SwitchSides_pressed(Playmat = $"../Playmat"):
 	var BoardImage = preload("res://Assets/Playmat/BoardImage.png")
@@ -81,10 +74,6 @@ func Update_HUD_Duelist_Token(Dueler, Side):
 			Token_Container.add_child(InstanceToken)
 
 
-func _on_b_main_deck_child_entered_tree(node):
-	pass # Replace with function body.
-
-
 
 """--------------------------------- Card Display Functions ---------------------------------"""
 func LookAtCard(CardNode, FrameData, ArtData, NameData, CostData, AttributeData):
@@ -93,52 +82,23 @@ func LookAtCard(CardNode, FrameData, ArtData, NameData, CostData, AttributeData)
 	
 	if SelectedCard != null:
 		if FrameData != "Special": # Card is NOT Advance Tech card
-			var Frame_Texture = load("res://Assets/Cards/Frame/Large_Frame_" + FrameData + ".png")
-			var Cost_Texture
-			if FrameData != "Tech":
-				Cost_Texture = load("res://Assets/Cards/Cost/Large/Large_Cost_" + FrameData + "_" + str(CostData) + ".png")
-			var Attribute_Texture
-			if SelectedCard.Type == "Normal" or SelectedCard.Type == "Hero":
-				Attribute_Texture = load("res://Assets/Cards/Attribute/Attribute_" + AttributeData + ".png")
-			var Text_Outline_Color
-			if FrameData == "Normal":
-				Text_Outline_Color = Color("676767")
-			elif FrameData == "Hero":
-				Text_Outline_Color = Color("cdaf2f")
-			elif FrameData == "Magic":
-				Text_Outline_Color = Color("7a51a0")
-			elif FrameData == "Trap":
-				Text_Outline_Color = Color("ff0000")
-			elif FrameData == "Tech":
-				Text_Outline_Color = Color("1f8742")
+			var Duelist = BM.Player if GameData.FocusedCardParentName.left(1) == "W" else BM.Enemy
+			const TEXT_OUTLINE_COLOR_DICT_MAP = {"Normal": "676767", "Hero": "cdaf2f", "Magic": "7a51a0", "Trap": "ff0000", "Tech": "1f8742", "Status": "00ffff"}
+			var Text_Outline_Color = Color(TEXT_OUTLINE_COLOR_DICT_MAP[FrameData])
+			var description_text = "[" + SelectedCard.Anchor_Text + "] " + SelectedCard.Short_Description if SelectedCard.Anchor_Text != null and SelectedCard.Short_Description != null else "This card has no Short Description." if SelectedCard.Short_Description == null else SelectedCard.Short_Description
 			
-			BigCardNode.get_node("Frame").texture = Frame_Texture
+			BigCardNode.get_node("Frame").texture = load("res://Assets/Cards/Frame/Large_Frame_" + FrameData + ".png")
 			BigCardNode.get_node("ArtContainer/Art").texture = load(ArtData) # ImageContainer/CardImage of BigCard scene MUST REMAIN as a TEXTURE_BUTTON node type as it allows for auto-expansion of image proportions, thus cutting Eric's card art work in half.
-			BigCardNode.get_node("CostContainer/Cost").texture = Cost_Texture
+			BigCardNode.get_node("CostContainer/Cost").texture = load("res://Assets/Cards/Cost/Large/Large_Cost_" + FrameData + "_" + str(CostData) + ".png") if FrameData != "Tech" and CostData != 0 else null
 			BigCardNode.get_node("NameContainer/Name").text = NameData
+			BigCardNode.get_node("Description").text = description_text
+			BigCardNode.get_node("Attack").text = str(max(SelectedCard.Attack + SelectedCard.ATK_Bonus + Duelist.Field_ATK_Bonus, 0)) if SelectedCard.Type in ["Normal", "Hero"] else ""
+			BigCardNode.get_node("Health").text = str(max(SelectedCard.Health + SelectedCard.Health_Bonus + Duelist.Field_Health_Bonus, 0)) if SelectedCard.Type in ["Normal", "Hero"] else ""
+			BigCardNode.get_node("Attribute").texture = load("res://Assets/Cards/Attribute/Attribute_" + AttributeData + ".png") if SelectedCard.Type in ["Normal", "Hero"] else null
 			BigCardNode.get_node("NameContainer/Name").set("theme_override_colors/font_outline_color", Text_Outline_Color)
 			BigCardNode.get_node("Description").set("theme_override_colors/font_outline_color", Text_Outline_Color)
 			BigCardNode.get_node("Attack").set("theme_override_colors/font_outline_color", Text_Outline_Color)
 			BigCardNode.get_node("Health").set("theme_override_colors/font_outline_color", Text_Outline_Color)
-			if SelectedCard.Short_Description == null:
-				BigCardNode.get_node("Description").text = "This card has no Short Description."
-			else:
-				if SelectedCard.Anchor_Text != null:
-					BigCardNode.get_node("Description").text = "[" + SelectedCard.Anchor_Text + "] " + SelectedCard.Short_Description
-				else:
-					BigCardNode.get_node("Description").text = SelectedCard.Short_Description
-			if SelectedCard.Type == "Normal" or SelectedCard.Type == "Hero":
-				if GameData.FocusedCardParentName.left(1) == "W":
-					BigCardNode.get_node("Attack").text = str(max(SelectedCard.Attack + SelectedCard.ATK_Bonus + BM.Player.Field_ATK_Bonus, 0))
-					BigCardNode.get_node("Health").text = str(max(SelectedCard.Health + SelectedCard.Health_Bonus + BM.Player.Field_Health_Bonus, 0))
-				else:
-					BigCardNode.get_node("Attack").text = str(max(SelectedCard.Attack + SelectedCard.ATK_Bonus + BM.Enemy.Field_ATK_Bonus, 0))
-					BigCardNode.get_node("Health").text = str(max(SelectedCard.Health + SelectedCard.Health_Bonus + BM.Enemy.Field_Health_Bonus, 0))
-				BigCardNode.get_node("Attribute").texture = Attribute_Texture
-			else:
-				BigCardNode.get_node("Attack").text = ""
-				BigCardNode.get_node("Health").text = ""
-				BigCardNode.get_node("Attribute").texture = null
 		else: # Card is Advance Tech card
 			BigCardNode.get_node("Frame").texture = load("res://Assets/Cards/Frame/Large_Advance_Tech_Card.png")
 			BigCardNode.get_node("ArtContainer/Art").texture = null

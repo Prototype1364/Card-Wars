@@ -4,6 +4,7 @@ class_name Card
 
 # Member variables
 @onready var BM = get_tree().get_root().get_node("SceneHandler/Battle")
+@onready var BF = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots")
 var Frame: String
 var Art: String
 var Name: String
@@ -51,53 +52,38 @@ var Can_Attack: bool
 var Targetable: bool # Refers to whether a card can be targeted by an attacking card.
 
 # Initialization
-func _init(Card_Frame, Card_Art, Card_Name, Card_Type, Card_EffectType, Card_Anchor_Text, Card_Resolve_Side, Card_Resolve_Phase, Card_Resolve_Step, Card_Attribute, Card_Description, Card_Short_Description, Card_Attack, Card_ATK_Bonus, Card_Toxicity, Card_Cost, Card_Health, Card_Health_Bonus, Card_Burn_Damage, Card_Special_Edition_Text, Card_Rarity, Card_Passcode, Card_Deck_Capacity, Card_Tokens, Card_Is_Set, Card_Can_Activate_Effect, Card_Fusion_Level, Card_Attack_As_Reinforcement, Card_Immortal, Card_Invincible, Card_Relentless, Card_Multi_Strike, Card_Target_Reinforcer, Card_Paralysis, Card_Direct_Attack, Card_Owner):
-	Frame = Card_Frame
-	Art = Card_Art
-	Name = Card_Name
-	Type = Card_Type
-	Effect_Type = Card_EffectType
-	Anchor_Text = Card_Anchor_Text
-	Resolve_Side = Card_Resolve_Side
-	Resolve_Phase = Card_Resolve_Phase
-	Resolve_Step = Card_Resolve_Step
-	Attribute = Card_Attribute
-	Description = Card_Description if Card_Description != null else ""
-	Short_Description = Card_Short_Description
-	Attack = Card_Attack if Card_Attack != null else 0
-	ATK_Bonus = Card_ATK_Bonus if Card_ATK_Bonus != null else 0
+func _init(card_data):
+	# Set standard variables based on parameters passed in card_data
+	for key in card_data.keys():
+		if card_data[key] != null:
+			self.set(key, card_data[key])
+		else:
+			if key == "Description":
+				self.set(key, "")
+			else:
+				self.set(key, 0)
+
+	# Set default values that are common across all cards
+	var defaults = {
+		"0": ["ATK_Bonus", "Health_Bonus", "Revival_Health", "Tokens", "Burn_Damage"],
+		"1": ["Fusion_Level", "Attacks_Remaining"],
+		"False": ["Is_Set", "Can_Activate_Effect", "Attack_As_Reinforcement", "Immortal", "Invincible", "Relentless", "Multi_Strike", "Target_Reinforcer", "Paralysis", "Direct_Attack", "Can_Attack", "Targetable"],
+	}
+
+	for key in defaults.keys():
+		for value in defaults[key]:
+			if key == "False":
+				self.set(value, false)
+			else:
+				self.set(value, int(key))
+	
+	# Set non-standard variables
 	Total_Attack = Attack + ATK_Bonus
-	Cost = Card_Cost if Card_Cost != null else 0
-	Cost_Path = ""
-	if Type != "Special" and "Tech" not in Type:
-		Cost_Path = "res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png"
-	Health = Card_Health if Card_Health != null else 0
-	Health_Bonus = Card_Health_Bonus if Card_Health_Bonus != null else 0
 	Total_Health = Health + Health_Bonus
-	Revival_Health = Card_Health if Card_Health != null else 0
-	Special_Edition_Text = Card_Special_Edition_Text
-	Rarity = Card_Rarity
-	Passcode = Card_Passcode
-	Deck_Capacity = Card_Deck_Capacity
-	Tokens = Card_Tokens
+	Cost_Path = "res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png" if Type != "Special" and "Tech" not in Type else ""
 	Token_Path = preload("res://Scenes/SupportScenes/Token_Card.tscn")
-	Is_Set = Card_Is_Set
-	Can_Activate_Effect = Card_Can_Activate_Effect 
-	Fusion_Level = Card_Fusion_Level
-	Attack_As_Reinforcement = Card_Attack_As_Reinforcement
-	Immortal = Card_Immortal
-	Invincible = Card_Invincible
-	Relentless = Card_Relentless
-	Attacks_Remaining = 1 if Relentless == false else 2
-	Multi_Strike = Card_Multi_Strike
-	Target_Reinforcer = Card_Target_Reinforcer
-	Paralysis = Card_Paralysis
-	Direct_Attack = Card_Direct_Attack
-	Toxicity = Card_Toxicity if Card_Toxicity != null else 0
-	Burn_Damage = Card_Burn_Damage
 	Effects_Disabled = []
-	Owner = Card_Owner
-	Can_Attack = false
+	Owner = "Game"
 
 func _ready():
 	Update_Data()
@@ -112,44 +98,30 @@ func _ready():
 
 # Setters
 func set_frame(frame: String):
-	if "Deck" in get_parent().name:
-		$SmallCard/Frame.texture = load("res://Assets/Cards/Frame/Small_Card_Back.png")
-	else:
-		if Frame != "Special":
-			$SmallCard/Frame.texture = load("res://Assets/Cards/Frame/Small_Frame_" + frame + ".png")
-		else:
-			$SmallCard/Frame.texture = load("res://Assets/Cards/Frame/Small_Advance_Tech_Card.png")
+	var texture_path = "res://Assets/Cards/Frame/Small_Card_Back.png" if "Deck" in get_parent().name else ("res://Assets/Cards/Frame/Small_Frame_" + frame + ".png" if Frame != "Special" else "res://Assets/Cards/Frame/Small_Advance_Tech_Card.png")
+	$SmallCard/Frame.texture = load(texture_path)
 
 func set_art():
-	var Formatted_Name: String = Name.replace(" ", "_")
-	var Equip_Card_Format: String = "Equip_" + Type + "_" + Formatted_Name if Attribute == "Equip" else Formatted_Name
-	var Finalized_Name: String = Equip_Card_Format if Attribute == "Equip" else Type + "_" + Formatted_Name
-	Art = "res://Assets/Cards/Art/" + Finalized_Name + ".png" if Type != "Special" else ""
-	if "Deck" not in get_parent().name:
-		if Frame != "Special":
-			$SmallCard/ArtContainer/Art.texture = load(Art)
-		else:
-			$SmallCard/ArtContainer/Art.texture = null
-	else:
-		$SmallCard/ArtContainer/Art.texture = null
+	Art = "res://Assets/Cards/Art/" + (("Equip_" + Type + "_" + Name.replace(" ", "_")) if Attribute == "Equip" else (Type + "_" + Name.replace(" ", "_"))) + ".png" if Type != "Special" else ""
+	$SmallCard/ArtContainer/Art.texture = load(Art) if "Deck" not in get_parent().name and Frame != "Special" else null
 
-func set_attacks_remaining(value: int, role: String):
+func set_attacks_remaining(value: int = 1, role: String = "Initialize"):
 	if role == "Attack":
-		Attacks_Remaining += value
+		Attacks_Remaining -= value
 	else:
 		Attacks_Remaining = 1 if Relentless == false else 2
 
 func set_attack(value: int, context: String = "Initialize"):
 	if context == "Add":
-		Attack -= value
-	elif context == "Remove":
 		Attack += value
+	elif context == "Remove":
+		Attack -= value
 	else:
 		Attack = value
 	set_total_attack()
 
 func set_attack_bonus(value: int, context: String = "Initialize"):
-	if get_parent().name in ["MedBay", "Graveyard", "Banished", "Deck"]:
+	if BF.Get_Clean_Slot_Name(get_parent().name) in ["MedBay", "Graveyard", "Banished", "Deck"]:
 		ATK_Bonus = 0
 	else:
 		if context == "Add":
@@ -162,17 +134,17 @@ func set_attack_bonus(value: int, context: String = "Initialize"):
 
 func set_total_attack(_value: int = 0, _context: String = "Initialize"):
 	var Parent_Name: String = get_parent().name
-	var Player_Field_Slot_Names: Array = ["WFighter", "WR1", "WR2", "WR3"]
-	var Enemy_Field_Slot_Names: Array = ["BFighter", "BR1", "BR2", "BR3"]
+	var Field_Slot_Names: Array = ["Fighter", "R"]
 	var Field_Bonus: int = 0
-	if Parent_Name in Player_Field_Slot_Names or Parent_Name in Enemy_Field_Slot_Names:
-		if Parent_Name.left(1) == "W":
-			Field_Bonus = BM.Player.Field_ATK_Bonus
-		else:
-			Field_Bonus = BM.Enemy.Field_ATK_Bonus
+
+	# Calculate Total Attack based on card's Attack, Attack Bonus, Fusion Level, and Field Attack Bonus
+	if BF.Get_Clean_Slot_Name(get_parent().name) in Field_Slot_Names:
+		Field_Bonus = BM.Player.Field_ATK_Bonus if Parent_Name.left(1) == "W" else BM.Enemy.Field_ATK_Bonus
 	Total_Attack = (Attack * Fusion_Level) + ATK_Bonus + Field_Bonus
-	if "Deck" not in get_parent().name:
-		if Type == "Normal" or Type == "Hero":
+
+	# Update Attack text on card
+	if "Deck" not in Parent_Name:
+		if Type in ["Normal", "Hero"]:
 			$SmallCard/Attack.text = str(max(0, Total_Attack))
 		else:
 			Total_Attack = 0
@@ -192,9 +164,9 @@ func set_cost_path(node_name: String):
 
 func set_health(value: int, context: String = "Initialize"):
 	if context == "Add":
-		Health -= value
-	elif context == "Remove":
 		Health += value
+	elif context == "Remove":
+		Health -= value
 	elif context == "Capture":
 		Health = Revival_Health
 	else:
@@ -202,7 +174,7 @@ func set_health(value: int, context: String = "Initialize"):
 	set_total_health()
 
 func set_health_bonus(value: int, context: String = "Initialize"):
-	if get_parent().name in ["MedBay", "Graveyard", "Banished", "Deck"]:
+	if BF.Get_Clean_Slot_Name(get_parent().name) in ["MedBay", "Graveyard", "Banished", "Deck"]:
 		Health_Bonus = 0
 	else:
 		if context == "Add":
@@ -215,21 +187,19 @@ func set_health_bonus(value: int, context: String = "Initialize"):
 
 func set_total_health():
 	var Parent_Name: String = get_parent().name
-	var Player_Field_Slot_Names: Array = ["WFighter", "WR1", "WR2", "WR3"]
-	var Enemy_Field_Slot_Names: Array = ["BFighter", "BR1", "BR2", "BR3"]
+	var Clean_Parent_Name: String = BF.Get_Clean_Slot_Name(Parent_Name)
+	var Field_Slot_Names: Array = ["Fighter", "R1", "R2", "R3"]
 	var Field_Bonus: int = 0
-	if Parent_Name in Player_Field_Slot_Names or Parent_Name in Enemy_Field_Slot_Names:
-		if Parent_Name.left(1) == "W":
-			Field_Bonus = BM.Player.Field_Health_Bonus
-		else:
-			Field_Bonus = BM.Enemy.Field_Health_Bonus
+
+	# Calculate Total Health based on card's Health, Health Bonus, Fusion Level, and Field Health Bonus
+	if Clean_Parent_Name in Field_Slot_Names:
+		Field_Bonus = BM.Player.Field_Health_Bonus if Parent_Name.left(1) == "W" else BM.Enemy.Field_Health_Bonus
 	Total_Health = (Health * Fusion_Level) + Health_Bonus + Field_Bonus
-	if "Deck" not in get_parent().name:
-		if Type == "Normal" or Type == "Hero":
-			if get_parent().name in ["MedBay", "Graveyard", "Banished", "Deck"]:
-				$SmallCard/Health.text = str(max(0, Total_Health))
-			else:
-				$SmallCard/Health.text = str(max(0, Total_Health))
+
+	# Update Health text on card
+	if "Deck" not in Parent_Name:
+		if Type in ["Normal", "Hero"]:
+			$SmallCard/Health.text = str(max(0, Total_Health))
 		else:
 			Total_Health = 0
 			$SmallCard/Health.text = ""
@@ -237,7 +207,7 @@ func set_total_health():
 		$SmallCard/Health.text = ""
 
 func set_burn_damage(value: int, context: String = "Initialize"):
-	if get_parent().name in ["MedBay", "Graveyard", "Banished", "Deck"]:
+	if BF.Get_Clean_Slot_Name(get_parent().name) in ["MedBay", "Graveyard", "Banished", "Deck"]:
 		Burn_Damage = 0
 	else:
 		if context == "Add":
@@ -257,10 +227,11 @@ func set_tokens(value: int, context: String = "Initialize"):
 		Tokens -= value
 	else:
 		Tokens = 0
+	
 	var Token_Container: VBoxContainer = $SmallCard/TokenContainer/VBoxContainer
 	if Token_Container.get_child_count() < Tokens: # Add Token(s) up to the number of Tokens on the card
 		for _i in range(Tokens - Token_Container.get_child_count()):
-			var InstanceToken: Node = Token_Path.instance()
+			var InstanceToken: Node = Token_Path.instantiate()
 			InstanceToken.name = "Token" + str(Token_Container.get_child_count() + 1)
 			Token_Container.add_child(InstanceToken)
 	elif Token_Container.get_child_count() > Tokens: # Remove excess Token(s)
@@ -270,24 +241,17 @@ func set_tokens(value: int, context: String = "Initialize"):
 			i.queue_free()
 
 func set_is_set(context: String = "Initialize"):
-	if context == "Set":
-		Is_Set = true
-	else:
-		Is_Set = false
+	Is_Set = true if context == "Set" else false
 
 func set_can_activate_effect():
 	var Parent_Name: String = get_parent().name
 	var Side: String = "W" if GameData.Current_Turn == "Player" else "B"
 	var Resolvable_Side: bool = true if Resolve_Side == "Both" or Side == Parent_Name.left(1) else false
-	
-	if Parent_Name in ["Fighter", "R1", "R2", "R3", "Backrow1", "Backrow2", "Backrow3"]: # Card is on field
-		if Is_Set == false: # Ensures that set magic/trap cards don't have their ability to activate effects disabled.            
-			if Resolvable_Side: # Ensures that the card can only set its ability to activate effects when on the valid side of the field.
-				if Effect_Type == "Summon": # Ensures that cards with Summon effects can only activate their effects once (on initial summon), while allowing periodic/event/continuous effects to resolve multiple times.
-					Can_Activate_Effect = false
-				else:
-					Can_Activate_Effect = true
-	else: # Card is NOT on field and thus cannot activate effects.
+
+	# Ensures that only cards on the field (on correct side), that aren't set, and haven't already activated their summon effect can activate their effects.
+	if BF.Get_Clean_Slot_Name(Parent_Name) in ["Fighter", "R", "Backrow"] and not Is_Set and Resolvable_Side and Effect_Type != "Summon":
+		Can_Activate_Effect = true
+	else:
 		Can_Activate_Effect = false
 
 func set_fusion_level(value: int, context: String = "Initialize"):
@@ -300,9 +264,9 @@ func set_fusion_level(value: int, context: String = "Initialize"):
 	set_total_attack()
 	set_total_health()
 
-func set_effects_disabled(value: Array, context: String = "Initialize"):
+func set_effects_disabled(value: String, context: String = "Initialize"):
 	if context == "Initialize":
-		Effects_Disabled = value
+		Effects_Disabled = [value]
 	else:
 		if context == "Add":
 			Effects_Disabled.append(value)
@@ -311,33 +275,29 @@ func set_effects_disabled(value: Array, context: String = "Initialize"):
 		elif context == "Reset":
 			Effects_Disabled.clear()
 		else:
-			Effects_Disabled = value
+			Effects_Disabled = [value]
 
 func set_can_attack():
 	var Side: String = "W" if GameData.Current_Turn == "Player" else "B"
-	var Reinforcement_Zones: Array = ["R1", "R2", "R3"]
-	var Parent_Name: String = get_parent().name
-	if ("Fighter" in Parent_Name or (Attack_As_Reinforcement and Reinforcement_Zones.has(Parent_Name))) and Parent_Name.left(1) == Side and Paralysis == false and Attacks_Remaining > 0:
-		Can_Attack = true
-	else:
-		Can_Attack = false
+	var Clean_Parent_Name: String = BF.Get_Clean_Slot_Name(get_parent().name)
+	var in_valid_slot = (Clean_Parent_Name == "Fighter" or (Clean_Parent_Name == "R" and Attack_As_Reinforcement)) and get_parent().name.left(1) == Side
+
+	Can_Attack = true if in_valid_slot and Paralysis == false and Attacks_Remaining > 0 else false
 
 func set_targetable(attacking_card: Node):
-	var Reinforcement_Zones: Array = ["R1", "R2", "R3"]
-	var Parent_Name: String = get_parent().name
+	var Clean_Parent_Name: String = BF.Get_Clean_Slot_Name(get_parent().name)
 
-	if "Fighter" in Parent_Name or (Parent_Name in Reinforcement_Zones and (attacking_card.Multi_Strike == true or attacking_card.Target_Reinforcer == true)):
-		Targetable = true
-	else:
-		Targetable = false
+	Targetable = true if Clean_Parent_Name == "Fighter" or (Clean_Parent_Name == "R" and (attacking_card.Multi_Strike or attacking_card.Target_Reinforcer)) else false
 
 # Primary Functions
 func Update_Data():
 	set_frame(Frame)
 	set_art()
 	set_attack(Attack)
+	set_attack_bonus(ATK_Bonus)
 	set_cost(Cost)
 	set_health(Health)
+	set_health_bonus(Health_Bonus)
 	set_tokens(Tokens)
 
 func Reset_Stats_On_Capture():
@@ -352,30 +312,10 @@ func Reset_Variables_After_Flip_Summon():
 	set_can_activate_effect() # Ensures effects aren't triggered from the Graveyard
 	set_tokens(0, "Reset")
 
-func Update_Attacks_Remaining(Role):
-	if Role == "Attack":
-		Attacks_Remaining -= 1
-	else:
-		Attacks_Remaining = 1 if Relentless == false else 2
-
-func Get_Total_Health():
-	var Dueler = null
-	Total_Health = 0
-	var Parent_Name = self.get_parent().name
-	var Player_Field_Slot_Names = ["WFighter", "WR1", "WR2", "WR3"]
-	var Enemy_Field_Slot_Names = ["BFighter", "BR1", "BR2", "BR3"]
-	
-	if Parent_Name in Player_Field_Slot_Names:
-		Dueler = BM.Player
-	elif Parent_Name in Enemy_Field_Slot_Names:
-		Dueler = BM.Enemy
-
-	if Dueler != null:
-		Total_Health = Health + Health_Bonus + Dueler.Field_Health_Bonus
-	else:
-		Total_Health = Health + Health_Bonus
-
-	return Total_Health
+func hide_action_buttons():
+	$SmallCard/Action_Button_Container/Summon.visible = false
+	$SmallCard/Action_Button_Container/Set.visible = false
+	$SmallCard/Action_Button_Container/Target.visible = false
 
 # Signal-Related Functions
 func focusing():
@@ -391,18 +331,16 @@ func defocusing():
 
 func on_FocusSensor_pressed():
 	var Side: String = "W" if GameData.Current_Turn == "Player" else "B"
+	var Side_Opp: String = "B" if GameData.Current_Turn == "Player" else "W"
 	var Reposition_Zones: Array = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
 	var Parent_Name: String = get_parent().name
 	
 	match GameData.Current_Step:
 		"Main":
-			# Allows for Normal/Fusion summoning while skipping the need to press Summon/Set buttons when playing Normal/Hero card
-			if "Hand" in Parent_Name and (Type == "Normal" or Type == "Hero"):
+			# Allows for repositioning, sacrificing and Normal/Flip/Fusion summoning while skipping the need to press Summon/Set buttons when playing Normal/Hero card
+			if "Hand" in Parent_Name and Type in ["Normal", "Hero"]:
 				GameData.Summon_Mode = "Summon"
 				GameData.Chosen_Card = self
-				if int(Passcode) in GameData.FUSION_CARDS: # Fusion summon
-					GameData.Current_Card_Effect_Step = "Clicked"
-					CardEffects.call(Anchor_Text, self)
 			elif "Hand" in Parent_Name and Type == "Trap":
 				if Attribute == "Equip":
 					$SmallCard/Action_Button_Container/Summon.visible = true
@@ -413,19 +351,39 @@ func on_FocusSensor_pressed():
 			elif "Hand" in Parent_Name:
 				$SmallCard/Action_Button_Container/Summon.visible = true 
 				$SmallCard/Action_Button_Container/Set.visible = true
-			elif Parent_Name in Reposition_Zones and GameData.Chosen_Card == null:
-				GameData.Chosen_Card = self
+			elif Parent_Name in Reposition_Zones: # Allows repositioning & sacrificing of cards on own field
+				if GameData.CardFrom == "":
+					GameData.CardFrom = Parent_Name
+					GameData.CardMoved = name
+				elif GameData.CardFrom != "":
+					GameData.CardTo = get_parent()
+					GameData.CardSwitched = name
+					SignalBus.emit_signal("Reposition_Field_Cards", GameData.CardTo.name.left(1))
+				if GameData.Chosen_Card == null:
+					GameData.Chosen_Card = self
+				GameData.Summon_Mode = "Sacrifice"
+				$SmallCard/Action_Button_Container/Summon.visible = true
+				$SmallCard/Action_Button_Container/Summon.text = "Sacrifice"
+			elif Side + "Backrow" in Parent_Name:
+				$SmallCard/Action_Button_Container/Summon.text = "Flip"
+				$SmallCard/Action_Button_Container/Summon.visible = true
+				GameData.CardFrom = Parent_Name
+				GameData.CardMoved = name
 			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
 				SignalBus.emit_signal("EffectTargetSelected", self)
+			elif "HeroDeck" in Parent_Name:
+				SignalBus.emit_signal("Hero_Deck_Selected")
 		"Selection":
 			set_can_attack()
 			if Can_Attack:
 				GameData.Attacker = self
-				SignalBus.emit_signal("Check_For_Targets")
+				var Fighter_Opp = BF.Get_Field_Card_Data(Side_Opp, "Fighter")
+				if len(Fighter_Opp) > 0:
+					SignalBus.emit_signal("Update_GameState", "Step")
 			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
 				SignalBus.emit_signal("EffectTargetSelected", self)
 		"Target":
-			if ("Fighter" in Parent_Name and (Parent_Name.left(1) != Side)) or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name) and GameData.Attacker.Target_Reinforcer):
+			if ("Fighter" in Parent_Name and Parent_Name.left(1) != Side) or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name) and GameData.Attacker.Target_Reinforcer):
 				$SmallCard/Action_Button_Container/Target.visible = true
 			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
 				SignalBus.emit_signal("EffectTargetSelected", self)
@@ -437,59 +395,37 @@ func on_FocusSensor_pressed():
 			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
 				SignalBus.emit_signal("EffectTargetSelected", self)
 	
-	# Allows repositioning of cards on own field
-	if Reposition_Zones.has(Parent_Name) and GameData.Current_Step == "Main":
-		if GameData.CardFrom == "":
-			GameData.CardFrom = Parent_Name
-			GameData.CardMoved = name
-		elif GameData.CardFrom != "":
-			GameData.CardTo = get_parent()
-			GameData.CardSwitched = name
-			SignalBus.emit_signal("Reposition_Field_Cards", GameData.CardTo.name.left(1))
-	
-	# Allows Flip summoning of cards from backrow
-	elif Side + "Backrow" in Parent_Name and GameData.Current_Step == "Main":
-		$SmallCard/Action_Button_Container/Summon.text = "Flip"
-		$SmallCard/Action_Button_Container/Summon.visible = true
-		GameData.CardFrom = Parent_Name
-		GameData.CardMoved = name
-
 	# Allows user to re-open card Effect scenes during turn
 	if Parent_Name.left(1) == Side:
 		CardEffects.call(Anchor_Text, self)
 
 func _on_Summon_Set_pressed(Mode):
-	var Side: String = "W" if GameData.Current_Turn == "Player" else "B"
-	var Parent_Name: String = self.get_parent().name
-	
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Reposition_Zones = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
+	var Parent_Name = get_parent().name
+
 	GameData.Chosen_Card = self
-	
-	if "Hand" in Parent_Name and Mode == "Summon":
-		GameData.Summon_Mode = "Summon"
-		# Automatically move Equip card to appropriate Equip slot
-		if Attribute == "Equip":
-			$SmallCard/Action_Button_Container/Summon.visible = false
-			$SmallCard/Action_Button_Container/Set.visible = false
-			var slot_name: String = Side + "Equip" + Type
-			GameData.CardFrom = Parent_Name
-			GameData.CardMoved = name
-			SignalBus.emit_signal("Summon_Set_Pressed", slot_name)
-		else:
-			$SmallCard/Action_Button_Container/Summon.visible = false
-			$SmallCard/Action_Button_Container/Set.visible = false
-			SignalBus.emit_signal("Summon_Set_Pressed", "Backrow")
-	
-	elif "Hand" in Parent_Name and Mode == "Set":
-		GameData.Summon_Mode = "Set"
-		Is_Set = true
-		$SmallCard/Action_Button_Container/Summon.visible = false
-		$SmallCard/Action_Button_Container/Set.visible = false
-		SignalBus.emit_signal("Summon_Set_Pressed", "Backrow")
-	
+	$SmallCard/Action_Button_Container/Summon.visible = false
+	$SmallCard/Action_Button_Container/Set.visible = false
+
+	if "Hand" in Parent_Name:
+		GameData.Summon_Mode = Mode
+		if Mode == "Summon":
+			if Attribute == "Equip":
+				GameData.CardFrom = Parent_Name
+				GameData.CardMoved = name
+				SignalBus.emit_signal("Summon_Set_Pressed", Side + "Equip" + Type)
+			else:
+				SignalBus.emit_signal("Summon_Set_Pressed", Side + "Backrow")
+		elif Mode == "Set":
+			Is_Set = true
+			SignalBus.emit_signal("Summon_Set_Pressed", Side + "Backrow")
 	elif "Backrow" in Parent_Name and Mode == "Summon":
-		$SmallCard/Action_Button_Container/Summon.visible = false
 		$SmallCard/Action_Button_Container/Summon.text = "Summon"
 		SignalBus.emit_signal("Activate_Set_Card", Side, self)
+	elif Parent_Name in Reposition_Zones and GameData.Summon_Mode == "Sacrifice":
+		$SmallCard/Action_Button_Container/Summon.text = "Summon"
+		SignalBus.emit_signal("Sacrifice_Card", self)
 
 func _on_Target_pressed():
 	GameData.Target = self
@@ -514,6 +450,4 @@ func _on_Target_pressed():
 
 func _on_Hide_Action_Buttons_pressed(_event):
 	if Input.is_action_pressed("Cancel"):
-		$SmallCard/Action_Button_Container/Summon.visible = false
-		$SmallCard/Action_Button_Container/Set.visible = false
-		$SmallCard/Action_Button_Container/Target.visible = false
+		hide_action_buttons()

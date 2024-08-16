@@ -1,48 +1,28 @@
 extends Control
 
 @onready var Active_Effects = []
-@onready var trigger_card = get_parent()
 @onready var Selected_Button = null
-@onready var Grandparent_pos = get_parent().get_parent().global_position
+@onready var BF = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots")
 
 func _ready():
 	var _HV1 = SignalBus.connect("Button_Selected", Callable(self, "On_Button_Selection"))
 
-	position = Grandparent_pos
+	position = get_parent().get_parent().global_position
 
 func Get_Active_Card_Effects():
+	var zones = ["MainDeck", "HeroDeck", "Hand", "Graveyard", "MedicalBay", "Fighter", "R", "Backrow", "Equip_Magic", "Equip_Trap"]
+	var sides = ["W", "B"]
+	var card_sources = {}
 	var active_effects_dict = {}
-	var card_sources = {
-		"W_Deck": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/WMainDeck"),
-		"W_Hand": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/WHandScroller/WHand"),
-		"W_Graveyard": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/WGraveyard"),
-		"W_MedicalBay": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/WMedBay"),
-		"W_Fighter": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/WFighter"),
-		"WR1": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/WR1"),
-		"WR2": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/WR2"),
-		"WR3": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/WR3"),
-		"W_Backrow_1": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/WBackrow1"),
-		"W_Backrow_2": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/WBackrow2"),
-		"W_Backrow_3": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/WBackrow3"),
-		"W_Equip_Magic": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/WEquipMagic"),
-		"W_Equip_Trap": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/WEquipTrap"),
-		"B_Deck": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/BMainDeck"),
-		"B_Hand": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/BHandScroller/BHand"),
-		"B_Graveyard": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/BGraveyard"),
-		"B_MedicalBay": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/BMedBay"),
-		"B_Fighter": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/BFighter"),
-		"BR1": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/BR1"),
-		"BR2": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/BR2"),
-		"BR3": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/BR3"),
-		"B_Backrow_1": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/BBackrow1"),
-		"B_Backrow_2": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/BBackrow2"),
-		"B_Backrow_3": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/BBackrow3"),
-		"B_Equip_Magic": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/BEquipMagic"),
-		"B_Equip_Trap": get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/BEquipTrap"),
-	}
 
+	# Create a dictionary of all card sources
+	for side in sides:
+		for zone in zones:
+			card_sources[side + zone] = BF.Get_Field_Card_Data(side, zone)
+
+	# Populate Active Effects Dictionary
 	for source in card_sources:
-		for card in card_sources[source].get_children():
+		for card in card_sources[source]:
 			if card.Anchor_Text not in GameData.Disabled_Effects:
 				active_effects_dict[card.Anchor_Text] = true
 
@@ -69,7 +49,7 @@ func Get_Text():
 	return Selected_Button.text.replace(" ","_")
 
 func Remove_Scene():
-	trigger_card.remove_child(self)
+	get_parent().remove_child(self)
 	queue_free()
 
 func On_Button_Selection(button):

@@ -12,45 +12,70 @@ var Cost_Discount_Normal = 0
 var Cost_Discount_Hero = 0
 var Cost_Discount_Magic = 0
 var Cost_Discount_Trap = 0
-var Relentless = false # Refers to the Duelist's ability to grant extra attacks to their Fighter(s) each turn. This var is likely only changeable with a Tech Card.
 var Valid_Attackers = 0
 var Tech_Zone = []
-var Deck_Reloaded = false
+var Capture_Destination = "Graveyard"
+var Muggle_Mode = false
 
-# func _init(Duelist_Name, Duelist_LP, Duelist_Summon_Crests, Duelist_Tokens, Duelist_Field_ATK_Bonus, Duelist_Field_Health_Bonus, Duelist_Summon_Crest_Roll_Bonus, Duelist_Cost_Discount_Normal, Duelist_Cost_Discount_Hero, Duelist_Cost_Discount_Magic, Duelist_Cost_Discount_Trap, Duelist_Relentless, Duelist_Tech_Zone):
-# 	Name = Duelist_Name
-# 	LP = Duelist_LP
-# 	Summon_Crests = Duelist_Summon_Crests
-# 	Tokens = Duelist_Tokens
-# 	Field_ATK_Bonus = Duelist_Field_ATK_Bonus
-# 	Field_Health_Bonus = Duelist_Field_Health_Bonus
-# 	Summon_Crest_Roll_Bonus = Duelist_Summon_Crest_Roll_Bonus
-# 	Cost_Discount_Normal = Duelist_Cost_Discount_Normal
-# 	Cost_Discount_Hero = Duelist_Cost_Discount_Hero
-# 	Cost_Discount_Magic = Duelist_Cost_Discount_Magic
-# 	Cost_Discount_Trap = Duelist_Cost_Discount_Trap
-# 	Relentless = Duelist_Relentless
-# 	Valid_Attackers = 0
-# 	Tech_Zone = Duelist_Tech_Zone
-# 	Deck_Reloaded = false
+func set_summon_crests(value, context="Initialize"):
+	if context == "Add":
+		Summon_Crests += value
+	elif context == "Remove":
+		Summon_Crests -= value
+	else:
+		Summon_Crests = value
 
-func Update_Summon_Crests(roll_result):
-	Summon_Crests += roll_result
+func set_cost_discount_normal(value, context="Initialize"):
+	if context == "Add":
+		Cost_Discount_Normal += value
+	elif context == "Remove":
+		Cost_Discount_Normal -= value
+	else:
+		Cost_Discount_Normal = value
 
-func Update_Cost_Discount_Normal(change_amount):
-	Cost_Discount_Normal += change_amount
+func set_cost_discount_hero(value, context="Initialize"):
+	if context == "Add":
+		Cost_Discount_Hero += value
+	elif context == "Remove":
+		Cost_Discount_Hero -= value
+	else:
+		Cost_Discount_Hero = value
 
-func Update_Cost_Discount_Hero(change_amount):
-	Cost_Discount_Hero += change_amount
+func set_cost_discount_magic(value, context="Initialize"):
+	if context == "Add":
+		Cost_Discount_Magic += value
+	elif context == "Remove":
+		Cost_Discount_Magic -= value
+	else:
+		Cost_Discount_Magic = value
 
-func Update_Cost_Discount_Magic(change_amount):
-	Cost_Discount_Magic += change_amount
+func set_cost_discount_trap(value, context="Initialize"):
+	if context == "Add":
+		Cost_Discount_Trap += value
+	elif context == "Remove":
+		Cost_Discount_Trap -= value
+	else:
+		Cost_Discount_Trap = value
 
-func Update_Cost_Discount_Trap(change_amount):
-	Cost_Discount_Trap += change_amount
+func set_field_attack_bonus(value, context="Initialize"):
+	if context == "Add":
+		Field_ATK_Bonus += value
+	elif context == "Remove":
+		Field_ATK_Bonus -= value
+	else:
+		Field_ATK_Bonus = value
 
-func Update_Field_ATK_Bonus(change_amount):
-	Field_ATK_Bonus += change_amount
+func set_field_health_bonus(value, context="Initialize"):
+	if context == "Add":
+		Field_Health_Bonus += value
+	elif context == "Remove":
+		Field_Health_Bonus -= value
+	else:
+		Field_Health_Bonus = value
 
-func Update_Field_Health_Bonus(change_amount):
-	Field_Health_Bonus += change_amount
+func set_duelist_data(Duelist_Name, Duelist_Summon_Crests = 0):
+	Name = Duelist_Name
+	set_summon_crests(Duelist_Summon_Crests)
+
+func _on_capture_selector_pressed(new_destination: String):
+	Capture_Destination = new_destination
