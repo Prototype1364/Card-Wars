@@ -70,7 +70,7 @@ func _init(card_data):
 	var defaults = {
 		"0": ["ATK_Bonus", "Health_Bonus", "Revival_Health", "Tokens", "Burn_Damage"],
 		"1": ["Fusion_Level", "Attacks_Remaining"],
-		"False": ["Is_Set", "Can_Activate_Effect", "Attack_As_Reinforcement", "Immortal", "Invincible", "Rejuvenation", "Relentless", "Multi_Strike", "Target_Reinforcer", "Paralysis", "Direct_Attack", "Can_Attack", "Targetable"],
+		"False": ["Is_Set", "Can_Activate_Effect", "Attack_As_Reinforcement", "Immortal", "Invincible", "Rejuvenation", "Relentless", "Multi_Strike", "Target_Reinforcer", "Paralysis", "Unstoppable", "Direct_Attack", "Can_Attack", "Targetable"],
 	}
 
 	for key in defaults.keys():

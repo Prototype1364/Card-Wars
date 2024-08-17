@@ -588,8 +588,7 @@ func Poison(card):
 
 		if chosen_effect_text == "Heal" and Cards_On_Field.size() > 0:
 			var chosen_target = await Get_Card_Selected(card, "Field (All)", Side, Side_Opp)
-			if not chosen_target.is_immune("Card Effect", card):
-				chosen_target.set_health(card.Toxicity, "Add")
+			chosen_target.set_health(card.Toxicity, "Add")
 		elif chosen_effect_text == "Poison" and Cards_On_Field.size() > 0:
 			var chosen_target = await Get_Card_Selected(card, "Opponent Field (All)", Side, Side_Opp)
 			if not chosen_target.is_immune("Card Effect", card):
@@ -845,8 +844,7 @@ func Prayer(card):
 				elif roll_result in [3, 4]: # Could result in health of your Fighter going down... Should it be set to the higher of the two values if the target is your Fighter?
 					Effect_Target.set_health(Effect_Target.Revival_Health, "Set")
 				elif roll_result == 5:
-					if not Effect_Target.Unstoppable:
-						Effect_Target.set_paralysis(true, "Add")
+					Effect_Target.set_paralysis(true, "Add")
 				elif roll_result == 6:
 					Effect_Target.Invincible = true
 
