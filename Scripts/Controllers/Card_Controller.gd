@@ -41,15 +41,18 @@ var Fusion_Level: int # Refers to the number of cards it is Fused with (defaults
 var Attack_As_Reinforcement: bool # Refers to a card's ability to launch an attack from a Reinforcement slot. Mongols (when led by Ghenghis Khan) is the first card to have this ability.
 var Immortal: bool # Refers to whether a card can be captured with 0 HP. Demeter (in SAP version) is the first card to have this effect.
 var Invincible: bool # Refers to a card that cannot take Battle Damage. It must be defeated by a Hero/Magic/Trap/Tech card's effects. "The Level Beyond" is the first card to have this ability.
+var Rejuvenation: bool # Refers to a card that cannot take Burn Damage. It must be defeated by a Hero/Magic/Trap/Tech card's effects or through battle. Used in Juggernaut cards.
 var Relentless: bool # Refers to a card that gains double bonus on any alteration to its Attacks_Remaining variable (including the turn reset). King Leonidas was the first card to have this ability.
 var Multi_Strike: bool # Refers to a card's ability to deal damage to cards in the opponent's Reinforcement zone (Zeus is the first card to have this ability).
 var Target_Reinforcer: bool # Refers to a card's ability to choose to target an opponent in a reinforcement slot instead of the opposing Fighter (Poseidon is the first card to have this ability).
 var Paralysis: bool # Refers to a card's ability to launch an attack. Lancelot is the first card to utilize this Attribute (there's a 1/3 chance that his effect will result in him being unable to attack during that turn's Battle Phase).
+var Unstoppable: bool # Refers to a card that cannot be Paralyzed.
 var Direct_Attack: bool
 var Effects_Disabled: Array # An Array of all effects disabled by this card.
 var Owner: String # Refers to the card's original Owner (Player or Enemy). Used as part of Mordred's Hero card effect.
 var Can_Attack: bool
 var Targetable: bool # Refers to whether a card can be targeted by an attacking card.
+var Immunity: Dictionary # Refers to the types, attributes, and effects that this card is immune to (and locations where it's immune to card effects or other events [i.e. Battle Damage]).
 
 # Initialization
 func _init(card_data):
@@ -67,7 +70,7 @@ func _init(card_data):
 	var defaults = {
 		"0": ["ATK_Bonus", "Health_Bonus", "Revival_Health", "Tokens", "Burn_Damage"],
 		"1": ["Fusion_Level", "Attacks_Remaining"],
-		"False": ["Is_Set", "Can_Activate_Effect", "Attack_As_Reinforcement", "Immortal", "Invincible", "Relentless", "Multi_Strike", "Target_Reinforcer", "Paralysis", "Direct_Attack", "Can_Attack", "Targetable"],
+		"False": ["Is_Set", "Can_Activate_Effect", "Attack_As_Reinforcement", "Immortal", "Invincible", "Rejuvenation", "Relentless", "Multi_Strike", "Target_Reinforcer", "Paralysis", "Direct_Attack", "Can_Attack", "Targetable"],
 	}
 
 	for key in defaults.keys():
@@ -83,6 +86,7 @@ func _init(card_data):
 	Cost_Path = "res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png" if Type != "Special" and "Tech" not in Type else ""
 	Token_Path = preload("res://Scenes/SupportScenes/Token_Card.tscn")
 	Effects_Disabled = []
+	Immunity = {"Type": [], "Attribute": [], "Effect": [], "Location": []}
 	Owner = "Game"
 
 func _ready():
@@ -105,9 +109,13 @@ func set_art():
 	Art = "res://Assets/Cards/Art/" + (("Equip_" + Type + "_" + Name.replace(" ", "_")) if Attribute == "Equip" else (Type + "_" + Name.replace(" ", "_"))) + ".png" if Type != "Special" else ""
 	$SmallCard/ArtContainer/Art.texture = load(Art) if "Deck" not in get_parent().name and Frame != "Special" else null
 
-func set_attacks_remaining(value: int = 1, role: String = "Initialize"):
-	if role == "Attack":
+func set_attacks_remaining(value: int = 1, context: String = "Initialize"):
+	if context == "Attack":
 		Attacks_Remaining -= value
+	elif context == "Add":
+		Attacks_Remaining += value * 2 if Relentless else value
+	elif context == "Remove":
+		Attacks_Remaining -= value * 2 if Relentless else value
 	else:
 		Attacks_Remaining = 1 if Relentless == false else 2
 
@@ -142,7 +150,7 @@ func set_total_attack(_value: int = 0, _context: String = "Initialize"):
 		Field_Bonus = BM.Player.Field_ATK_Bonus if Parent_Name.left(1) == "W" else BM.Enemy.Field_ATK_Bonus
 	Total_Attack = (Attack * Fusion_Level) + ATK_Bonus + Field_Bonus
 
-	# Update Attack text on card
+	# Update Attack text on card (NOTE: Total Attack is set to 0 automatically for all non-Normal/Hero cards [meaning things like Status cards that use this stat will always do 0 damage. Figure out how you want to address this visually/statistically.])
 	if "Deck" not in Parent_Name:
 		if Type in ["Normal", "Hero"]:
 			$SmallCard/Attack.text = str(max(0, Total_Attack))
@@ -207,7 +215,7 @@ func set_total_health():
 		$SmallCard/Health.text = ""
 
 func set_burn_damage(value: int, context: String = "Initialize"):
-	if BF.Get_Clean_Slot_Name(get_parent().name) in ["MedBay", "Graveyard", "Banished", "Deck"]:
+	if BF.Get_Clean_Slot_Name(get_parent().name) in ["MedBay", "Graveyard", "Banished", "Deck"] or Anchor_Text == "Juggernaut":
 		Burn_Damage = 0
 	else:
 		if context == "Add":
@@ -289,6 +297,17 @@ func set_targetable(attacking_card: Node):
 
 	Targetable = true if Clean_Parent_Name == "Fighter" or (Clean_Parent_Name == "R" and (attacking_card.Multi_Strike or attacking_card.Target_Reinforcer)) else false
 
+func set_paralysis(value: bool, context: String = "Initialize"):
+	if Unstoppable:
+		Paralysis = false
+	else:
+		if context == "Add":
+			Paralysis = true
+		elif context == "Remove":
+			Paralysis = false
+		else:
+			Paralysis = value
+
 # Primary Functions
 func Update_Data():
 	set_frame(Frame)
@@ -316,6 +335,31 @@ func hide_action_buttons():
 	$SmallCard/Action_Button_Container/Summon.visible = false
 	$SmallCard/Action_Button_Container/Set.visible = false
 	$SmallCard/Action_Button_Container/Target.visible = false
+
+func is_immune(action_type: String, trigger_card: Node) -> bool:
+	var Clean_Parent_Name = BF.Get_Clean_Slot_Name(get_parent().name)
+	
+	# Check for Immunity based on action type
+	if action_type == "Card Effect": # NOTE: Since there's currently no check to see if the trigger_card is on the same side of the field as your card, immunity means the card is unaffected regardless of whether the opponent is trying to resolve an effect on the card or the player is.
+		# Card Effect Immunity Guide:
+		# - Type-based: For cards that are immune to all effects of a certain type [e.g. Jinzo with Trap cards])
+		# - Attribute-based: For cards that are immune to all effects of a certain attribute [e.g. a card that is immune to all Warrior effects, whether Normal or Hero]. Weaker protection than Type effects, but stronger than singular effect immunity due to being immune to some Hero effects based on their Attribute)
+		# - Effect-based: For cards that are immune to specific effects [e.g. a card that is immune to the life-draining effects of Behind_Enemy_Lines])
+		# - Location-based: For cards that are immune to effects based on their location [e.g. a card that is immune to all effects while in the Medical Bay])
+		if trigger_card.Type in Immunity["Type"] or trigger_card.Attribute in Immunity["Attribute"] or trigger_card.Anchor_Text in Immunity["Effect"] or Clean_Parent_Name in Immunity["Location"]:
+			return true
+	elif action_type == "Battle Damage":
+		if (Clean_Parent_Name == "R" and "Multi_Strike" in Immunity["Effects"]) or Invincible:
+			return true
+	elif action_type == "Burn Damage":
+		if Rejuvenation:
+			return true
+	elif action_type == "Capture":
+		if Immortal:
+			return true
+
+	# No immunity found
+	return false
 
 # Signal-Related Functions
 func focusing():

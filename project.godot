@@ -24,6 +24,7 @@ CardEffects="*res://Singletons/Card_Effects.gd"
 [debug]
 
 gdscript/warnings/unused_parameter=0
+gdscript/warnings/unused_signal=0
 
 [display]
 

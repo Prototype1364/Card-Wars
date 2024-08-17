@@ -68,7 +68,7 @@ func Update_Game_Step():
 	if GameData.Current_Step in EFFECT_STEPS: # Ensures that Card Effects are resolved when appropriate (moved to first if statement to ensure effects are resolved before step is handled [important for Damage step-related card efffects])
 		BC.Resolve_Card_Effects()
 	if STEPS.find(GameData.Current_Step) == 9: # Current Step is Damage Step
-		Resolve_Battle_Damage()
+		BC.Resolve_Damage("Battle")
 	if STEPS.find(GameData.Current_Step) == 12 and get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > 5: # Ensures cards are discarded when appropriate
 		return
 	
@@ -243,7 +243,7 @@ func Conduct_Opening_Phase():
 func Conduct_Standby_Phase():
 	# Standby Phase (Effect -> Token)
 	BC.Set_Hero_Card_Effect_Status() # Sets the Can_Activate_Effect of all Periodic-style Hero cards on the turn player's field == True
-	BC.Resolve_Burn_Damage() # Resolves Burn Damage from any active Burn Effects
+	BC.Resolve_Damage("Burn") # Resolves Burn Damage from any active Burn Effects
 	Update_Game_State("Step")
 	BC.Add_Tokens()
 	Update_Game_State("Phase")
@@ -281,14 +281,6 @@ func Conduct_Battle_Phase():
 	# Battle Phase (Selection -> Target -> Damage -> Capture -> Repeat)
 	# NOTE: Func skipped entirely due to all steps being handled by other funcs (Except Repeat step which may require some thought to implement)
 	pass
-
-func Resolve_Battle_Damage():
-	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
-	var enemy = Enemy if GameData.Current_Turn == "Player" else Player
-	
-	BC.Resolve_Battle_Damage()
-	UI.Update_HUD_Duelist(enemy, Side_Opp)
-	UI.Update_HUD_GameState()
 
 func Capture_Card(Card_Captured, Capture_Type = "Normal", Reset_Stats = true):
 	BC.Capture_Card(Card_Captured, Capture_Type, Reset_Stats)

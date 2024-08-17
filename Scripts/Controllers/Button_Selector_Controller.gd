@@ -23,7 +23,7 @@ func Get_Active_Card_Effects():
 	# Populate Active Effects Dictionary
 	for source in card_sources:
 		for card in card_sources[source]:
-			if card.Anchor_Text not in GameData.Disabled_Effects:
+			if card.Anchor_Text not in GameData.Disabled_Effects and card.Anchor_Text != "Juggernaut": # Juggernaut effect can't be disabled
 				active_effects_dict[card.Anchor_Text] = true
 
 	Active_Effects = active_effects_dict.keys()

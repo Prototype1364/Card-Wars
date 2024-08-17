@@ -134,8 +134,7 @@ func Creature(card):
 		# Perform Fusion Summon if a copy of the card exists on the field
 		for i in Cards_On_Field:
 			if i.Name == card.Name and i != card:
-				i.Fusion_Level += 1
-				i.Update_Data()
+				i.set_fusion_level(1, "Add")
 				var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Banished")
 				SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 				break
@@ -260,7 +259,7 @@ func Wizard(card):
 
 		# Add Disabled Effect to Disabled_Effects list & this card's Disabled_Effects list
 		GameData.Disabled_Effects.append(chosen_effect_text)
-		card.set_effects_disabled(chosen_effect_text, "Add") #FIXME (NOTE): Not sure why we have this? It's to show what effects were disabled by this card specifically, but why would that level of specificity be needed? Was there an effect we planned on using that needed this?
+		card.set_effects_disabled(chosen_effect_text, "Add")
 
 
 
@@ -285,7 +284,7 @@ func Atrocity(card):
 	if Valid_Card and MedBay_Opp.get_child_count() > 0 and card.Can_Activate_Effect:
 		var Chosen_Card_Node = await Get_Card_Selected(card, "Opponent MedBay", Side, Side_Opp)
 
-		if Chosen_Card_Node != null:
+		if not Chosen_Card_Node.is_immune("Card Effect", card):
 			var Damage_Modifier = 0.2
 			var damage_dealt = int(floor(card.Total_Attack * Damage_Modifier))
 			Chosen_Card_Node.set_health(damage_dealt, "Remove")
@@ -320,7 +319,8 @@ func Behind_Enemy_Lines(card): # Name probably needs to be changed once effect i
 		if Hero_Deck != []:
 			var Targeted_Hero = Hero_Deck[BC.Dice_Roll(len(Hero_Deck))]
 			var damage_dealt = int(floor(BC.Dice_Roll(5) / 10 * Targeted_Hero.Health))
-			Targeted_Hero.set_health(damage_dealt, "Remove")
+			if not Targeted_Hero.is_immune("Card Effect", card):
+				Targeted_Hero.set_health(damage_dealt, "Remove")
 
 func Conqueror(card):
 	pass
@@ -472,6 +472,13 @@ func For_Honor_And_Glory(card):
 		GameData.For_Honor_And_Glory = false
 
 func Fury(card):
+	"""
+	Effect (PROTOTYPE UPDATE):
+		- Increase the ATK of the card for each card in the player's MedBay once per turn.
+		- ACE SETUP: Maximized by decks with a lot of draw/discard power that can time when this card hits the field, cheap support cards to spam that guard this card against taking damage or pair it with defensive Fighter and a card that allows for Reinforcers to attack (basically create the RPG holy trinity).
+		- COUNTERPLAY: Minimized by paralysis effects, damage transferrence/rebound effects, effects that reduce total attack power, and cards that can remove cards from the MedBay (forced reload effect).
+	"""
+
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	
 	if Valid_Card and card.Can_Activate_Effect:
@@ -481,13 +488,24 @@ func Fury(card):
 		card.set_attack_bonus(MedBay_Count, "Add")
 
 func Guardian(card):
+	"""
+	Effect (PROTOTYPE UPDATE):
+		- Reflects damage done to ally reinforcers back to the opponent's Fighter.
+		- ACE SETUP: Maximized when used in a supporting role with a high-attack Reinforcers and a support card allowing for the reinforcer to attack from the reinforcement zone (would be perfect paired with Fury card and Ranged Normal card).
+		- COUNTERPLAY: Minimized by attacking this Fighter directly, or when paired with the proper support cards using status cards or other non-direct attack approaches to capture those support cards.
+	"""
+
+
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 	var Reinforcers = BF.Get_Field_Card_Data(Side_Opp, "R")
+	var Is_Fighter = true if card in BF.Get_Field_Card_Data(Side, "Fighter") else false
 	
-	if Valid_Card and GameData.Target in Reinforcers:
+	if Valid_Card and GameData.Target in Reinforcers and Is_Fighter:
 		GameData.Target.set_health(GameData.Attacker.Total_Attack, "Add")
-		GameData.Attacker.set_health(GameData.Attacker.Total_Attack, "Remove")
+		if not GameData.Attacker.is_immune("Card Effect", card):
+			GameData.Attacker.set_health(GameData.Attacker.Total_Attack, "Remove")
 
 func Humiliator(card):
 	pass		
@@ -505,6 +523,14 @@ func Inspiration(card):
 			SignalBus.emit_signal("Draw_Card", GameData.Current_Turn, 1, "Tech", Card_Index)
 
 func Invincibility(card):
+	"""
+	Effect (PROTOTYPE UPDATE):
+		- This card takes no damage from battle. Still takes damage from effects.
+		- ACE SETUP: Maximized by forcing the opponent to attempt to win via battle damage against this card (target changing effects, magic/trap/status card nullification effects [muggle mode]).
+		- COUNTERPLAY: Decks that do not need to defeat your Fighter to win (Exodia) or using non-direct damage dealing strategies to win (poison, status cards, etc.).
+	"""
+
+
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	
 	if Valid_Card:
@@ -513,10 +539,26 @@ func Invincibility(card):
 		card.Invincible = false
 
 func Juggernaut(card):
+	"""
+	Effect (PROTOTYPE UPDATE):
+		- This card can only be damaged by battle while on the field. This effect cannot be disabled and this card can't suffer from burn damage or inhibiting effects (i.e. paralysis) while on the field. Magic/Trap/Status cards have no effect on it while on the field.
+		- ACE SETUP: Maximized by being the sole hero in the deck, or by having a deck that can consistently keep this card on the field.
+		- COUNTERPLAY: Disorient-style effects that can move this card off the field without needing to defeat it, capturing it before it hits the field through a targeted-damage effect (Atrocity), or using your own beatstick to do enough damage through battle to capture it quickly.
+	"""
+
+
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 
 	if Valid_Card:
-		card.set_attack(card.Attack, "Add")
+		card.Immunity["Type"].append("Magic") # Immune to all Magic cards
+		card.Immunity["Type"].append("Trap") # Immune to all Trap cards
+		card.Immunity["Type"].append("Status") # Immune to all Status cards
+		card.Unstoppable = true # Immune to Paralysis
+		card.Rejuvenation = true # Immune to Burn Damage
+	elif On_Field(card) == false:
+		card.Immunity["Type"].clear() # Remove all immunities when off the field
+		card.Unstoppable = false # Remove Paralysis immunity when off the field
+		card.Rejuvenation = false # Remove Burn Damage immunity when off the field
 
 func Mimic(card):
 	pass
@@ -527,7 +569,8 @@ func Paralysis(card):
 	var Fighter_Opp = BF.Get_Field_Card_Data(Side_Opp, "Fighter")[0] if BF.Get_Field_Card_Data(Side_Opp, "Fighter") != [] else null
 	
 	if Valid_Card and Fighter_Opp != null and card.Can_Activate_Effect:
-		Fighter_Opp.Paralysis = true
+		card.Can_Activate_Effect = false
+		Fighter_Opp.set_paralysis(true, "Add")
 
 func Perfect_Copy(card):
 	pass
@@ -545,10 +588,12 @@ func Poison(card):
 
 		if chosen_effect_text == "Heal" and Cards_On_Field.size() > 0:
 			var chosen_target = await Get_Card_Selected(card, "Field (All)", Side, Side_Opp)
-			chosen_target.set_health(card.Toxicity, "Add")
+			if not chosen_target.is_immune("Card Effect", card):
+				chosen_target.set_health(card.Toxicity, "Add")
 		elif chosen_effect_text == "Poison" and Cards_On_Field.size() > 0:
 			var chosen_target = await Get_Card_Selected(card, "Opponent Field (All)", Side, Side_Opp)
-			chosen_target.set_burn_damage(card.Toxicity, "Add") # Doesn't update health because that happens automatically during the Standby Phase
+			if not chosen_target.is_immune("Card Effect", card):
+				chosen_target.set_burn_damage(card.Toxicity, "Add") # Doesn't update health because that happens automatically during the Standby Phase
 
 func Reformation(card):
 	pass
@@ -557,9 +602,20 @@ func Reincarnation(card):
 	pass
 
 func Relentless(card):
+	"""
+	Effect (PROTOTYPE UPDATE):
+		- This card can attack multiple times per turn.
+		- ACE SETUP: Maximized when paired with cards that force low-health Heroes to spawn (i.e. Atrocity), or cards that can increase the number of attacks this card can make per turn.
+		- COUNTERPLAY: Minimized when facing cards that can reduce its attacks remaining (since all alterations to this stat are doubled), target-lock abilities (forcing this card to always target a specific card when attacking [ability not yet created]), or cards with a combination of target transferrence (force attack of reinforcer) and damage reflector effects (Guardian).
+	"""
+
+	
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	
-	card.Relentless = true if Valid_Card else false
+	if Valid_Card:
+		card.Relentless = true
+	elif On_Field(card) == false or Valid_Effect_Type(card) == false:
+		card.Relentless = false
 
 func Retribution(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -571,7 +627,12 @@ func Retribution(card):
 		if current_card.Type in ["Normal", "Hero"]:
 			if Valid_Card and Fighter_Opp != null and card.Can_Activate_Effect:
 				card.Can_Activate_Effect = false
-				Fighter_Opp.set_health(card.Total_Attack, "Remove")
+				if not Fighter_Opp.is_immune("Card Effect", card):
+					Fighter_Opp.set_health(card.Total_Attack, "Remove")
+
+				# Capture card if it dies
+				if Fighter_Opp.Total_Health <= 0:
+					SignalBus.emit_signal("Capture_Card", Fighter_Opp, "Inverted")
 
 func Spawn(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -582,7 +643,7 @@ func Spawn(card):
 
 		# Reduce Fighter_Opp's Health by 1 for every Token on card and capture if applicable
 		var Fighter_Opp = BF.Get_Field_Card_Data(Side_Opp, "Fighter")[0] if BF.Get_Field_Card_Data(Side_Opp, "Fighter") != [] else null
-		if Fighter_Opp != null:
+		if Fighter_Opp != null and not Fighter_Opp.is_immune("Card Effect", card):
 			Fighter_Opp.set_health(card.Tokens, "Remove")
 			if Fighter_Opp.Total_Health <= 0:
 				SignalBus.emit_signal("Capture_Card", Fighter_Opp)
@@ -591,8 +652,8 @@ func Spawn(card):
 	elif On_Field(card) && Valid_Effect_Type(card):
 		if GameData.Current_Step == "Damage":
 			if card == GameData.Target and card.Tokens > 0:
-				if GameData.Attacker.Multi_Strike == false:
-					GameData.Target.set_health(GameData.Attacker.Total_Attack, "Add")
+				if GameData.Attacker.Multi_Strike == false or card.is_immune("Card Effect", GameData.Attacker):
+					card.set_health(GameData.Attacker.Total_Attack, "Add")
 					card.set_tokens(1, "Remove")
 				else:
 					card.set_tokens(card.Tokens, "Remove")
@@ -666,7 +727,7 @@ func Disable(card):
 	var Fighter_Opp = BF.Get_Field_Card_Data(Side_Opp, "Fighter")[0] if BF.Get_Field_Card_Data(Side_Opp, "Fighter") != [] else null
 
 	if Valid_Card and Fighter_Opp != null and card.Can_Activate_Effect:
-		Fighter_Opp.Paralysis = true
+		Fighter_Opp.set_paralysis(true, "Add")
 
 func Excalibur(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -687,7 +748,7 @@ func Excalibur(card):
 				if current_card.Attribute == "Warrior":
 					current_card.set_attack_bonus(3, "Add")
 			for current_card in Cards_On_Field_Opp:
-				if current_card.Attribute == "Warrior":
+				if current_card.Attribute == "Warrior" and not current_card.is_immune("Card Effect", card):
 					current_card.set_attack_bonus(2, "Remove")
 
 func Heart_of_the_Underdog(card):
@@ -778,14 +839,16 @@ func Prayer(card):
 		var Effect_Target = Fighter if roll_result in [2, 4, 5, 6] else Fighter_Opp
 
 		if Effect_Target != null:
-			if roll_result in [1, 2]:
-				Effect_Target.set_attack(3, "Add")
-			elif roll_result in [3, 4]:
-				Effect_Target.set_health(Effect_Target.Revival_Health, "Set")
-			elif roll_result == 5:
-				Effect_Target.Paralysis = true
-			elif roll_result == 6:
-				Effect_Target.Invincible = true
+			if Effect_Target == Fighter or (Effect_Target == Fighter_Opp and not Fighter_Opp.is_immune("Card Effect", card)):
+				if roll_result in [1, 2]:
+					Effect_Target.set_attack(3, "Add")
+				elif roll_result in [3, 4]: # Could result in health of your Fighter going down... Should it be set to the higher of the two values if the target is your Fighter?
+					Effect_Target.set_health(Effect_Target.Revival_Health, "Set")
+				elif roll_result == 5:
+					if not Effect_Target.Unstoppable:
+						Effect_Target.set_paralysis(true, "Add")
+				elif roll_result == 6:
+					Effect_Target.Invincible = true
 
 func Resurrection(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -862,7 +925,8 @@ func Bomb(card):
 	if Valid_Card_In_Hand: # FIXME: This effect is unresolvable in its intended form (i.e. during Standby Phase - Effect Step) due to the fact that it is in the Hand (a zone that is avoided by Resolve_Card_Effects entirely). Therefore, for testing purposes you have it resolving during the Main Phase when clicked on. However, a solution to this Resolve_Card_Effects conundrum needs to be found (possibly by using the Cards group as a way to resolve all effects when needed [though doing this may temporarily require some careful attention to effects resolving when/where they shouldn't until all bugs are ironed out])
 		# Resolve Effect
 		var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
-		Fighter.set_health(card.Attack, "Remove") # FIXME (NOTE): Using Attack for now instead of Total_Attack due to Total_Attack being set to 0 for all non Normal/Hero cards in set_total_attack() func. Is this the intended behavior in light of new changes? Also, not sure if it would be better to use Total_Attack here anyway, because then things like Field_ATK_Bonus earned by the player would make this effect stronger/worse for them (which may/may not be desirable)...
+		if not Fighter.is_immune("Card Effect", card):
+			Fighter.set_health(card.Attack, "Remove")
 
 		# Reparent Nodes
 		var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay")

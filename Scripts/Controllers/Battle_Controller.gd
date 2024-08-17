@@ -187,17 +187,10 @@ func Resolve_Burn_Damage():
 
 	# Loop through all cards on appropriate side of field, apply burn damage, and capture if applicable
 	for card in Cards_On_Field:
-		card.set_health(card.Burn_Damage, "Remove")
-		if card.Total_Health <= 0 and card.Immortal == false:
-			Capture_Card(card)
-	
-func Activate_Set_Card(Chosen_Card):
-	var Dueler = BM.Player if Chosen_Card.get_parent().name.left(1) == "W" else BM.Enemy
-
-	if (Chosen_Card.Type == "Magic" and Dueler.Muggle_Mode == false) or ((Chosen_Card.Type == "Trap" and Chosen_Card.Tokens > 0)):
-		Chosen_Card.Can_Activate_Effect = true
-		CardEffects.call(Chosen_Card.Anchor_Text, Chosen_Card)
-		Chosen_Card.Can_Activate_Effect = false # Reset to ensure card doesn't activate from Graveyard
+		if not card.is_immune("Burn Damage", null): # Ensures that cards immune to any kind of burn damage are not affected.
+			card.set_health(card.Burn_Damage, "Remove")
+			if card.Total_Health <= 0 and not card.is_immune("Capture", null):
+				Capture_Card(card)
 
 func Resolve_Battle_Damage():
 	var player = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
@@ -211,10 +204,25 @@ func Resolve_Battle_Damage():
 		for _i in range(GameData.Attacker.Attacks_Remaining):
 			GameData.Attacker.set_attacks_remaining(1, "Attack")
 			for card in Targets:
-				if card.Invincible == false:
+				if not card.is_immune("Battle Damage", GameData.Attacker):
 					card.set_health(GameData.Attacker.Total_Attack, "Remove")
-					if card.Total_Health <= 0 and card.Immortal == false:
+					if card.Total_Health <= 0 and not card.is_immune("Capture", GameData.Attacker):
 						Capture_Card(card)
+
+func Activate_Set_Card(Chosen_Card):
+	var Dueler = BM.Player if Chosen_Card.get_parent().name.left(1) == "W" else BM.Enemy
+
+	if (Chosen_Card.Type == "Magic" and Dueler.Muggle_Mode == false) or ((Chosen_Card.Type == "Trap" and Chosen_Card.Tokens > 0)):
+		Chosen_Card.Can_Activate_Effect = true
+		CardEffects.call(Chosen_Card.Anchor_Text, Chosen_Card)
+		Chosen_Card.Can_Activate_Effect = false # Reset to ensure card doesn't activate from Graveyard
+
+func Resolve_Damage(damage_type: String):
+	# Resolve Damage based on damage type
+	if damage_type == "Battle":
+		Resolve_Battle_Damage()
+	elif damage_type == "Burn":
+		Resolve_Burn_Damage()
 
 func Capture_Card(Card_Captured, Capture_Type = "Normal", Reset_Stats = true):
 	var Destination_Node = Get_Destination_Node_On_Capture(Capture_Type, Card_Captured)
@@ -341,9 +349,7 @@ func Check_For_Deck_Reload():
 		SignalBus.emit_signal("Reload_Deck", "HeroDeck")
 
 func Close_Action_Buttons():
-	for card in get_tree().get_nodes_in_group("Cards"):
-		card.hide_action_buttons()
-
+	get_tree().call_group("Cards", "hide_action_buttons")
 
 
 #######################################
