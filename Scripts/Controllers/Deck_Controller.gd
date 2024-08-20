@@ -28,7 +28,7 @@ func Create_Card(cardPasscode):
 				"Deck_Capacity": card["DeckCapacity"],
 			}
 			var Created_Card = Card.new(card_data)
-			var Card_Controller = load('Scenes/SupportScenes/SmallCard.tscn').instantiate()
+			var Card_Controller = load('res://Scenes/SupportScenes/SmallCard.tscn').instantiate()
 			Created_Card.add_child(Card_Controller)
 			Created_Card.name = "Card" + str(GameData.CardCounter)
 			GameData.CardCounter += 1

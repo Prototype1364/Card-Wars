@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://dg8le21xl6poj"]
 
 [ext_resource type="Script" path="res://Scripts/MenuButton.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://dr3s0hnbndi57" path="res://Assets/UI/Menu_Hammer.png" id="3"]
-[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="3_oj8f4"]
+[ext_resource type="Texture2D" uid="uid://beqvjxpelfohh" path="res://Assets/UI/Menu_Hammer.png" id="3"]
+[ext_resource type="FontFile" uid="uid://co858100nof5b" path="res://Resources/Fonts/MTCORSVA.TTF" id="3_oj8f4"]
 
 [node name="TextureButton" type="TextureButton"]
 custom_minimum_size = Vector2(1820, 100)

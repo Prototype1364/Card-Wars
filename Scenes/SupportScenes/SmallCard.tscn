@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://drsw0l0otqsm0"]
 
-[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="1"]
+[ext_resource type="FontFile" uid="uid://co858100nof5b" path="res://Resources/Fonts/MTCORSVA.TTF" id="1"]
 
 [sub_resource type="StyleBoxFlat" id="2"]
 bg_color = Color(0.6, 0.6, 0.6, 0)

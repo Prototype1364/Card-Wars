@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://340nlxwjl4l8"]
 
-[ext_resource type="FontFile" uid="uid://cl3p5juh2lsjf" path="res://Resources/Fonts/MTCORSVA.TTF" id="1"]
+[ext_resource type="FontFile" uid="uid://co858100nof5b" path="res://Resources/Fonts/MTCORSVA.TTF" id="1"]
 
 [node name="BigCard" type="Control"]
 layout_mode = 3
