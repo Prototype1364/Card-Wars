@@ -16,25 +16,21 @@ func Set_Focus_Neighbors(Focus_To_Set, Side, Node_To_Set_For):
 		var Hand = Hand_Node.get_children()
 		for i in range(len(Hand)):
 			var Current_Node = Hand_Node.get_node(str(Hand[i].name))
-			var Left_Neighbor = Hand[(i - 1 + len(Hand)) % len(Hand)]
-			var Right_Neighbor = Hand[(i + 1) % len(Hand)]
-			Current_Node.focus_neighbor_left = Left_Neighbor.get_path()
-			Current_Node.focus_previous = Left_Neighbor.get_path()
-			Current_Node.focus_neighbor_right = Right_Neighbor.get_path()
-			Current_Node.focus_next = Right_Neighbor.get_path()
+			var Left_Neighbor = Hand[(i - 1 + len(Hand)) % len(Hand)].get_path()
+			var Right_Neighbor = Hand[(i + 1) % len(Hand)].get_path()
+			for focus_property in ["focus_neighbor_left", "focus_previous"]:
+				Current_Node.set(focus_property, Left_Neighbor)
+			for focus_property in ["focus_neighbor_right", "focus_next"]:
+				Current_Node.set(focus_property, Right_Neighbor)
 		
 		# Changes bottom focus of MainDeck to first card in Hand.
 		if len(Hand) > 0:
-			Node_To_Set_For.get_parent().get_parent().get_node("NonHands/" + Side + "MainDeck").focus_neighbor_bottom = Hand.front().get_path()
+			get_node("NonHands/" + Side + "MainDeck").focus_neighbor_bottom = Hand.front().get_path()
 		
 	elif Focus_To_Set == "Field":
 		var Parent = Node_To_Set_For.get_parent()
-		Node_To_Set_For.focus_neighbor_left = Parent.focus_neighbor_left
-		Node_To_Set_For.focus_neighbor_right = Parent.focus_neighbor_right
-		Node_To_Set_For.focus_neighbor_top = Parent.focus_neighbor_top
-		Node_To_Set_For.focus_neighbor_bottom = Parent.focus_neighbor_bottom
-		Node_To_Set_For.focus_previous = Parent.focus_previous
-		Node_To_Set_For.focus_next = Parent.focus_next
+		for focus_property in ["focus_neighbor_left", "focus_neighbor_right", "focus_neighbor_top", "focus_neighbor_bottom", "focus_previous", "focus_next"]:
+			Node_To_Set_For.set(focus_property, Parent.get(focus_property))
 
 func Get_Field_Card_Data(Side, Zone) -> Array:
 	var Zone_Count = Get_Zone_Count(Zone)
@@ -124,10 +120,9 @@ func Play_Card(Side, Net_Cost):
 	if GameData.Chosen_Card.Type == "Magic" and not ("Equip" in GameData.Chosen_Card.get_parent().name) and GameData.Chosen_Card.Is_Set == false:
 		Reparent_Nodes(GameData.Chosen_Card, Graveyard)
 	
-	# Updates Card Summoned This Turn Array, Resolves Card Effects that occur during Summon/Set (i.e. Deep Pit), Updates Card Data, Resets Reposition Variables, & Updates Duelist HUD
+	# Updates Card Summoned This Turn Array, Resolves Card Effects that occur during Summon/Set (i.e. Deep Pit), Resets Reposition Variables, & Updates Duelist HUD
 	GameData.Cards_Summoned_This_Turn.append(GameData.Chosen_Card)	
 	SignalBus.emit_signal("Resolve_Card_Effects")
-	GameData.Chosen_Card.Update_Data()
 	SignalBus.emit_signal("Reset_Reposition_Card_Variables")	
 	SignalBus.emit_signal("Update_HUD_Duelist", get_parent().get_parent().get_node("UI/Duelists/HUD_" + Side), Dueler)
 
