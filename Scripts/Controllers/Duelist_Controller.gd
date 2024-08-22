@@ -21,7 +21,7 @@ var Shield_Wall_Active = false
 
 func set_hand_size_limit(value, context="Initialize"):
 	if context == "Add":
-		Hand_Size_Limit = min(Hand_Size_Limit, Hand_Size_Limit + value)
+		Hand_Size_Limit = min(6, Hand_Size_Limit + value)
 	elif context == "Remove":
 		Hand_Size_Limit -= max(1, Hand_Size_Limit - value)
 	else:

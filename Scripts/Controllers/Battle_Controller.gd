@@ -5,25 +5,8 @@ extends TextureRect
 
 """--------------------------------- Pre-Filled Functions ---------------------------------"""
 func Resolve_Card_Effects():
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
-	var Available_Zones = get_node("CardSpots/NonHands").get_children() + get_node("CardSpots/" + Side + "HandScroller/").get_children() + get_node("CardSpots/" + Side_Opp + "HandScroller/").get_children()
-	var Zones_To_Check = []
-	var Zones_To_Avoid = [Side + "Hand", Side + "MainDeck", Side + "HeroDeck", Side + "TechDeck", Side + "TechZone", Side + "Banished", Side_Opp + "Hand", Side_Opp + "MainDeck", Side_Opp + "HeroDeck", Side_Opp + "TechDeck", Side_Opp + "TechZone", Side_Opp + "Banished"]
-	var AnchorText
-
-	# Populate Zones_To_Check Array
-	for i in Available_Zones.size():
-		if (Available_Zones[i].name.left(1) == Side or Available_Zones[i].name.left(1) == Side_Opp) and ! Available_Zones[i].name in Zones_To_Avoid:
-			Zones_To_Check.append(Available_Zones[i])
-
-	# Resolve Card Effects
-	for zone in range(len(Zones_To_Check)): # Zone loop enables you to check all zones with just a single Item (card) loop.
-		for item in range(len(Zones_To_Check[zone].get_children())):
-			AnchorText = Zones_To_Check[zone].get_child(item).Anchor_Text
-			if AnchorText != null:
-				var Chosen_Card = Zones_To_Check[zone].get_child(item)
-				CardEffects.call(AnchorText, Chosen_Card)
+	for card in get_tree().get_nodes_in_group("Cards"):
+		CardEffects.call(card.Anchor_Text, card)
 
 
 

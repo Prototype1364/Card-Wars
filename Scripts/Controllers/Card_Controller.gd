@@ -109,7 +109,6 @@ func set_frame(frame: String):
 	$SmallCard/Frame.texture = load(texture_path)
 
 func set_art():
-	Art = "res://Assets/Cards/Art/" + (("Equip_" + Type + "_" + Name.replace(" ", "_")) if Attribute == "Equip" else (Type + "_" + Name.replace(" ", "_"))) + ".png" if Type != "Special" else ""
 	$SmallCard/ArtContainer/Art.texture = load(Art) if "Deck" not in get_parent().name and Frame != "Special" else null
 
 func set_attacks_remaining(value: int = 1, context: String = "Initialize"):
@@ -169,9 +168,6 @@ func set_cost(value: int):
 		$SmallCard/CostContainer/Cost.texture = load(Cost_Path)
 	else:
 		$SmallCard/CostContainer/Cost.texture = null
-
-func set_cost_path(node_name: String):
-	Cost_Path = "res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(node_name) + ".png"
 
 func set_health(value: int, context: String = "Initialize"):
 	if context == "Add":
@@ -352,7 +348,7 @@ func is_immune(action_type: String, trigger_card: Node) -> bool:
 		if trigger_card.Type in Immunity["Type"] or trigger_card.Attribute in Immunity["Attribute"] or trigger_card.Anchor_Text in Immunity["Effect"] or Clean_Parent_Name in Immunity["Location"]:
 			return true
 	elif action_type == "Battle Damage":
-		if (Clean_Parent_Name == "R" and "Multi_Strike" in Immunity["Effects"]) or Invincible:
+		if (Clean_Parent_Name == "R" and "Multi_Strike" in Immunity["Effect"]) or Invincible:
 			return true
 	elif action_type == "Burn Damage":
 		if Rejuvenation:

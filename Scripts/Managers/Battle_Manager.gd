@@ -3,7 +3,7 @@ extends Control
 const PHASES = ["Opening Phase", "Standby Phase", "Main Phase", "Battle Phase", "End Phase"]
 const PHASE_THRESHOLDS = [3, 5, 6, 11, 16]
 const STEPS = ["Start", "Draw", "Roll", "Recruit", "Effect", "Token", "Main", "Selection", "Target", "Damage", "Capture", "Repeat", "Discard", "Reload", "Effect", "Victory", "End"]
-const EFFECT_STEPS = ["Effect", "Selection", "Damage", "Capture", "Discard"] # Discard may/may not end up being an Effect Step. You just added it, just in case.
+const EFFECT_STEPS = ["Start", "Effect", "Selection", "Damage", "Capture", "Discard"] # Discard may/may not end up being an Effect Step. You just added it, just in case.
 const FUNC_STEPS = ["Damage"]
 
 # Import Dependencies
@@ -149,8 +149,8 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main", Draw_At_Index
 		BF.Reparent_Nodes(Card_Info['Card_Drawn'], Card_Info['Destination_Node'])
 		Card_Info['Card_Drawn'].Update_Data()
 
-		# Activate Advance Tech Card Effect when Drawn
-		if Card_Info['Card_Drawn'].Type == "Special":
+		# Activate Card Effect when Drawing a Tech Card or Activate Tech Card
+		if Card_Info['Card_Drawn'].Type == "Special" or Card_Info['Card_Drawn'].Type == "Tech":
 			BC.Activate_Summon_Effects(Card_Info['Card_Drawn'])
 
 

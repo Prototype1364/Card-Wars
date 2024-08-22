@@ -107,13 +107,13 @@ func Get_Button_Selected(card: Card, selection_type: String = "Normal", custom_o
 
 """--------------------------------- Attribute Effects ---------------------------------"""
 func Breakthrough(card): # Activate Tech (Special)
-	# FIXME: There seems to be a bug relating to tech cards. Occasionally, when the Advance Tech card is played by the opponent, a Tech card will appear in the player’s tech zone. Not entirely sure why this happens… Could be because of weird luck/randomness with the Scientist effect being resolved (despite it not being on the field) or something to do with the Advance Tech card resolving more often than it should (i.e. when it is in the MedBay instead of just when it is drawn into the Hand). Keep an eye out for the cause and find a solution.
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
+	var Card_In_Hand = card in BF.Get_Field_Card_Data(Side, "Hand")
 	var Dueler_Tech_Deck = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "TechDeck")
 	var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay")
 
-	if len(Dueler_Tech_Deck.get_children()) > 0:
+	if len(Dueler_Tech_Deck.get_children()) > 0 and Card_In_Hand:
 		SignalBus.emit_signal("Draw_Card", GameData.Current_Turn, 1, "Tech")
 		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 
@@ -284,15 +284,16 @@ func Atrocity(card):
 	if Valid_Card and MedBay_Opp.get_child_count() > 0 and card.Can_Activate_Effect:
 		var Chosen_Card_Node = await Get_Card_Selected(card, "Opponent MedBay", Side, Side_Opp)
 
-		if not Chosen_Card_Node.is_immune("Card Effect", card):
-			var Damage_Modifier = 0.2
-			var damage_dealt = int(floor(card.Total_Attack * Damage_Modifier))
-			Chosen_Card_Node.set_health(damage_dealt, "Remove")
+		if Chosen_Card_Node != null:
+			if not Chosen_Card_Node.is_immune("Card Effect", card):
+				var Damage_Modifier = 0.2
+				var damage_dealt = int(floor(card.Total_Attack * Damage_Modifier))
+				Chosen_Card_Node.set_health(damage_dealt, "Remove")
 
-			# Send card to Banished slot if it dies
-			if Chosen_Card_Node.Total_Health <= 0:
-				var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "Banished")
-				SignalBus.emit_signal("Reparent_Nodes", Chosen_Card_Node, Destination_Node)
+				# Send card to Banished slot if it dies
+				if Chosen_Card_Node.Total_Health <= 0:
+					var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "Banished")
+					SignalBus.emit_signal("Reparent_Nodes", Chosen_Card_Node, Destination_Node)
 
 func Barrage(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -328,7 +329,7 @@ func Bestow(card):
 	if Valid_Card_In_Play:
 		var Side = "W" if GameData.Current_Turn == "Player" else "B"
 		var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
-		var Zones_To_Search = ["MainDeck", "Fighter", "R", "Backrow", "EquipMagic", "EquipTrap", "TechZone", "Graveyard", "MedBay"]
+		var Zones_To_Search = ["MainDeck", "Fighter", "R", "Backrow", "EquipMagic", "EquipTrap", "TechZone", "Graveyard", "MedBay", "Hand"]
 		
 		if Fighter != null:
 			if Fighter.Name == "King Arthur":
@@ -336,9 +337,17 @@ func Bestow(card):
 					for side in ["W", "B"]:
 						var Cards_In_Zone = BF.Get_Field_Card_Data(side, zone)
 						for card_in_zone in Cards_In_Zone:
-							if card_in_zone.Name == "Excalibur":
-								# Add Excalibur to the field in EquipMagic slot
-								SignalBus.emit_signal("Activate_Set_Card", side, card_in_zone)
+							if card_in_zone.Name == "Excalibur" and zone != "EquipMagic":
+								# Add Excalibur to the field in EquipMagic slot (replacing previous card if necessary)
+								var Graveyard = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + side + "Graveyard")
+								var EquipSlot = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + side + "EquipMagic")
+								if EquipSlot.get_child_count() > 0:
+									GameData.Last_Equip_Card_Replaced.append(EquipSlot.get_child(0))
+									SignalBus.emit_signal("Reparent_Nodes", EquipSlot.get_child(0), Graveyard)
+									BC.Activate_Set_Card(EquipSlot.get_child(0)) # Ensures that any effects that trigger upon being sent to the Graveyard are resolved (i.e. Last Stand).
+								card_in_zone.Can_Activate_Effect = true
+								SignalBus.emit_signal("Reparent_Nodes", card_in_zone, EquipSlot)
+								card_in_zone.Update_Data()
 								break
 
 func Conqueror(card):
@@ -592,6 +601,9 @@ func Juggernaut(card):
 		card.Unstoppable = false # Remove Paralysis immunity when off the field
 		card.Rejuvenation = false # Remove Burn Damage immunity when off the field
 
+func Kinship(card):
+	pass
+
 func Mimic(card):
 	pass
 
@@ -714,7 +726,8 @@ func Tailor_Made(card):
 		# Move Chosen_Card to proper hand
 		var Chosen_Card_Node = await Get_Card_Selected(card, "Global Cards", Side, Side_Opp)
 		var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
-		SignalBus.emit_signal("Reparent_Nodes", Chosen_Card_Node, Destination_Node)
+		if Chosen_Card_Node != null:		
+			SignalBus.emit_signal("Reparent_Nodes", Chosen_Card_Node, Destination_Node)
 
 		# Remove all children from Global_Card_Holder
 		for child in Global_Card_Holder.get_children():
@@ -737,7 +750,8 @@ func Blade_Song(card):
 		# Reparent Nodes
 		var Destination_Hand = root.get_node("SceneHandler/Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
 		var Destination_Graveyard = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Graveyard")
-		SignalBus.emit_signal("Reparent_Nodes", Chosen_Card_Node, Destination_Hand)
+		if Chosen_Card_Node != null:		
+			SignalBus.emit_signal("Reparent_Nodes", Chosen_Card_Node, Destination_Hand)
 		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Graveyard)
 
 func Deep_Pit(card):
@@ -782,8 +796,9 @@ func Excalibur(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
+	var Dueler = BM.Player if card.get_parent().name.left(1) == "W" else BM.Enemy
 
-	if Valid_Card and card.Can_Activate_Effect:
+	if Valid_Card:
 		var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
 		var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
 		var Fighter_Opp = BF.Get_Field_Card_Data(Side_Opp, "Fighter")[0] if BF.Get_Field_Card_Data(Side_Opp, "Fighter") != [] else null
@@ -791,14 +806,33 @@ func Excalibur(card):
 		var Cards_On_Field = [Fighter] + Reinforcers if Fighter != null else Reinforcers
 		var Cards_On_Field_Opp = [Fighter_Opp] + Reinforcers_Opp if Fighter_Opp != null else Reinforcers_Opp
 
-		# Resolve Effect if equipped to King Arthur
+		# Resolve Effect(s) if equipped to King Arthur
 		if Fighter.Name == "King Arthur":
-			for current_card in Cards_On_Field:
-				if current_card.Attribute == "Warrior":
-					current_card.set_attack_bonus(3, "Add")
-			for current_card in Cards_On_Field_Opp:
-				if current_card.Attribute == "Warrior" and not current_card.is_immune("Card Effect", card):
-					current_card.set_attack_bonus(2, "Remove")
+			# Effect 1-3:
+				# 1) Add Attack Bonus to King Arthur and all allied Warriors, Remove Attack Bonus from all enemy cards
+				# 2) Make King Arthur and all allies immune to Burn Damage (Rejuvenation)
+				# 3) Inspire King Arthur and all allies to attack again
+			if GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect" and card.Can_Activate_Effect:
+				card.Can_Activate_Effect = false
+				for current_card in Cards_On_Field:
+					current_card.Rejuvenation = true
+					current_card.set_attacks_remaining(1, "Add")
+					if current_card.Attribute == "Warrior":
+						current_card.set_attack_bonus(3, "Add")
+				for current_card in Cards_On_Field_Opp:
+					if current_card.is_immune("Card Effect", card):
+						current_card.set_attack_bonus(2, "Remove")
+
+			# Effect 4: Deal a percentage of King Arthur's Total Attack as damage to all opposing Reinforcers (if any)
+			if GameData.Current_Step == "Damage":
+				var Damage_Percent = 0.33
+				for current_card in Reinforcers_Opp:
+					if not current_card.is_immune("Card Effect", card) and GameData.Attacker == Fighter and GameData.Current_Step == "Damage":
+						current_card.set_health(int(floor(Fighter.Total_Attack * Damage_Percent)), "Remove")
+
+		# Reset Can_Activate_Effect to allow for resolving standby effects once per turn (periodic equip effects [NOTE: This should probably be a func in BC, not here, but since this is currently the only Periodic magic card, it's here for now])
+		if GameData.Current_Step == "Start" and Dueler.Name == GameData.Current_Turn:
+			card.Can_Activate_Effect = true
 
 func Heart_of_the_Underdog(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -855,17 +889,18 @@ func Miraculous_Recovery(card):
 		var Chosen_Card_Node = await Get_Card_Selected(card, "Both MedBays", Side, Side_Opp)
 
 		# Restore Stats to Base (if Normal/Hero)
-		if Chosen_Card_Node.Type in ["Normal", "Hero"]:
-			Chosen_Card_Node.set_health(Chosen_Card_Node.Revival_Health, "Set")
-			Chosen_Card_Node.set_health_bonus(0, "Set")
-			Chosen_Card_Node.set_attack(Chosen_Card_Node.Base_Attack, "Set")
-			Chosen_Card_Node.set_attack_bonus(0, "Set")
+		if Chosen_Card_Node != null:
+			if Chosen_Card_Node.Type in ["Normal", "Hero"]:
+				Chosen_Card_Node.set_health(Chosen_Card_Node.Revival_Health, "Set")
+				Chosen_Card_Node.set_health_bonus(0, "Set")
+				Chosen_Card_Node.set_attack(Chosen_Card_Node.Base_Attack, "Set")
+				Chosen_Card_Node.set_attack_bonus(0, "Set")
 
-		# Reparent Nodes
-		var Destination_Hand = root.get_node("SceneHandler/Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
-		var Destination_Graveyard = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Graveyard")
-		SignalBus.emit_signal("Reparent_Nodes", Chosen_Card_Node, Destination_Hand)
-		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Graveyard)
+			# Reparent Nodes
+			var Destination_Hand = root.get_node("SceneHandler/Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
+			var Destination_Graveyard = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Graveyard")
+			SignalBus.emit_signal("Reparent_Nodes", Chosen_Card_Node, Destination_Hand)
+			SignalBus.emit_signal("Reparent_Nodes", card, Destination_Graveyard)
 
 func Morale_Boost(card):
 	"""
@@ -884,12 +919,13 @@ func Morale_Boost(card):
 		var Chosen_Card_Node = await Get_Card_Selected(card, "Field (All)", Side, Side_Opp)
 
 		# Resolve Effect
-		if Chosen_Card_Node.Type in ["Normal", "Hero"]:
-			Chosen_Card_Node.set_attacks_remaining(1, "Add")
+		if Chosen_Card_Node != null:
+			if Chosen_Card_Node.Type in ["Normal", "Hero"]:
+				Chosen_Card_Node.set_attacks_remaining(1, "Add")
 
-		# Reparent Nodes
-		var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Graveyard")
-		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
+			# Reparent Nodes
+			var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Graveyard")
+			SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 
 func Prayer(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -925,18 +961,19 @@ func Resurrection(card):
 		var Chosen_Card_Node = await Get_Card_Selected(card, "MedBay", Side, Side_Opp, "MedBay", [], ["Normal"])
 
 		# Find Open Slot to Summon Chosen Card into
-		var Fighter_Open = BF.Find_Open_Slot("Fighter", Side)
-		var Reinforcer_Open = BF.Find_Open_Slot("R", Side)
-		var Destination_Node
-		if Fighter_Open != null:
-			Destination_Node = root.get_node(Fighter_Open)
-		elif Reinforcer_Open != null:
-			Destination_Node = root.get_node(Reinforcer_Open)
-		else:
-			Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
+		if Chosen_Card_Node != null:
+			var Fighter_Open = BF.Find_Open_Slot("Fighter", Side)
+			var Reinforcer_Open = BF.Find_Open_Slot("R", Side)
+			var Destination_Node
+			if Fighter_Open != null:
+				Destination_Node = root.get_node(Fighter_Open)
+			elif Reinforcer_Open != null:
+				Destination_Node = root.get_node(Reinforcer_Open)
+			else:
+				Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand")
 
-		# Update MedBay/Hand
-		SignalBus.emit_signal("Reparent_Nodes", Chosen_Card_Node, Destination_Node)
+			# Update MedBay/Hand
+			SignalBus.emit_signal("Reparent_Nodes", Chosen_Card_Node, Destination_Node)
 
 func Runetouched(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -975,6 +1012,7 @@ func Cursed_Mirror(card):
 """--------------------------------- Tech Effects ---------------------------------"""
 func Fire(card):
 	if card.Can_Activate_Effect:
+		card.Can_Activate_Effect = false
 		var Side = "W" if GameData.Current_Turn == "Player" else "B"
 		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
 		var Node_To_Update = root.get_node("SceneHandler/Battle/HUD_" + Side)
@@ -984,6 +1022,7 @@ func Fire(card):
 
 func The_Wheel(card):
 	if card.Can_Activate_Effect:
+		card.Can_Activate_Effect = false
 		var Side = "W" if GameData.Current_Turn == "Player" else "B"
 		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
 		var Node_To_Update = root.get_node("SceneHandler/Battle/HUD_" + Side)
@@ -995,16 +1034,13 @@ func The_Wheel(card):
 		SignalBus.emit_signal("Update_HUD_Duelist", Node_To_Update, Dueler)
 
 func Shield_Wall(card):
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-
-	if Valid_Card:
+	if card.Can_Activate_Effect:
+		card.Can_Activate_Effect = false
 		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
 		Dueler.Shield_Wall_Active = true
 
 func Concrete(card):
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-
-	if Valid_Card and card.Can_Activate_Effect:
+	if card.Can_Activate_Effect:
 		card.Can_Activate_Effect = false
 		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
 		Dueler.set_hand_size_limit(1, "Add")
