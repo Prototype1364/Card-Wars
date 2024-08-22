@@ -69,7 +69,7 @@ func Update_Game_Step():
 		BC.Resolve_Card_Effects()
 	if STEPS.find(GameData.Current_Step) == 9: # Current Step is Damage Step
 		BC.Resolve_Damage("Battle")
-	if STEPS.find(GameData.Current_Step) == 12 and get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > 5: # Ensures cards are discarded when appropriate
+	if STEPS.find(GameData.Current_Step) == 12 and get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > player.Hand_Size_Limit: # Ensures cards are discarded when appropriate
 		return
 	
 	# Update Step value
@@ -112,6 +112,7 @@ func Update_Game_Phase():
 		Update_Game_Phase()
 
 func Update_Game_Turn():
+	var player = Player if GameData.Current_Turn == "Player" else Enemy
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	
 	# Complete all incomplete Phases/Steps for remainder of Turn
@@ -122,7 +123,7 @@ func Update_Game_Turn():
 			Update_Game_Step()
 	
 	# Check if Discard Required to avoid exceeding Hand Size Limit
-	if get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() <= 5:
+	if get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() <= player.Hand_Size_Limit:
 		Conduct_End_Phase()
 		if GameData.Victor == null:
 			BC.Reset_Turn_Variables(PHASES, STEPS)
@@ -205,7 +206,7 @@ func Setup_Game():
 	
 	# Draw Opening Hands
 	GameData.Current_Step = "Draw"
-	Draw_Card(GameData.Current_Turn, 35)
+	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
 	Draw_Card(GameData.Current_Turn, 5)
 	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
@@ -313,6 +314,7 @@ func Conduct_End_Phase():
 	Update_Game_State("Step")
 
 func Discard_Card(Side):
+	var Dueler = Player if GameData.Current_Turn == "Player" else Enemy
 	var CardMoved = get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand/" + str(GameData.CardMoved))
 	var MedBay = get_node("Playmat/CardSpots/NonHands/" + Side + "MedBay")
 	
@@ -327,7 +329,7 @@ func Discard_Card(Side):
 	BC.Reset_Reposition_Card_Variables()
 	
 	# Retry to End Turn
-	while get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > 5:
+	while get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > Dueler.Hand_Size_Limit:
 		return
 	if GameData.Current_Step == "Discard":
 		Update_Game_Turn()

@@ -205,7 +205,8 @@ func Resolve_Battle_Damage():
 			GameData.Attacker.set_attacks_remaining(1, "Attack")
 			for card in Targets:
 				if not card.is_immune("Battle Damage", GameData.Attacker):
-					card.set_health(GameData.Attacker.Total_Attack, "Remove")
+					card.set_health(GameData.Attacker.get_net_damage(), "Remove")
+					CardEffects.call(card.Anchor_Text, card) # Call any effects that may trigger on damage (Defiance, etc.)
 					if card.Total_Health <= 0 and not card.is_immune("Capture", GameData.Attacker):
 						Capture_Card(card)
 

@@ -16,6 +16,16 @@ var Valid_Attackers = 0
 var Tech_Zone = []
 var Capture_Destination = "Graveyard"
 var Muggle_Mode = false
+var Hand_Size_Limit = 5
+var Shield_Wall_Active = false
+
+func set_hand_size_limit(value, context="Initialize"):
+	if context == "Add":
+		Hand_Size_Limit = min(Hand_Size_Limit, Hand_Size_Limit + value)
+	elif context == "Remove":
+		Hand_Size_Limit -= max(1, Hand_Size_Limit - value)
+	else:
+		Hand_Size_Limit = value
 
 func set_summon_crests(value, context="Initialize"):
 	if context == "Add":

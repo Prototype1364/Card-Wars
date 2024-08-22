@@ -18,6 +18,7 @@ var Attribute: String
 var Description: String
 var Short_Description: String
 var Attacks_Remaining: int
+var Base_Attack: int
 var Attack: int
 var ATK_Bonus: int # Used to keep track of Equip card bonuses specifically.
 var Total_Attack: int
@@ -68,7 +69,7 @@ func _init(card_data):
 
 	# Set default values that are common across all cards
 	var defaults = {
-		"0": ["ATK_Bonus", "Health_Bonus", "Revival_Health", "Tokens", "Burn_Damage"],
+		"0": ["ATK_Bonus", "Health_Bonus", "Tokens", "Burn_Damage"],
 		"1": ["Fusion_Level", "Attacks_Remaining"],
 		"False": ["Is_Set", "Can_Activate_Effect", "Attack_As_Reinforcement", "Immortal", "Invincible", "Rejuvenation", "Relentless", "Multi_Strike", "Target_Reinforcer", "Paralysis", "Unstoppable", "Direct_Attack", "Can_Attack", "Targetable"],
 	}
@@ -81,6 +82,8 @@ func _init(card_data):
 				self.set(value, int(key))
 	
 	# Set non-standard variables
+	Base_Attack = Attack
+	Revival_Health = Health
 	Total_Attack = Attack + ATK_Bonus
 	Total_Health = Health + Health_Bonus
 	Cost_Path = "res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png" if Type != "Special" and "Tech" not in Type else ""
@@ -360,6 +363,14 @@ func is_immune(action_type: String, trigger_card: Node) -> bool:
 
 	# No immunity found
 	return false
+
+func get_net_damage() -> int:
+	var Dueler_Opp = BM.Enemy if get_parent().name.left(1) == "W" else BM.Player
+	var Dueler_Side_Opp = "W" if Dueler_Opp == BM.Player else "B"
+	var Reinforcers_Opp = BF.Get_Field_Card_Data(Dueler_Side_Opp, "R")
+	var Shield_Wall_Active = Dueler_Opp.Shield_Wall_Active
+	var Shield_Wall_Damage_Reduction = len(Reinforcers_Opp) * 5 if Shield_Wall_Active else 0
+	return Total_Attack - Shield_Wall_Damage_Reduction
 
 # Signal-Related Functions
 func focusing():
