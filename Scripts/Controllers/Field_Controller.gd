@@ -99,7 +99,7 @@ func Reposition_Field_Cards(Side) -> void:
 	# Resets variables to avoid game crashing if you try to switch multiple times in a single turn.
 	SignalBus.emit_signal("Reset_Reposition_Card_Variables")
 
-func Play_Card(Side, Net_Cost):
+func Play_Card(Side, Net_Cost, Summon_Mode):
 	var Dueler = BM.Player if GameData.CardTo.name.left(1) == "W" else BM.Enemy
 	var Equip_Slot = get_node("NonHands/" + Side + "EquipMagic") if GameData.Chosen_Card.Type == "Magic" else get_node("NonHands/" + Side + "EquipTrap")
 	var Graveyard = get_node("NonHands/" + Side + "Graveyard")
@@ -114,6 +114,8 @@ func Play_Card(Side, Net_Cost):
 	Reparent_Nodes(GameData.Chosen_Card, GameData.CardTo)
 	Set_Focus_Neighbors("Field", Side, GameData.CardTo.get_child(0))
 	Set_Focus_Neighbors("Hand", Side, get_node(Side + "HandScroller/" + Side + "Hand"))
+	if "Backrow" in GameData.CardTo.name and Summon_Mode == "Set":
+		GameData.Chosen_Card.set_is_set("Set")
 	SignalBus.emit_signal("Activate_Summon_Effects", GameData.Chosen_Card)
 		
 	# Ensures that a card summoned to Equip slot is not immediately sent to Graveyard.
@@ -188,9 +190,9 @@ func _on_Card_Slot_pressed(slot_name):
 
 	if GameData.Chosen_Card != null and Destination_Node != null:
 		if "Hand" in GameData.Chosen_Card.get_parent().name and GameData.Current_Step == "Main" and GameData.Summon_Mode != "":
-			GameData.Summon_Mode = ""
 			GameData.CardTo = get_node(Destination_Node)
-			SignalBus.emit_signal("Play_Card", GameData.Chosen_Card.get_parent().name.left(1))
+			SignalBus.emit_signal("Play_Card", GameData.Chosen_Card.get_parent().name.left(1), GameData.Summon_Mode)
+			GameData.Summon_Mode = ""
 		elif GameData.Current_Step == "Main":
 			if GameData.Chosen_Card.get_parent().name != "":
 				GameData.CardTo = get_node(Destination_Node)

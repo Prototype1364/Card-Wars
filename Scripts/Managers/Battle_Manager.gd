@@ -190,8 +190,8 @@ func Hero_Deck_Selected():
 """--------------------------------- Setup Game Functions ---------------------------------"""
 func Setup_Game():
 	# Populate Duelist Data
-	Player.set_duelist_data("Player", 50)
-	Enemy.set_duelist_data("Enemy", 50)
+	Player.set_duelist_data("Player", 0)
+	Enemy.set_duelist_data("Enemy", 0)
 
 	# Populates & Shuffles Player/Enemy Decks
 	DC.Create_Deck("Arthurian", "Player")
@@ -260,7 +260,7 @@ func Conduct_Main_Phase():
 	# Flip by on_Focus_Sensor_pressed() in SmallCard.gd and Activate_Set_Card()
 	pass
 
-func Play_Card(Side):
+func Play_Card(Side, Summon_Mode):
 	var player = Player if GameData.Current_Turn == "Player" else Enemy
 	var Card_Is_Valid = BC.Valid_Card(Side, GameData.Chosen_Card)
 	var Card_Net_Cost = BC.Calculate_Net_Cost(player, GameData.Chosen_Card)
@@ -268,11 +268,12 @@ func Play_Card(Side):
 	var Card_Is_Affordable = BC.Summon_Affordable(player, Card_Net_Cost)
 	
 	if Card_Is_Valid and Destination_Is_Valid and Card_Is_Affordable:
-		BF.Play_Card(Side, Card_Net_Cost)
+		BF.Play_Card(Side, Card_Net_Cost, Summon_Mode)
 
 func Activate_Set_Card(Side, Chosen_Card):
 	BC.Activate_Set_Card(Chosen_Card)
 	BF.Activate_Set_Card(Side, Chosen_Card)
+	BC.Reset_Reposition_Card_Variables()
 	Chosen_Card.Reset_Variables_After_Flip_Summon()
 
 

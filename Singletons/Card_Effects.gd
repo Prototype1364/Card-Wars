@@ -20,7 +20,7 @@ func Set_Battle_Scripts(): # A temporary function to fix the issue of the BM var
 """--------------------------------- General Functions ---------------------------------"""
 func On_Field(card) -> bool: 
 	var Clean_Parent_Name = BF.Get_Clean_Slot_Name(card.get_parent().name)
-	var Valid_Slots = ["Fighter", "R", "Backrow", "EquipTrap", "EquipMagic"]
+	var Valid_Slots = ["Fighter", "R", "Backrow", "EquipTrap", "EquipMagic", "TechZone"]
 	
 	return true if Clean_Parent_Name in Valid_Slots else false
 
@@ -216,20 +216,27 @@ func Scientist(card):
 func Spy(card):
 	pass
 
-func Support(card):
+func Support(card): # FIXME: Missing Attribute icon (causes error when mousing over card, but doesn't crash the game)
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
 
-	if Valid_Card and Fighter != null and card != Fighter and card.Health > 0 and card.Can_Activate_Effect:
+	if (card.Health + card.Health_Bonus) > 0 and GameData.Current_Step == "Main": # Allows for partial transfers on Summon without locking player out of ability to transfer down the road.
+		card.Can_Activate_Effect = true
+
+	if Valid_Card and Fighter != null and card != Fighter and (card.Health + card.Health_Bonus) > 0 and card.Can_Activate_Effect:
 		card.Can_Activate_Effect = false
-		var Health_Transfer_Value = await Get_Text_Entry_Transfer_Amount(card, card.Health)		
+		var Health_Transfer_Value = await Get_Text_Entry_Transfer_Amount(card, card.Health + card.Health_Bonus)		
+		var Health_Bonus_Reduction = max(0, Health_Transfer_Value - card.Health)
 		Fighter.set_health(Health_Transfer_Value, "Add")
-		card.set_health(Health_Transfer_Value, "Remove")
+		card.set_health(min(card.Health, Health_Transfer_Value), "Remove")
+		card.set_health_bonus(Health_Bonus_Reduction, "Remove")
 
 		# Capture card if it dies
 		if card.Total_Health <= 0:
-			SignalBus.emit_signal("Capture_Card", card, "Inverted")
+			var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay")
+			SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
+			card.Reset_Stats_On_Capture()
 
 func Titan(card):
 	pass
@@ -245,13 +252,18 @@ func Warrior(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
 
-	if Valid_Card and Fighter != null and card != Fighter and card.Attack > 0 and card.Can_Activate_Effect:
-		card.Can_Activate_Effect = false
-		var Attack_Transfer_Value = await Get_Text_Entry_Transfer_Amount(card, card.Attack)
-		Fighter.set_attack(Attack_Transfer_Value, "Add")
-		card.set_attack(Attack_Transfer_Value, "Remove")
+	if (card.Attack + card.ATK_Bonus) > 0 and GameData.Current_Step == "Main": # Allows for partial transfers on Summon without locking player out of ability to transfer down the road.
+		card.Can_Activate_Effect = true
 
-func Wizard(card):
+	if Valid_Card and Fighter != null and card != Fighter and (card.Attack + card.ATK_Bonus) > 0 and card.Can_Activate_Effect:
+		card.Can_Activate_Effect = false
+		var Attack_Transfer_Value = await Get_Text_Entry_Transfer_Amount(card, card.Attack + card.ATK_Bonus)
+		var ATK_Bonus_Reduction = max(0, Attack_Transfer_Value - card.Attack)
+		Fighter.set_attack(Attack_Transfer_Value, "Add")
+		card.set_attack(min(card.Attack, Attack_Transfer_Value), "Remove")
+		card.set_attack_bonus(ATK_Bonus_Reduction, "Remove")
+
+func Wizard(card): # NOTE: Is this too OP? Should we go back to the old effect where it disables an Attribute effect of the player's choice (instead of any effect)?
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 
 	if Valid_Card and card.Can_Activate_Effect:
@@ -602,7 +614,22 @@ func Juggernaut(card):
 		card.Rejuvenation = false # Remove Burn Damage immunity when off the field
 
 func Kinship(card):
-	pass
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+
+	if Valid_Card:
+		if card == GameData.Target:
+			var Card_Side = "W" if card.get_parent().name.left(1) == "W" else "B"
+			var Cards_On_Field = BF.Get_Field_Card_Data(Card_Side, "Fighter") + BF.Get_Field_Card_Data(Card_Side, "R")
+			var net_damage = GameData.Attacker.get_net_damage()
+						
+			# Find Excess Fusion Level of Reinforcers
+			var total_fusion_level = 1
+			for current_card in Cards_On_Field:
+				total_fusion_level += current_card.Fusion_Level if current_card != card and current_card.Fusion_Level > 1 else 0
+
+			# Heal back the difference between net damage and true damage taken
+			var true_damage_taken = int(floor(net_damage / total_fusion_level))
+			card.set_health(net_damage - true_damage_taken, "Add")
 
 func Mimic(card):
 	pass
@@ -998,10 +1025,14 @@ func Cursed_Mirror(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 
-	if Valid_Card:
+	if Valid_Card and GameData.Attacker != null:
+		card.set_tokens(0, "Reset")
 		GameData.Target.set_health(GameData.Attacker.get_net_damage(), "Add")
 		if not GameData.Attacker.is_immune("Card Effect", card):
 			GameData.Attacker.set_health(GameData.Attacker.get_net_damage(), "Remove")
+
+			if GameData.Attacker.Total_Health <= 0:
+				SignalBus.emit_signal("Capture_Card", GameData.Attacker, "Inverted")
 		
 		# Reparent Nodes
 		var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "Graveyard")
@@ -1015,17 +1046,18 @@ func Fire(card):
 		card.Can_Activate_Effect = false
 		var Side = "W" if GameData.Current_Turn == "Player" else "B"
 		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
-		var Node_To_Update = root.get_node("SceneHandler/Battle/HUD_" + Side)
+		var Node_To_Update = root.get_node("SceneHandler/Battle/UI/Duelists/HUD_" + Side)
 		
 		Dueler.set_field_health_bonus(5, "Add")
 		SignalBus.emit_signal("Update_HUD_Duelist", Node_To_Update, Dueler)
+		get_tree().call_group("Cards", "set_total_health")
 
 func The_Wheel(card):
 	if card.Can_Activate_Effect:
 		card.Can_Activate_Effect = false
 		var Side = "W" if GameData.Current_Turn == "Player" else "B"
 		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
-		var Node_To_Update = root.get_node("SceneHandler/Battle/HUD_" + Side)
+		var Node_To_Update = root.get_node("SceneHandler/Battle/UI/Duelists/HUD_" + Side)
 		
 		Dueler.set_cost_discount_normal(1, "Remove")
 		Dueler.set_cost_discount_hero(1, "Remove")
@@ -1044,6 +1076,23 @@ func Concrete(card):
 		card.Can_Activate_Effect = false
 		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
 		Dueler.set_hand_size_limit(1, "Add")
+
+func Medicine(card):
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Card_On_Correct_Side = true if card.get_parent().name.left(1) == Side else false
+
+	if On_Field(card) and GameData.Current_Step == "Start" and Card_On_Correct_Side and GameData.Turn_Counter > 1:
+		card.Can_Activate_Effect = true
+
+	if On_Field(card) and Card_On_Correct_Side and card.Can_Activate_Effect:
+		card.Can_Activate_Effect = false
+		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
+		var Node_To_Update = root.get_node("SceneHandler/Battle/UI/Duelists/HUD_" + Side)
+		
+		Dueler.set_field_health_bonus(3, "Add")
+		SignalBus.emit_signal("Update_HUD_Duelist", Node_To_Update, Dueler)
+		await get_tree().create_timer(0.05).timeout # Creating a timer ensures that the HUD variable is updated before the signal is emitted
+		get_tree().call_group("Cards", "set_total_health")
 
 
 

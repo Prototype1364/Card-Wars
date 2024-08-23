@@ -469,7 +469,6 @@ func _on_Summon_Set_pressed(Mode):
 			else:
 				SignalBus.emit_signal("Summon_Set_Pressed", Side + "Backrow")
 		elif Mode == "Set":
-			Is_Set = true
 			SignalBus.emit_signal("Summon_Set_Pressed", Side + "Backrow")
 	elif "Backrow" in Parent_Name and Mode == "Summon":
 		$SmallCard/Action_Button_Container/Summon.text = "Summon"
