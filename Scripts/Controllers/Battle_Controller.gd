@@ -156,11 +156,12 @@ func Choose_Starting_Player():
 
 func Set_Hero_Card_Effect_Status():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")
+	var Cards_On_Field = BF.Get_Field_Card_Data(Side, "Fighter") + BF.Get_Field_Card_Data(Side, "R")
 
-	if Fighter != []:
-		if Fighter[0].Type == "Hero" and "Periodic" in Fighter[0].Effect_Type:
-			Fighter[0].Can_Activate_Effect = true
+	if Cards_On_Field != []:
+		for card in Cards_On_Field:
+			if card.Type == "Hero" and "Periodic" in card.Effect_Type:
+				card.Can_Activate_Effect = true
 
 func Resolve_Burn_Damage():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
@@ -369,6 +370,7 @@ func _on_Deck_Slot_pressed():
 				var Destination_Node = get_tree().get_root().get_node(Slot_Used)
 				SignalBus.emit_signal("Reparent_Nodes", Hero_Card_Summoned, Destination_Node)
 				Hero_Card_Summoned.Update_Data()
+				GameData.Cards_Summoned_This_Turn.append(Hero_Card_Summoned)
 				var starting_summon_power = int(summon_power_label.text)
 				starting_summon_power -= Hero_Card_Summoned.Cost
 				summon_power_label.text = str(starting_summon_power)

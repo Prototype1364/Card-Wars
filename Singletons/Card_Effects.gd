@@ -351,8 +351,9 @@ func Bestow(card):
 						for card_in_zone in Cards_In_Zone:
 							if card_in_zone.Name == "Excalibur" and zone != "EquipMagic":
 								# Add Excalibur to the field in EquipMagic slot (replacing previous card if necessary)
-								var Graveyard = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + side + "Graveyard")
-								var EquipSlot = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + side + "EquipMagic")
+								var Fighter_Side = "W" if Fighter.get_parent().name.left(1) == "W" else "B"
+								var Graveyard = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Fighter_Side + "Graveyard")
+								var EquipSlot = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Fighter_Side + "EquipMagic")
 								if EquipSlot.get_child_count() > 0:
 									GameData.Last_Equip_Card_Replaced.append(EquipSlot.get_child(0))
 									SignalBus.emit_signal("Reparent_Nodes", EquipSlot.get_child(0), Graveyard)
