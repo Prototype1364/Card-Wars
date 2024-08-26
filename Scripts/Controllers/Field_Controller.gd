@@ -63,6 +63,7 @@ func Get_Zone_Count(Zone: String) -> int:
 		return 0
 
 func Reposition_Field_Cards(Side) -> void:
+	# FIXME: There a certain times that cards can be switched into invalid slots (i.e. Hero being switched with Normal reinforcer). This is due to the Reset_Reposition_Card_Variables() func not being run in all places it needs to. You can either find all of these places and call the func appropriately, or add some logic to field slots to ensure that only cards of certain types (i.e. Heroes only in Fighter slot) can be placed in them (and add a check in this func for that validity, running the reset func it false).
 	var CardSwitched # Indicates the card instance that got switched out of its spot (i.e. the one that was replaced by the CardMoved).
 	var Slots_To_Avoid = [Side + "Banished", Side + "Graveyard", Side + "MedBay", Side + "Hand", Side + "TechZone"]
 	var Chosen_Card_Parent_Name = GameData.Chosen_Card.get_parent().name

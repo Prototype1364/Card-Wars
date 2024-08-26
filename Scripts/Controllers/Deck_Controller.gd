@@ -67,16 +67,12 @@ func Create_Advance_Tech_Card():
 func Shuffle_Deck(player, Deck_Source = "MainDeck"):
 	var Deck = get_node("W" + Deck_Source) if player.Name == "Player" else get_node("B" + Deck_Source)
 	
-	# Create a new array to shuffle the deck
-	var NewArray = []
+	# Create an array of all child nodes
+	var deck_children = []
 	for i in range(Deck.get_child_count()):
-		var random_number = BC.RNGesus(0, Deck.get_child_count() - 1)
-		while random_number in NewArray:
-			random_number = BC.RNGesus(0, Deck.get_child_count() - 1)
-		NewArray.append(random_number)
-	
-	# Loop through the deck and shuffle the cards based on the new array order
-	for i in range(Deck.get_child_count()):
-		var card_index = NewArray[i]
-		var card = Deck.get_child(card_index)
-		Deck.move_child(card, i)
+		deck_children.append(Deck.get_child(i))
+
+	# Shuffle the array, then re-arrange the children in the Deck node based on the shuffled array order
+	deck_children.shuffle()
+	for i in range(deck_children.size()):
+		Deck.move_child(deck_children[i], i)

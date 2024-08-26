@@ -288,6 +288,8 @@ func Atrocity(card):
 		- ACE SETUP: Maximized by high ATK values, ATK boosting support effects, drain/DoT effects, and any other effect that lowers the amount of damage you need to deal to banish targets.
 		- COUNTERPLAY: Versatile deck-building strategies that don't rely on one "ace" card to win, health recovery effects, and effects that allow for card pile movement (i.e. move cards out of medbay).
 	"""
+
+	# FIXME: Appears to be a bug where the Card selector scene is not removed after confirming selection (or is being spawned twice, check scene tree during runtime to see if that's what is happening)
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
@@ -491,6 +493,8 @@ func Expansion(card):
 	pass
 
 func Faithful(card):
+	# FIXME: This effect is not disabled when the Wizard effect is activated after King Arthur is summoned (i.e. he retains immortality despite the effect being disabled after he was initially summoned... is this okay?)
+	# FIXME: Damage taken beyond 0 HP is being recorded. This makes it difficult to "heal" a card using Support-based normal cards as the Health value may be -90 by the time the health transfer happens.
 	var Valid_Card = true if On_Field(card) && Valid_Effect_Type(card) else false
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Card_On_Correct_Side = true if card.get_parent().name.left(1) == Side else false
@@ -790,16 +794,18 @@ func Deep_Pit(card):
 		- COUNTERPLAY: ???
 	"""
 
-	
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 
 	if Valid_Card and card.Tokens > 0:
-		var Cards_On_Field_Opp = BF.Get_Field_Card_Data(Side_Opp, "R") + BF.Get_Field_Card_Data(Side_Opp, "Fighter")
+		var Cards_On_Field_Opp = BF.Get_Field_Card_Data(Side, "R") + BF.Get_Field_Card_Data(Side, "Fighter")
+		var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "Graveyard")
 		for current_card in Cards_On_Field_Opp:
 			if current_card.Attribute == "Warrior":
-				current_card.set_attack_bonus(-3, "Add")
-		SignalBus.emit_signal("Activate_Set_Card", Side_Opp, card)
+				current_card.set_attack_bonus(3, "Remove")
+		card.set_tokens(card.Tokens, "Remove")
+		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 
 func Disarm(card):
 	"""
