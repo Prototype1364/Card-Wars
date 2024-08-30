@@ -52,8 +52,6 @@ signal Reload_Deck
 
 signal Shuffle_Deck
 
-signal Reset_Reposition_Card_Variables
-
 signal EffectTargetSelected
 
 signal Confirm

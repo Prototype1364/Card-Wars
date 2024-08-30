@@ -62,85 +62,57 @@ func Get_Zone_Count(Zone: String) -> int:
 	else:
 		return 0
 
-func Reposition_Field_Cards(Side) -> void:
-	# FIXME: There a certain times that cards can be switched into invalid slots (i.e. Hero being switched with Normal reinforcer). This is due to the Reset_Reposition_Card_Variables() func not being run in all places it needs to. You can either find all of these places and call the func appropriately, or add some logic to field slots to ensure that only cards of certain types (i.e. Heroes only in Fighter slot) can be placed in them (and add a check in this func for that validity, running the reset func it false).
-	var CardSwitched # Indicates the card instance that got switched out of its spot (i.e. the one that was replaced by the CardMoved).
-	var Slots_To_Avoid = [Side + "Banished", Side + "Graveyard", Side + "MedBay", Side + "Hand", Side + "TechZone"]
-	var Chosen_Card_Parent_Name = GameData.Chosen_Card.get_parent().name
-	var Clean_CardTo_Name = Get_Clean_Slot_Name(GameData.CardTo.name)
-	var failed_slot_validation_check = {
-		"involves_ineligible_slot": Chosen_Card_Parent_Name in Slots_To_Avoid or GameData.CardTo.name in Slots_To_Avoid or "Hand" in Chosen_Card_Parent_Name or GameData.CardSwitched == Side + "Hand",
-		"is_wrong_turn": (GameData.Current_Turn == "Player" and GameData.CardTo.name.left(1) == "B") or (GameData.Current_Turn == "Enemy" and GameData.CardTo.name.left(1) == "W")}
-	var failed_type_and_situation_check = {
-		"Fighter": GameData.Chosen_Card.Type != "Hero",
-		"R": GameData.For_Honor_And_Glory,
-		"EquipMagic": ("Magic" in GameData.CardTo.name and (GameData.Chosen_Card.Attribute != "Equip" or GameData.Chosen_Card.Type != "Magic")),
-		"EquipTrap": ("Trap" in GameData.CardTo.name and (GameData.Chosen_Card.Attribute != "Equip" or GameData.Chosen_Card.Type != "Trap")),
-		"Backrow": GameData.Chosen_Card.Type not in ["Magic", "Trap"]}
+func Reposition_Field_Cards(card) -> void:
+	var Side = card.get_parent().name.left(1)
+	var Side_Opp = "B" if Side == "W" else "W"
+	var card_list = "Reinforcers" if card.Type == "Normal" else "Field (All)"
+	var Chosen_Card_Node = await CardEffects.Get_Card_Selected(card, card_list, Side, Side_Opp, null, [], [], [])
+	var Destination_Node = Chosen_Card_Node.get_parent()
 	
-	# Ensures Cards aren't moved into/out of ineligible hand/field slots (or sides of the field) & into valid slots based on Card Type/Attribute, Game-related variables
-	if true in failed_slot_validation_check.values() or failed_type_and_situation_check[Clean_CardTo_Name]:
-		SignalBus.emit_signal("Reset_Reposition_Card_Variables")
-		return
-	
-	# Ensures that card switching behavior only happens when switching (as opposed to merely moving) cards.
-	if GameData.CardSwitched != "":
-		CardSwitched = GameData.CardTo.get_node(str(GameData.CardSwitched))
-	
-	if GameData.Chosen_Card.name != GameData.CardSwitched: # Ensures that you aren't switching a card with itself (same instance of scene). If this isn't here weird errors get thrown, particularly in CardExaminer scene/script.
-		if CardSwitched != null: # Ensures switching only happens when performing a valid switch.
-			Reparent_Nodes(CardSwitched, GameData.Chosen_Card.get_parent())
-		Reparent_Nodes(GameData.Chosen_Card, GameData.CardTo)
-	
-	# Set Focus Neighbour values for repositioned card(s).
-	if GameData.CardSwitched != "":
-		Set_Focus_Neighbors("Field", Side, CardSwitched)
-	Set_Focus_Neighbors("Field", Side, GameData.Chosen_Card)
-	
-	# Resets variables to avoid game crashing if you try to switch multiple times in a single turn.
-	SignalBus.emit_signal("Reset_Reposition_Card_Variables")
+	Reparent_Nodes(Chosen_Card_Node, card.get_parent())
+	Reparent_Nodes(card, Destination_Node)
+	Set_Focus_Neighbors("Field", Chosen_Card_Node.get_parent().name.left(1), Chosen_Card_Node)
+	Set_Focus_Neighbors("Field", card.get_parent().name.left(1), card)
 
-func Play_Card(Side, Net_Cost, Summon_Mode):
-	var Dueler = BM.Player if GameData.CardTo.name.left(1) == "W" else BM.Enemy
-	var Equip_Slot = get_node("NonHands/" + Side + "EquipMagic") if GameData.Chosen_Card.Type == "Magic" else get_node("NonHands/" + Side + "EquipTrap")
+func Play_Card(Side, Net_Cost, Summon_Mode, Destination_Node, Chosen_Card):
+	var Dueler = BM.Player if Destination_Node.name.left(1) == "W" else BM.Enemy
+	var Equip_Slot = get_node("NonHands/" + Side + "EquipMagic") if Chosen_Card.Type == "Magic" else get_node("NonHands/" + Side + "EquipTrap")
 	var Graveyard = get_node("NonHands/" + Side + "Graveyard")
 	
 	# Deducts Net Cost from Dueler's Summon Crests
 	Dueler.set_summon_crests(Net_Cost, "Remove")
 	
 	# Reparents played card (and any previous equip cards, if applicable) and resolves any summon/card effects
-	if Equip_Slot.get_child_count() > 0 and GameData.Chosen_Card.Attribute == "Equip" and "Backrow" not in GameData.CardTo.name:
+	if Equip_Slot.get_child_count() > 0 and Chosen_Card.Attribute == "Equip" and "Backrow" not in Destination_Node.name:
 		GameData.Last_Equip_Card_Replaced.append(Equip_Slot.get_child(0))
 		Reparent_Nodes(Equip_Slot.get_child(0), Graveyard)
-	Reparent_Nodes(GameData.Chosen_Card, GameData.CardTo)
-	Set_Focus_Neighbors("Field", Side, GameData.CardTo.get_child(0))
+	Reparent_Nodes(Chosen_Card, Destination_Node)
+	Set_Focus_Neighbors("Field", Side, Destination_Node.get_child(0))
 	Set_Focus_Neighbors("Hand", Side, get_node(Side + "HandScroller/" + Side + "Hand"))
-	if "Backrow" in GameData.CardTo.name and Summon_Mode == "Set":
-		GameData.Chosen_Card.set_is_set("Set")
-	SignalBus.emit_signal("Activate_Summon_Effects", GameData.Chosen_Card)
+	if "Backrow" in Destination_Node.name and Summon_Mode == "Set":
+		Chosen_Card.set_is_set("Set")
+	SignalBus.emit_signal("Activate_Summon_Effects", Chosen_Card)
 		
 	# Ensures that a card summoned to Equip slot is not immediately sent to Graveyard.
-	if GameData.Chosen_Card.Type == "Magic" and not ("Equip" in GameData.Chosen_Card.get_parent().name) and GameData.Chosen_Card.Is_Set == false:
-		Reparent_Nodes(GameData.Chosen_Card, Graveyard)
+	if Chosen_Card.Type == "Magic" and not ("Equip" in Chosen_Card.get_parent().name) and Chosen_Card.Is_Set == false:
+		Reparent_Nodes(Chosen_Card, Graveyard)
 	
 	# Updates Card Summoned This Turn Array, Resolves Card Effects that occur during Summon/Set (i.e. Deep Pit), Resets Reposition Variables, & Updates Duelist HUD
-	GameData.Cards_Summoned_This_Turn.append(GameData.Chosen_Card)	
+	GameData.Cards_Summoned_This_Turn.append(Chosen_Card)	
 	SignalBus.emit_signal("Resolve_Card_Effects")
-	SignalBus.emit_signal("Reset_Reposition_Card_Variables")	
 	SignalBus.emit_signal("Update_HUD_Duelist", get_parent().get_parent().get_node("UI/Duelists/HUD_" + Side), Dueler)
 
 func Activate_Set_Card(Side, Chosen_Card):
 	# Replaces current Equip card with activated card & Reparents appropriate Nodes
 	var Graveyard = get_node("NonHands/" + Side + "Graveyard")
 	var EquipSlot = get_node("NonHands/" + Side + "Equip" + Chosen_Card.Type)
-	var New_Equip_Card = get_node("NonHands/" + str(GameData.CardFrom) + "/" + str(GameData.CardMoved))
 	
 	if Chosen_Card.Attribute == "Equip":
 		if EquipSlot.get_child_count() > 0:
 			GameData.Last_Equip_Card_Replaced.append(EquipSlot.get_child(0))
 			Reparent_Nodes(EquipSlot.get_child(0), Graveyard)
 			BC.Activate_Set_Card(EquipSlot.get_child(0)) # Ensures that any effects that trigger upon being sent to the Graveyard are resolved (i.e. Last Stand).
-		Reparent_Nodes(New_Equip_Card, EquipSlot)
+		Reparent_Nodes(Chosen_Card, EquipSlot)
 	else:
 		Reparent_Nodes(Chosen_Card, Graveyard)
 
@@ -181,20 +153,3 @@ func Get_Clean_Slot_Name(Slot_Name):
 		return Slot_Name.right(-1).left(len(Slot_Name.right(-1)) - 1) if Slot_Name.right(1).is_valid_int() else Slot_Name.right(-1)
 	else:
 		return Slot_Name
-
-#######################################
-# SIGNAL FUNCTIONS
-#######################################
-func _on_Card_Slot_pressed(slot_name):
-	var converted_slot_name = Get_Clean_Slot_Name(slot_name)
-	var Destination_Node = Find_Open_Slot(converted_slot_name)
-
-	if GameData.Chosen_Card != null and Destination_Node != null:
-		if "Hand" in GameData.Chosen_Card.get_parent().name and GameData.Current_Step == "Main" and GameData.Summon_Mode != "":
-			GameData.CardTo = get_node(Destination_Node)
-			SignalBus.emit_signal("Play_Card", GameData.Chosen_Card.get_parent().name.left(1), GameData.Summon_Mode)
-			GameData.Summon_Mode = ""
-		elif GameData.Current_Step == "Main":
-			if GameData.Chosen_Card.get_parent().name != "":
-				GameData.CardTo = get_node(Destination_Node)
-				Reposition_Field_Cards(GameData.CardTo.name.left(1))

@@ -28,13 +28,6 @@ func Draw_Card(Turn_Player, Deck_Source = "MainDeck", Draw_At_Index = 0) -> Dict
 	
 	return {'Card_Drawn': Card_Drawn, 'Destination_Node': Destination_Node}
 
-func Reset_Reposition_Card_Variables():
-	GameData.Chosen_Card = null
-	GameData.CardMoved = ""
-	GameData.CardFrom = ""
-	GameData.CardTo = ""
-	GameData.CardSwitched = ""
-
 func Summon_Affordable(Dueler, Net_Cost) -> bool:
 	if Net_Cost <= Dueler.Summon_Crests:
 		return true
@@ -69,19 +62,14 @@ func Calculate_Net_Cost(player, Chosen_Card) -> int:
 	else:
 		return 0
 
-func Valid_Card(Side, Chosen_Card) -> bool:
-	# ID Card Played
-	if GameData.CardFrom == Side + "Hand":
-		Chosen_Card = get_node("CardSpots/" + Side + "HandScroller/" + Side + "Hand/" + str(GameData.CardMoved))
-
+func Valid_Card(Side, Chosen_Card, Destination_Node) -> bool:
 	# Define conditions for invalid card play
 	var is_not_turn_player = (Side == "W" and GameData.Current_Turn == "Enemy") or (Side == "B" and GameData.Current_Turn == "Player")
-	var is_invalid_equip_slot = Chosen_Card.Attribute != "Equip" and "Equip" in GameData.CardTo.name
-	var is_restricted_reinforcer = GameData.CardTo.name in ["R1", "R2", "R3"] and GameData.For_Honor_And_Glory
+	var is_invalid_equip_slot = Chosen_Card.Attribute != "Equip" and "Equip" in Destination_Node.name
+	var is_restricted_reinforcer = Destination_Node.name in ["R1", "R2", "R3"] and GameData.For_Honor_And_Glory
 
 	# Check if any invalid condition is met
 	if is_not_turn_player or is_invalid_equip_slot or is_restricted_reinforcer:
-		Reset_Reposition_Card_Variables()
 		return false
 	else:
 		return true
@@ -143,7 +131,7 @@ func Set_Turn_Player():
 		GameData.Current_Turn = "Player" if GameData.Current_Turn == "Enemy" else "Enemy"
 
 func Choose_Starting_Player():
-	var random_number = 1
+	var random_number = 2
 	#	var random_number = RNGesus(1, 2)
 	GameData.Current_Turn = "Player" if random_number == 1 else "Enemy"
 	
@@ -333,8 +321,6 @@ func Check_For_Deck_Reload():
 	if len(HeroDeck) == 0:
 		SignalBus.emit_signal("Reload_Deck", "HeroDeck")
 
-func Close_Action_Buttons():
-	get_tree().call_group("Cards", "hide_action_buttons")
 
 
 #######################################

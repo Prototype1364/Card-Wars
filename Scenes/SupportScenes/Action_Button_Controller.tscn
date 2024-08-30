@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://c5ndllrypol6q"]
+
+[node name="Summon" type="Button"]
+text = "Summon"
+clip_text = true

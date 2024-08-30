@@ -99,19 +99,3 @@ layout_mode = 0
 offset_right = 120.0
 offset_bottom = 40.0
 theme_override_constants/separation = 0
-
-[node name="Summon" type="Button" parent="Action_Button_Container"]
-visible = false
-layout_mode = 2
-text = "Summon"
-clip_text = true
-
-[node name="Set" type="Button" parent="Action_Button_Container"]
-visible = false
-layout_mode = 2
-text = "Set"
-
-[node name="Target" type="Button" parent="Action_Button_Container"]
-visible = false
-layout_mode = 2
-text = "Target"

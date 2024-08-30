@@ -20,21 +20,6 @@ var Attacker
 var Target
 var For_Honor_And_Glory = false
 
-# Focus Card variables
-var FocusedCardName = ""
-var FocusedCardParentName = ""
-
-# Play/Reposition Card variables
-var Chosen_Card = null
-var Summon_Mode = ""
-var CardFrom = ""
-var CardTo = ""
-var CardMoved = ""
-var CardSwitched = ""
-
-# Card Effect Resolution variables
-var Resolve_On_Opposing_Card = false
-
 # Variable used to name Card nodes
 var CardCounter = 0
 

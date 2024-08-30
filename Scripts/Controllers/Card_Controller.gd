@@ -95,12 +95,9 @@ func _init(card_data):
 func _ready():
 	Update_Data()
 	var _HV1 = $SmallCard/FocusSensor.pressed.connect(Callable(self, "on_FocusSensor_pressed"))
-	var _HV2 = $SmallCard/Action_Button_Container/Target.pressed.connect(Callable(self, "_on_Target_pressed"))
-	var _HV3 = $SmallCard/FocusSensor.gui_input.connect(Callable(self, "_on_Hide_Action_Buttons_pressed"))
-	var _HV4 = $SmallCard/FocusSensor.mouse_entered.connect(Callable(self, "focusing"))
-	var _HV5 = $SmallCard/FocusSensor.mouse_exited.connect(Callable(self, "defocusing"))
-	var _HV6 = $SmallCard/Action_Button_Container/Summon.pressed.connect(Callable(self, "_on_Summon_Set_pressed").bind("Summon"))
-	var _HV7 = $SmallCard/Action_Button_Container/Set.pressed.connect(Callable(self, "_on_Summon_Set_pressed").bind("Set"))
+	var _HV2 = $SmallCard/FocusSensor.gui_input.connect(Callable(self, "_on_Hide_Action_Buttons_pressed"))
+	var _HV3 = $SmallCard/FocusSensor.mouse_entered.connect(Callable(self, "focusing"))
+	var _HV4 = $SmallCard/FocusSensor.mouse_exited.connect(Callable(self, "defocusing"))
 
 
 # Setters
@@ -201,12 +198,12 @@ func set_total_health():
 	# Calculate Total Health based on card's Health, Health Bonus, Fusion Level, and Field Health Bonus
 	if Clean_Parent_Name in Field_Slot_Names:
 		Field_Bonus = BM.Player.Field_Health_Bonus if Parent_Name.left(1) == "W" else BM.Enemy.Field_Health_Bonus
-	Total_Health = (Health * Fusion_Level) + Health_Bonus + Field_Bonus
+	Total_Health = max(0, (Health * Fusion_Level) + Health_Bonus + Field_Bonus)
 
 	# Update Health text on card
 	if "Deck" not in Parent_Name:
 		if Type in ["Normal", "Hero"]:
-			$SmallCard/Health.text = str(max(0, Total_Health))
+			$SmallCard/Health.text = str(Total_Health)
 		else:
 			Total_Health = 0
 			$SmallCard/Health.text = ""
@@ -368,118 +365,53 @@ func get_net_damage() -> int:
 	var Shield_Wall_Damage_Reduction = len(Reinforcers_Opp) * 5 if Shield_Wall_Active else 0
 	return Total_Attack - Shield_Wall_Damage_Reduction
 
-# Signal-Related Functions
-func focusing():
-	GameData.FocusedCardName = name
-	GameData.FocusedCardParentName = get_parent().name
-	if "Deck" not in get_parent().name:
-		SignalBus.emit_signal("LookAtCard", self, Frame, Art, Name, Cost, Attribute)
-
-func defocusing():
-	GameData.FocusedCardName = ""
-	GameData.FocusedCardParentName = ""
-	SignalBus.emit_signal("NotLookingAtCard")
-
-func on_FocusSensor_pressed():
+func Spawn_Action_Buttons():
 	var Side: String = "W" if GameData.Current_Turn == "Player" else "B"
-	var Side_Opp: String = "B" if GameData.Current_Turn == "Player" else "W"
-	var Reposition_Zones: Array = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
 	var Parent_Name: String = get_parent().name
+	var Reposition_Zones: Array = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
+	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
+	var Reinforcer_Field_Cards = BF.Get_Field_Card_Data(Side, "R")
+	var buttons_to_spawn_map = {"Normal": ["Summon"], "Hero": ["Summon"], "Trap": ["Set"], "Magic": ["Summon", "Set"]}
+	var buttons_to_spawn = null
+
+	# Check for Hero in Reinforcer zone (needed for repositioning logic)
+	var Hero_In_Reinforcements = false
+	for card in Reinforcer_Field_Cards:
+		if card.Type == "Hero" and card != self:
+			Hero_In_Reinforcements = true
+			break
 	
-	match GameData.Current_Step:
-		"Main":
-			# Allows for repositioning, sacrificing and Normal/Flip/Fusion summoning while skipping the need to press Summon/Set buttons when playing Normal/Hero card
-			if "Hand" in Parent_Name and Type in ["Normal", "Hero"]:
-				GameData.Summon_Mode = "Summon"
-				GameData.Chosen_Card = self
-			elif "Hand" in Parent_Name and Type == "Trap":
-				if Attribute == "Equip":
-					$SmallCard/Action_Button_Container/Summon.visible = true
-					$SmallCard/Action_Button_Container/Set.visible = false
-				else:
-					$SmallCard/Action_Button_Container/Summon.visible = false
-					$SmallCard/Action_Button_Container/Set.visible = true
-			elif "Hand" in Parent_Name:
-				$SmallCard/Action_Button_Container/Summon.visible = true 
-				$SmallCard/Action_Button_Container/Set.visible = true
-			elif Parent_Name in Reposition_Zones: # Allows repositioning & sacrificing of cards on own field
-				if GameData.CardFrom == "":
-					GameData.CardFrom = Parent_Name
-					GameData.CardMoved = name
-				elif GameData.CardFrom != "":
-					GameData.CardTo = get_parent()
-					GameData.CardSwitched = name
-					SignalBus.emit_signal("Reposition_Field_Cards", GameData.CardTo.name.left(1))
-				if GameData.Chosen_Card == null:
-					GameData.Chosen_Card = self
-				GameData.Summon_Mode = "Sacrifice"
-				$SmallCard/Action_Button_Container/Summon.visible = true
-				$SmallCard/Action_Button_Container/Summon.text = "Sacrifice"
-			elif Side + "Backrow" in Parent_Name:
-				$SmallCard/Action_Button_Container/Summon.text = "Flip"
-				$SmallCard/Action_Button_Container/Summon.visible = true
-				GameData.CardFrom = Parent_Name
-				GameData.CardMoved = name
-			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
-				SignalBus.emit_signal("EffectTargetSelected", self)
-			elif "HeroDeck" in Parent_Name:
-				SignalBus.emit_signal("Hero_Deck_Selected")
-		"Selection":
-			set_can_attack()
-			if Can_Attack:
-				GameData.Attacker = self
-				var Fighter_Opp = BF.Get_Field_Card_Data(Side_Opp, "Fighter")
-				if len(Fighter_Opp) > 0:
-					SignalBus.emit_signal("Update_GameState", "Step")
-			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
-				SignalBus.emit_signal("EffectTargetSelected", self)
-		"Target":
-			if ("Fighter" in Parent_Name and Parent_Name.left(1) != Side) or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name) and GameData.Attacker.Target_Reinforcer):
-				$SmallCard/Action_Button_Container/Target.visible = true
-			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
-				SignalBus.emit_signal("EffectTargetSelected", self)
-		"Discard":
-			GameData.CardFrom = Parent_Name
-			GameData.CardMoved = name
-			if "Hand" in GameData.CardFrom:
-				SignalBus.emit_signal("Discard_Card", GameData.CardFrom.left(1))
-			elif "Effect_Target_List" in Parent_Name: # For Card Selector scene
-				SignalBus.emit_signal("EffectTargetSelected", self)
-	
-	# Allows user to re-open card Effect scenes during turn
-	if Parent_Name.left(1) == Side:
-		CardEffects.call(Anchor_Text, self)
-
-func _on_Summon_Set_pressed(Mode):
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Reposition_Zones = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
-	var Parent_Name = get_parent().name
-
-	GameData.Chosen_Card = self
-	$SmallCard/Action_Button_Container/Summon.visible = false
-	$SmallCard/Action_Button_Container/Set.visible = false
-
+	# Determine which buttons to spawn based on card's location, type, attribute, and game conditions
 	if "Hand" in Parent_Name:
-		GameData.Summon_Mode = Mode
-		if Mode == "Summon":
-			if Attribute == "Equip":
-				GameData.CardFrom = Parent_Name
-				GameData.CardMoved = name
-				SignalBus.emit_signal("Summon_Set_Pressed", Side + "Equip" + Type)
-			else:
-				SignalBus.emit_signal("Summon_Set_Pressed", Side + "Backrow")
-		elif Mode == "Set":
-			SignalBus.emit_signal("Summon_Set_Pressed", Side + "Backrow")
-	elif "Backrow" in Parent_Name and Mode == "Summon":
-		$SmallCard/Action_Button_Container/Summon.text = "Summon"
-		SignalBus.emit_signal("Activate_Set_Card", Side, self)
-	elif Parent_Name in Reposition_Zones and GameData.Summon_Mode == "Sacrifice":
-		$SmallCard/Action_Button_Container/Summon.text = "Summon"
-		SignalBus.emit_signal("Sacrifice_Card", self)
+		buttons_to_spawn = buttons_to_spawn_map[Type] if Attribute != "Equip" else ["Summon"]
+	elif Parent_Name in Reposition_Zones:
+		if (Type == "Normal" and BF.Find_Open_Slot("R") == null) or (Type == "Hero" and (Hero_In_Reinforcements and (BF.Find_Open_Slot("R") == null or Fighter == self))) or (Type == "Hero" and BF.Find_Open_Slot("Fighter") == null and Fighter != self):
+			buttons_to_spawn = ["Reposition", "Sacrifice"]
+		else:
+			buttons_to_spawn = ["Sacrifice"]
+	elif Side + "Backrow" in Parent_Name:
+		buttons_to_spawn = ["Flip"]
+	elif ("Fighter" in Parent_Name and Parent_Name.left(1) != Side) or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name) and GameData.Attacker.Target_Reinforcer):
+		buttons_to_spawn = ["Target"]
 
-func _on_Target_pressed():
-	GameData.Target = self
-	$SmallCard/Action_Button_Container/Target.visible = false
+	# Spawn buttons
+	if buttons_to_spawn != null:
+		var button_container = $SmallCard/Action_Button_Container
+		for button in buttons_to_spawn:
+			var action_button_scene = preload("res://Scenes/SupportScenes/Action_Button_Controller.tscn").instantiate()
+			var Mode = "Summon" if button in ["Summon", "Flip"] else button
+			button_container.add_child(action_button_scene)
+			action_button_scene.name = button
+			action_button_scene.text = button
+			action_button_scene.pressed.connect(Callable(self, "_on_Action_Button_pressed").bind(Mode))
+
+func Remove_Action_Buttons():
+	var button_container = $SmallCard/Action_Button_Container
+	for button in button_container.get_children():
+		button_container.remove_child(button)
+		button.queue_free()
+
+func On_Target_Selection():
 	# Signal emitted twice to ensure that Damage Step is conducted following successful Target selection
 	SignalBus.emit_signal("Update_GameState", "Step")
 	SignalBus.emit_signal("Update_GameState", "Step")
@@ -487,8 +419,6 @@ func _on_Target_pressed():
 	# If NO Capture happened, advance GameState (advance to Repeat Step happens automatically when card IS captured)
 	if GameData.Current_Step == "Capture":
 		if GameData.Attacks_To_Launch == 0:
-			# Move to End Phase (no captures will happen following direct attack)
-			SignalBus.emit_signal("Update_GameState", "Phase")
 			# Attempt to End Turn (works if no discards are necessary)
 			SignalBus.emit_signal("Update_GameState", "Turn")
 		else:
@@ -498,6 +428,63 @@ func _on_Target_pressed():
 		# Attempt to End Turn
 		SignalBus.emit_signal("Update_GameState", "Turn")
 
-func _on_Hide_Action_Buttons_pressed(_event):
-	if Input.is_action_pressed("Cancel"):
-		hide_action_buttons()
+# Signal-Related Functions
+func focusing():
+	if "Deck" not in get_parent().name:
+		SignalBus.emit_signal("LookAtCard", self, Frame, Art, Name, Cost, Attribute)
+
+func defocusing():
+	SignalBus.emit_signal("NotLookingAtCard")
+
+func on_FocusSensor_pressed():
+	var Side: String = "W" if GameData.Current_Turn == "Player" else "B"
+	var Side_Opp: String = "B" if GameData.Current_Turn == "Player" else "W"
+	var Turn_Side_Field_And_Hand_Cards: Array = BF.Get_Field_Card_Data(Side, "Fighter") + BF.Get_Field_Card_Data(Side, "R") + BF.Get_Field_Card_Data(Side, "Backrow") + BF.Get_Field_Card_Data(Side, "Hand")
+	var Parent_Name: String = get_parent().name
+	
+	if "Effect_Target_List" in Parent_Name:
+		SignalBus.emit_signal("EffectTargetSelected", self)
+	else:
+		match GameData.Current_Step:
+			"Main":
+				if self in Turn_Side_Field_And_Hand_Cards: # Allows for repositioning, sacrificing and Normal/Flip/Fusion summoning
+					Spawn_Action_Buttons()
+				elif "HeroDeck" in Parent_Name: # Allows for manual Hero summoning
+					SignalBus.emit_signal("Hero_Deck_Selected")
+			"Selection":
+				set_can_attack()
+				if Can_Attack:
+					GameData.Attacker = self
+					var Fighter_Opp = BF.Get_Field_Card_Data(Side_Opp, "Fighter")
+					if len(Fighter_Opp) > 0:
+						SignalBus.emit_signal("Update_GameState", "Step")
+			"Target":
+				Spawn_Action_Buttons()
+			"Discard":
+				if "Hand" in Parent_Name:
+					SignalBus.emit_signal("Discard_Card", Parent_Name.left(1), self)
+	
+	# Allows user to re-open card Effect scenes during turn
+	if Parent_Name.left(1) == Side:
+		CardEffects.call(Anchor_Text, self)
+
+func _on_Action_Button_pressed(Mode):
+	var Side = "W" if GameData.Current_Turn == "Player" else "B"
+	var Reposition_Zones = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
+	var Parent_Name = get_parent().name
+	var Destination_Node_Map = {"Hero": BF.Find_Open_Slot("Fighter") if BF.Find_Open_Slot("Fighter") != null else BF.Find_Open_Slot("R"), "Normal": BF.Find_Open_Slot("R"), "Magic": BF.Find_Open_Slot("Backrow"), "Trap": BF.Find_Open_Slot("Backrow")}
+	var Destination_Node_Path = Destination_Node_Map[Type] if Attribute != "Equip" else BF.Find_Open_Slot("Equip" + Type)
+	var Destination_Node = get_tree().get_root().get_node(Destination_Node_Path) if Destination_Node_Path != null else null
+	Remove_Action_Buttons()
+
+	if "Hand" in Parent_Name and Destination_Node != null:
+		SignalBus.emit_signal("Play_Card", Side, Mode, Destination_Node, self)
+	elif "Backrow" in Parent_Name and Mode == "Summon":
+		SignalBus.emit_signal("Activate_Set_Card", Side, self)
+	elif Parent_Name in Reposition_Zones and Mode == "Sacrifice":
+		SignalBus.emit_signal("Sacrifice_Card", self)
+	elif Parent_Name in Reposition_Zones and Mode == "Reposition":
+		SignalBus.emit_signal("Reposition_Field_Cards", self)
+	elif Mode == "Target":
+		GameData.Target = self
+		On_Target_Selection()

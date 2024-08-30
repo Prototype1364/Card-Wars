@@ -28,17 +28,15 @@ func _ready():
 	var _HV7 = SignalBus.connect("Activate_Summon_Effects", Callable(self, "Activate_Summon_Effects"))
 	var _HV8 = SignalBus.connect("Update_HUD_Duelist", Callable(self, "Update_HUD_Duelist"))
 	var _HV9 = SignalBus.connect("Summon_Affordable", Callable(self, "Summon_Affordable"))
-	var _HV10 = SignalBus.connect("Summon_Set_Pressed", Callable(self, "_on_Card_Slot_pressed"))
-	var _HV11 = SignalBus.connect("Reload_Deck", Callable(self, "Reload_Deck"))
-	var _HV12 = SignalBus.connect("Resolve_Card_Effects", Callable(self, "Resolve_Card_Effects"))
-	var _HV13 = SignalBus.connect("Reposition_Field_Cards", Callable(self, "Reposition_Field_Cards"))
-	var _HV14 = SignalBus.connect("Reset_Reposition_Card_Variables", Callable(self, "Reset_Reposition_Card_Variables"))
-	var _HV15 = SignalBus.connect("Play_Card", Callable(self, "Play_Card"))
-	var _HV16 = SignalBus.connect("Draw_Card", Callable(self, "Draw_Card"))
-	var _HV17 = SignalBus.connect("Reparent_Nodes", Callable(self, "Reparent_Nodes"))
-	var _HV18 = SignalBus.connect("Shuffle_Deck", Callable(self, "Shuffle_Deck"))
-	var _HV19 = SignalBus.connect("Sacrifice_Card", Callable(self, "Sacrifice_Card"))
-	var _HV20 = SignalBus.connect("Hero_Deck_Selected", Callable(self, "Hero_Deck_Selected"))
+	var _HV10 = SignalBus.connect("Reload_Deck", Callable(self, "Reload_Deck"))
+	var _HV11 = SignalBus.connect("Resolve_Card_Effects", Callable(self, "Resolve_Card_Effects"))
+	var _HV12 = SignalBus.connect("Reposition_Field_Cards", Callable(self, "Reposition_Field_Cards"))
+	var _HV13 = SignalBus.connect("Play_Card", Callable(self, "Play_Card"))
+	var _HV14 = SignalBus.connect("Draw_Card", Callable(self, "Draw_Card"))
+	var _HV15 = SignalBus.connect("Reparent_Nodes", Callable(self, "Reparent_Nodes"))
+	var _HV16 = SignalBus.connect("Shuffle_Deck", Callable(self, "Shuffle_Deck"))
+	var _HV17 = SignalBus.connect("Sacrifice_Card", Callable(self, "Sacrifice_Card"))
+	var _HV18 = SignalBus.connect("Hero_Deck_Selected", Callable(self, "Hero_Deck_Selected"))
 	SignalBus.emit_signal("READY") # Temporary signal to ensure Card_Effects script functions as expected. See note in Card_Effects.gd for more info.
 	
 	Setup_Game()
@@ -98,10 +96,6 @@ func Update_Game_Phase():
 	# Ensures that Attacks to Launch is set at start of each Battle Phase
 	if GameData.Current_Phase == "Battle Phase":
 		BC.Set_Attacks_To_Launch()
-	
-	# Ensures that effects are resolved if the current step is an Effect Step
-	if GameData.Current_Step in EFFECT_STEPS:
-		BC.Resolve_Card_Effects()
 	
 	# Skips Battle Phase if no cards are in player's Fighter/Reinforcement slots
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
@@ -175,9 +169,6 @@ func Reposition_Field_Cards(Side):
 
 func Resolve_Card_Effects():
 	BC.Resolve_Card_Effects()
-
-func Reset_Reposition_Card_Variables():
-	BC.Reset_Reposition_Card_Variables()
 
 func Sacrifice_Card(Card_Sacrificed):
 	BC.Sacrifice_Card(Card_Sacrificed)
@@ -260,20 +251,19 @@ func Conduct_Main_Phase():
 	# Flip by on_Focus_Sensor_pressed() in SmallCard.gd and Activate_Set_Card()
 	pass
 
-func Play_Card(Side, Summon_Mode):
+func Play_Card(Side, Summon_Mode, Destination_Node, Chosen_Card):
 	var player = Player if GameData.Current_Turn == "Player" else Enemy
-	var Card_Is_Valid = BC.Valid_Card(Side, GameData.Chosen_Card)
-	var Card_Net_Cost = BC.Calculate_Net_Cost(player, GameData.Chosen_Card)
-	var Destination_Is_Valid = BC.Valid_Destination(Side, GameData.CardTo, GameData.Chosen_Card)
+	var Card_Is_Valid = BC.Valid_Card(Side, Chosen_Card, Destination_Node)
+	var Card_Net_Cost = BC.Calculate_Net_Cost(player, Chosen_Card)
+	var Destination_Is_Valid = BC.Valid_Destination(Side, Destination_Node, Chosen_Card)
 	var Card_Is_Affordable = BC.Summon_Affordable(player, Card_Net_Cost)
 	
 	if Card_Is_Valid and Destination_Is_Valid and Card_Is_Affordable:
-		BF.Play_Card(Side, Card_Net_Cost, Summon_Mode)
+		BF.Play_Card(Side, Card_Net_Cost, Summon_Mode, Destination_Node, Chosen_Card)
 
 func Activate_Set_Card(Side, Chosen_Card):
 	BC.Activate_Set_Card(Chosen_Card)
 	BF.Activate_Set_Card(Side, Chosen_Card)
-	BC.Reset_Reposition_Card_Variables()
 	Chosen_Card.Reset_Variables_After_Flip_Summon()
 
 
@@ -307,27 +297,22 @@ func Conduct_End_Phase():
 		print(GameData.Victor + " wins!")
 		return
 
-	# HACK: Close out any action buttons or card effects that are still stuck open or awaiting the Confirm signal
-	BC.Close_Action_Buttons()
+	# HACK: Close out any card effects that are still awaiting the Confirm signal
 	SignalBus.emit_signal("Confirm")
 	
 	# End Step
 	Update_Game_State("Step")
 
-func Discard_Card(Side):
+func Discard_Card(Side, Chosen_Card):
 	var Dueler = Player if GameData.Current_Turn == "Player" else Enemy
-	var CardMoved = get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand/" + str(GameData.CardMoved))
 	var MedBay = get_node("Playmat/CardSpots/NonHands/" + Side + "MedBay")
 	
 	# Updates children for parents in From & To locations
-	BF.Reparent_Nodes(CardMoved, MedBay)
+	BF.Reparent_Nodes(Chosen_Card, MedBay)
 	
 	# Matches focuses of child to new parent.
-	BF.Set_Focus_Neighbors("Field", Side, CardMoved)
+	BF.Set_Focus_Neighbors("Field", Side, Chosen_Card)
 	BF.Set_Focus_Neighbors("Hand", Side, get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand"))
-	
-	# Resets GameData variables for next movement.
-	BC.Reset_Reposition_Card_Variables()
 	
 	# Retry to End Turn
 	while get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > Dueler.Hand_Size_Limit:
@@ -351,9 +336,6 @@ func _on_Playmat_gui_input(event):
 
 func _on_SwitchSides_pressed():
 	UI._on_SwitchSides_pressed()
-
-func _on_Card_Slot_pressed(slot_name):
-	BF._on_Card_Slot_pressed(slot_name)
 
 func _on_Deck_Slot_pressed():
 	BC._on_Deck_Slot_pressed()

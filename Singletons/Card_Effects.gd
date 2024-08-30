@@ -289,13 +289,13 @@ func Atrocity(card):
 		- COUNTERPLAY: Versatile deck-building strategies that don't rely on one "ace" card to win, health recovery effects, and effects that allow for card pile movement (i.e. move cards out of medbay).
 	"""
 
-	# FIXME: Appears to be a bug where the Card selector scene is not removed after confirming selection (or is being spawned twice, check scene tree during runtime to see if that's what is happening)
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 	var MedBay_Opp = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "MedBay")
 	
 	if Valid_Card and MedBay_Opp.get_child_count() > 0 and card.Can_Activate_Effect:
+		card.Can_Activate_Effect = false
 		var Chosen_Card_Node = await Get_Card_Selected(card, "Opponent MedBay", Side, Side_Opp)
 
 		if Chosen_Card_Node != null:
@@ -387,7 +387,7 @@ func Detonate(card):
 		- This card does x damage to the card holder's current Fighter when drawn (Standby Phase - Effect Step).
 		- The damage dealt is equal to the number of tokens on the hero card when the activation occured.
 		- This card cannot be played or banished by the opponent in any way (basically like negative status cards in Slay the Spire).
-		- During any standby phase, effect step where this card exists in the hand, damage is dealt (See FIXME (NOTE) in Bomb effect FMI on why this currently isn't the way it works).
+		- During any standby phase, effect step where this card exists in the hand, damage is dealt.
 		- Card is automatically discarded to medbay after resolution and reloaded into the maindeck when appropriate.
 		- ACE SETUP: This effect is maximized by token-transfer and token-stacking effects (more tokens at once, more tokens per turn).
 		- COUNTERPLAY: This card is minimized by damage reflecting effects or damage transferrence effects (armor, mirror force).
@@ -493,8 +493,7 @@ func Expansion(card):
 	pass
 
 func Faithful(card):
-	# FIXME: This effect is not disabled when the Wizard effect is activated after King Arthur is summoned (i.e. he retains immortality despite the effect being disabled after he was initially summoned... is this okay?)
-	# FIXME: Damage taken beyond 0 HP is being recorded. This makes it difficult to "heal" a card using Support-based normal cards as the Health value may be -90 by the time the health transfer happens.
+	# FIXME (NOTE): This effect is not disabled when the Wizard effect is activated after King Arthur is summoned (i.e. he retains immortality despite the effect being disabled after he was initially summoned... is this okay? Not just for this effect but for any other effects that may have similar situations)
 	var Valid_Card = true if On_Field(card) && Valid_Effect_Type(card) else false
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Card_On_Correct_Side = true if card.get_parent().name.left(1) == Side else false
@@ -1108,7 +1107,7 @@ func Bomb(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Valid_Card_In_Hand = true if card in BF.Get_Field_Card_Data(Side, "Hand") && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 
-	if Valid_Card_In_Hand: # FIXME: This effect is unresolvable in its intended form (i.e. during Standby Phase - Effect Step) due to the fact that it is in the Hand (a zone that is avoided by Resolve_Card_Effects entirely). Therefore, for testing purposes you have it resolving during the Main Phase when clicked on. However, a solution to this Resolve_Card_Effects conundrum needs to be found (possibly by using the Cards group as a way to resolve all effects when needed [though doing this may temporarily require some careful attention to effects resolving when/where they shouldn't until all bugs are ironed out])
+	if Valid_Card_In_Hand:
 		# Resolve Effect
 		var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
 		if not Fighter.is_immune("Card Effect", card):
