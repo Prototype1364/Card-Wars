@@ -131,7 +131,7 @@ func Set_Turn_Player():
 		GameData.Current_Turn = "Player" if GameData.Current_Turn == "Enemy" else "Enemy"
 
 func Choose_Starting_Player():
-	var random_number = 2
+	var random_number = 1
 	#	var random_number = RNGesus(1, 2)
 	GameData.Current_Turn = "Player" if random_number == 1 else "Enemy"
 	
@@ -142,14 +142,13 @@ func Choose_Starting_Player():
 		SignalBus.emit_signal("Flip_Duelist_HUDs")
 		SignalBus.emit_signal("Update_HUD_GameState")
 
-func Set_Hero_Card_Effect_Status():
+func Set_Field_Card_Effect_Status():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Cards_On_Field = BF.Get_Field_Card_Data(Side, "Fighter") + BF.Get_Field_Card_Data(Side, "R")
 
 	if Cards_On_Field != []:
 		for card in Cards_On_Field:
-			if card.Type == "Hero" and "Periodic" in card.Effect_Type:
-				card.Can_Activate_Effect = true
+			card.Can_Activate_Effect = true
 
 func Resolve_Burn_Damage():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
@@ -203,31 +202,27 @@ func Capture_Card(Card_Captured, Capture_Type = "Normal", Reset_Stats = true):
 	var Fighter_Captured = true if "Fighter" in Parent_Name else false
 	
 	# Capture Targeted Card, remove effects disabled by the card, and Reparent Nodes
-	Update_Cards_Captured_This_Turn_And_Disabled_Effects(Card_Captured)
+	GameData.Cards_Captured_This_Turn.append(Card_Captured)
 	BF.Reparent_Nodes(Card_Captured, Destination_Node)
 
 	# Move Equips to Graveyard when Fighter is Captured
 	if Fighter_Captured:
-		var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
-		var Equip_Magic_Cards = BF.Get_Field_Card_Data(Side_Opp, "EquipMagic")
-		var Equip_Trap_Cards = BF.Get_Field_Card_Data(Side_Opp, "EquipTrap")
+		var Captured_Card_Side = Card_Captured.get_parent().name.left(1)
+		var Equip_Magic_Cards = BF.Get_Field_Card_Data(Captured_Card_Side, "EquipMagic")
+		var Equip_Trap_Cards = BF.Get_Field_Card_Data(Captured_Card_Side, "EquipTrap")
 
 		for card in Equip_Magic_Cards + Equip_Trap_Cards:
-			Update_Cards_Captured_This_Turn_And_Disabled_Effects(card)
+			GameData.Cards_Captured_This_Turn.append(card)
 			BF.Reparent_Nodes(card, Destination_Node)
+
+		# Recruit new Hero if own Fighter slot is empty
+		Recruit_Hero()
 
 	# Reset Captured Card's Stats/Visuals
 	if Reset_Stats:
 		Card_Captured.Reset_Stats_On_Capture()
 		Card_Captured.Update_Data()
-
-func Update_Cards_Captured_This_Turn_And_Disabled_Effects(Card_Captured):
-	GameData.Cards_Captured_This_Turn.append(Card_Captured)
-	if Card_Captured.Effects_Disabled != []:
-		for i in range(len(Card_Captured.Effects_Disabled)):
-			GameData.Disabled_Effects.erase(Card_Captured.Effects_Disabled[i])
-		Card_Captured.Effects_Disabled = []
-
+	
 func Get_Destination_Node_On_Capture(Capture_Type, Card_Captured) -> Node:
 	var Destination_Node
 	var Duelist = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
@@ -246,17 +241,29 @@ func Recruit_Hero(): # FIXME: Heroes are not recruited immediately after the pre
 	# Recruit new Hero if own Fighter slot is empty
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")
+	var HeroDeck = BF.Get_Field_Card_Data(Side, "HeroDeck")
 	var Player = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
 
-	if Fighter == []:
+	if Fighter == [] and HeroDeck != []:
 		var Drawn_Card = Draw_Card(Player, "HeroDeck")
 		SignalBus.emit_signal("Reparent_Nodes", Drawn_Card['Card_Drawn'], Drawn_Card['Destination_Node'])
 		Drawn_Card['Card_Drawn'].Update_Data()
 		GameData.Cards_Summoned_This_Turn.append(Drawn_Card['Card_Drawn'])
 	
-		# Ensures that Summon type effect heroes can activate their effects (Periodic effects are activated in Set_Hero_Card_Effect_Status() func)
+		# Ensures that Summon type effect heroes can activate their effects (Periodic effects are activated in Set_Field_Card_Effect_Status() func)
 		if Drawn_Card['Card_Drawn'].Effect_Type in ["Summon"]:
 			Drawn_Card['Card_Drawn'].Can_Activate_Effect = true
+	elif Fighter == [] and HeroDeck == []:
+		var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
+		var Replacement_Fighter_Found = false
+		for card in Reinforcers:
+			if card.Type == "Hero":
+				Replacement_Fighter_Found = true
+				SignalBus.emit_signal("Reparent_Nodes", card, get_node("CardSpots/NonHands/" + Side + "Fighter"))
+				break
+		if not Replacement_Fighter_Found:
+			GameData.Victor = BM.Enemy.Name if GameData.Current_Turn == "Player" else BM.Player.Name
+			SignalBus.emit_signal("Update_GameState", "Turn")
 
 func Sacrifice_Card(Chosen_Card):
 	# Reparent Nodes
@@ -272,22 +279,34 @@ func Sacrifice_Card(Chosen_Card):
 	summon_power_label.text = str(summon_power)
 
 	# Update Data
+	Chosen_Card.set_effects_disabled("", "Reset")
 	Chosen_Card.Update_Data()
 
 func Check_For_Deck_Out() -> bool:
 	# Collect field card data
-	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
-	var Fighter = BF.Get_Field_Card_Data(Side_Opp, "Fighter")
-	var Reinforcers = BF.Get_Field_Card_Data(Side_Opp, "R")
-	var MedBay = BF.Get_Field_Card_Data(Side_Opp, "MedBay")
-	var Hero_Deck = BF.Get_Field_Card_Data(Side_Opp, "HeroDeck")
+	var Player_Heroes = BF.Get_Field_Card_Data("W", "HeroDeck") + BF.Get_Field_Card_Data("W", "Fighter") + BF.Get_Field_Card_Data("W", "R")
+	var Enemy_Heroes = BF.Get_Field_Card_Data("B", "HeroDeck") + BF.Get_Field_Card_Data("B", "Fighter") + BF.Get_Field_Card_Data("B", "R")
 
 	# Check for any uncaptured heroes (if none, declare victor)
-	for card in Fighter + Reinforcers + MedBay + Hero_Deck:
+	var player_hero_found = false
+	var enemy_hero_found = false
+	for card in Player_Heroes:
 		if card.Type == "Hero":
-			return false
-	GameData.Victor = BM.Player.Name if GameData.Current_Turn == "Player" else BM.Enemy.Name
-	return true
+			player_hero_found = true
+			break
+	for card in Enemy_Heroes:
+		if card.Type == "Hero":
+			enemy_hero_found = true
+			break
+
+	if not player_hero_found:
+		GameData.Victor = BM.Enemy.Name
+		return true
+	elif not enemy_hero_found:
+		GameData.Victor = BM.Player.Name
+		return true
+	else:
+		return false
 	
 func Exodia_Complete() -> bool:
 	# Collect field card data

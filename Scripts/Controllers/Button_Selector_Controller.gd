@@ -9,23 +9,11 @@ func _ready():
 
 	position = get_parent().get_parent().global_position
 
-func Get_Active_Card_Effects():
-	var zones = ["MainDeck", "HeroDeck", "Hand", "Graveyard", "MedicalBay", "Fighter", "R", "Backrow", "Equip_Magic", "Equip_Trap"]
-	var sides = ["W", "B"]
-	var card_sources = {}
+func Get_Active_Card_Effects(desired_types = ["Any"], desired_attributes = ["Any"]):
 	var active_effects_dict = {}
-
-	# Create a dictionary of all card sources
-	for side in sides:
-		for zone in zones:
-			card_sources[side + zone] = BF.Get_Field_Card_Data(side, zone)
-
-	# Populate Active Effects Dictionary
-	for source in card_sources:
-		for card in card_sources[source]:
-			if card.Anchor_Text not in GameData.Disabled_Effects and card.Anchor_Text != "Juggernaut": # Juggernaut effect can't be disabled
-				active_effects_dict[card.Anchor_Text] = true
-
+	for card in get_tree().get_nodes_in_group("Cards"):
+		if card.Anchor_Text not in GameData.Disabled_Effects and card.Anchor_Text != "Juggernaut" and (card.Type in desired_types or desired_types == ["Any"]) and (card.Attribute in desired_attributes or desired_attributes == ["Any"]):
+			active_effects_dict[card.Anchor_Text] = true
 	Active_Effects = active_effects_dict.keys()
 
 func Get_Custom_Options(options):

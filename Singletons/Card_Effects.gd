@@ -82,7 +82,7 @@ func Get_Text_Entry_Transfer_Amount(card, total_stat_value) -> int:
 
 	return Attack_Transfer_Value
 
-func Get_Button_Selected(card: Card, selection_type: String = "Normal", custom_options: Array = []) -> String:
+func Get_Button_Selected(card: Card, selection_type: String = "Normal", custom_options: Array = [], desired_types: Array = ["Any"], desired_attributes: Array = ["Any"]) -> String:
 		# Add Button_Selector scene as child of card to allow for selection
 		var Button_Selector_Scene = load("res://Scenes/SupportScenes/Button_Selector.tscn").instantiate()
 		card.add_child(Button_Selector_Scene)
@@ -91,7 +91,7 @@ func Get_Button_Selected(card: Card, selection_type: String = "Normal", custom_o
 		if selection_type == "Custom":
 			Button_Selector_Scene.Get_Custom_Options(custom_options)
 		else:
-			Button_Selector_Scene.Get_Active_Card_Effects()
+			Button_Selector_Scene.Get_Active_Card_Effects(desired_types, desired_attributes)
 		Button_Selector_Scene.Add_Buttons()
 
 		# Wait for the Confirm signal to be emitted using await
@@ -130,13 +130,22 @@ func Creature(card):
 		card.Can_Activate_Effect = false
 		var Side = "W" if GameData.Current_Turn == "Player" else "B"
 		var Cards_On_Field = BF.Get_Field_Card_Data(Side, "Fighter") + BF.Get_Field_Card_Data(Side, "R")
+		var Cards_In_Main_Deck = BF.Get_Field_Card_Data(Side, "MainDeck")
+		var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Banished")
 
 		# Perform Fusion Summon if a copy of the card exists on the field
-		for i in Cards_On_Field:
-			if i.Name == card.Name and i != card:
-				i.set_fusion_level(1, "Add")
-				var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Banished")
+		for field_card in Cards_On_Field:
+			if field_card.Name == card.Name and field_card != card:
+				field_card.set_fusion_level(1, "Add")
 				SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
+				return # Exit function if Fusion Summon is successful (without checking MainDeck until next turn)
+		
+		# Perform Fusion Summon if a copy of the card exists in the MainDeck
+		for deck_card in Cards_In_Main_Deck:
+			if deck_card.Name == card.Name:
+				card.set_fusion_level(1, "Add")
+				SignalBus.emit_signal("Reparent_Nodes", deck_card, Destination_Node)
+				deck_card.Update_Data()
 				break
 
 func Cryptid(card):
@@ -189,10 +198,7 @@ func Ranged(card):
 				break
 		
 		if Ranged_On_Field:
-			Fighter.Target_Reinforcer = true
 			Fighter.Attacks_Remaining = Fighter.Attacks_Remaining + 2 if Fighter.Relentless else Fighter.Attacks_Remaining + 1
-		else:
-			Fighter.Target_Reinforcer = false
 
 func Rogue(card):
 	pass
@@ -216,7 +222,7 @@ func Scientist(card):
 func Spy(card):
 	pass
 
-func Support(card): # FIXME: Missing Attribute icon (causes error when mousing over card, but doesn't crash the game)
+func Support(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
@@ -237,6 +243,9 @@ func Support(card): # FIXME: Missing Attribute icon (causes error when mousing o
 			var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay")
 			SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 			card.Reset_Stats_On_Capture()
+
+	if GameData.Current_Step == "Start":
+		card.set_health(min(card.Revival_Health, ceil(card.Revival_Health / 10)), "Add")
 
 func Titan(card):
 	pass
@@ -263,14 +272,17 @@ func Warrior(card):
 		card.set_attack(min(card.Attack, Attack_Transfer_Value), "Remove")
 		card.set_attack_bonus(ATK_Bonus_Reduction, "Remove")
 
-func Wizard(card): # NOTE: Is this too OP? Should we go back to the old effect where it disables an Attribute effect of the player's choice (instead of any effect)?
+	if GameData.Current_Step == "Start":
+		card.set_attack(min(card.Base_Attack, ceil(card.Base_Attack / 10)), "Add")
+
+func Wizard(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 
 	if Valid_Card and card.Can_Activate_Effect:
-		var chosen_effect_text = await Get_Button_Selected(card)
+		card.Can_Activate_Effect = false
+		var chosen_effect_text = await Get_Button_Selected(card, "Normal", [], ["Normal"], ["Any"])
 
 		# Add Disabled Effect to Disabled_Effects list & this card's Disabled_Effects list
-		GameData.Disabled_Effects.append(chosen_effect_text)
 		card.set_effects_disabled(chosen_effect_text, "Add")
 
 
@@ -296,7 +308,7 @@ func Atrocity(card):
 	
 	if Valid_Card and MedBay_Opp.get_child_count() > 0 and card.Can_Activate_Effect:
 		card.Can_Activate_Effect = false
-		var Chosen_Card_Node = await Get_Card_Selected(card, "Opponent MedBay", Side, Side_Opp)
+		var Chosen_Card_Node = await Get_Card_Selected(card, "Opponent MedBay", Side, Side_Opp, null, [], ["Normal", "Hero"], [])
 
 		if Chosen_Card_Node != null:
 			if not Chosen_Card_Node.is_immune("Card Effect", card):
@@ -315,7 +327,7 @@ func Barrage(card):
 	if Valid_Card:
 		card.Multi_Strike = true
 
-func Behind_Enemy_Lines(card): # Name probably needs to be changed once effect is updated
+func Behind_Enemy_Lines(card):
 	"""
 	Effect (PROTOTYPE UPDATE):
 		- If this card is placed in the reinforcer zones, target a random card in the opponent's hero deck.
@@ -362,6 +374,7 @@ func Bestow(card):
 									BC.Activate_Set_Card(EquipSlot.get_child(0)) # Ensures that any effects that trigger upon being sent to the Graveyard are resolved (i.e. Last Stand).
 								card_in_zone.Can_Activate_Effect = true
 								SignalBus.emit_signal("Reparent_Nodes", card_in_zone, EquipSlot)
+								Excalibur(card_in_zone) # Manually activate Excalibur's effect after it is equipped
 								card_in_zone.Update_Data()
 								break
 
@@ -493,7 +506,6 @@ func Expansion(card):
 	pass
 
 func Faithful(card):
-	# FIXME (NOTE): This effect is not disabled when the Wizard effect is activated after King Arthur is summoned (i.e. he retains immortality despite the effect being disabled after he was initially summoned... is this okay? Not just for this effect but for any other effects that may have similar situations)
 	var Valid_Card = true if On_Field(card) && Valid_Effect_Type(card) else false
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Card_On_Correct_Side = true if card.get_parent().name.left(1) == Side else false

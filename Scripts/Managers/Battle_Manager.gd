@@ -67,7 +67,7 @@ func Update_Game_Step():
 		BC.Resolve_Card_Effects()
 	if STEPS.find(GameData.Current_Step) == 9: # Current Step is Damage Step
 		BC.Resolve_Damage("Battle")
-	if STEPS.find(GameData.Current_Step) == 12 and get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > player.Hand_Size_Limit: # Ensures cards are discarded when appropriate
+	if STEPS.find(GameData.Current_Step) == 12 and get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > player.Hand_Size_Limit and GameData.Victor == null: # Ensures cards are discarded when appropriate
 		return
 	
 	# Update Step value
@@ -117,7 +117,7 @@ func Update_Game_Turn():
 			Update_Game_Step()
 	
 	# Check if Discard Required to avoid exceeding Hand Size Limit
-	if get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() <= player.Hand_Size_Limit:
+	if get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() <= player.Hand_Size_Limit or GameData.Victor != null:
 		Conduct_End_Phase()
 		if GameData.Victor == null:
 			BC.Reset_Turn_Variables(PHASES, STEPS)
@@ -234,7 +234,7 @@ func Conduct_Opening_Phase():
 """--------------------------------- Standby Phase ---------------------------------"""
 func Conduct_Standby_Phase():
 	# Standby Phase (Effect -> Token)
-	BC.Set_Hero_Card_Effect_Status() # Sets the Can_Activate_Effect of all Periodic-style Hero cards on the turn player's field == True
+	BC.Set_Field_Card_Effect_Status() # Sets the Can_Activate_Effect of all Periodic-style Hero cards on the turn player's field == True
 	BC.Resolve_Damage("Burn") # Resolves Burn Damage from any active Burn Effects
 	Update_Game_State("Step")
 	BC.Add_Tokens()

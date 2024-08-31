@@ -45,14 +45,12 @@ var Invincible: bool # Refers to a card that cannot take Battle Damage. It must 
 var Rejuvenation: bool # Refers to a card that cannot take Burn Damage. It must be defeated by a Hero/Magic/Trap/Tech card's effects or through battle. Used in Juggernaut cards.
 var Relentless: bool # Refers to a card that gains double bonus on any alteration to its Attacks_Remaining variable (including the turn reset). King Leonidas was the first card to have this ability.
 var Multi_Strike: bool # Refers to a card's ability to deal damage to cards in the opponent's Reinforcement zone (Zeus is the first card to have this ability).
-var Target_Reinforcer: bool # Refers to a card's ability to choose to target an opponent in a reinforcement slot instead of the opposing Fighter (Poseidon is the first card to have this ability).
 var Paralysis: bool # Refers to a card's ability to launch an attack. Lancelot is the first card to utilize this Attribute (there's a 1/3 chance that his effect will result in him being unable to attack during that turn's Battle Phase).
 var Unstoppable: bool # Refers to a card that cannot be Paralyzed.
 var Direct_Attack: bool
 var Effects_Disabled: Array # An Array of all effects disabled by this card.
 var Owner: String # Refers to the card's original Owner (Player or Enemy). Used as part of Mordred's Hero card effect.
 var Can_Attack: bool
-var Targetable: bool # Refers to whether a card can be targeted by an attacking card.
 var Immunity: Dictionary # Refers to the types, attributes, and effects that this card is immune to (and locations where it's immune to card effects or other events [i.e. Battle Damage]).
 
 # Initialization
@@ -71,7 +69,7 @@ func _init(card_data):
 	var defaults = {
 		"0": ["ATK_Bonus", "Health_Bonus", "Tokens", "Burn_Damage"],
 		"1": ["Fusion_Level", "Attacks_Remaining"],
-		"False": ["Is_Set", "Can_Activate_Effect", "Attack_As_Reinforcement", "Immortal", "Invincible", "Rejuvenation", "Relentless", "Multi_Strike", "Target_Reinforcer", "Paralysis", "Unstoppable", "Direct_Attack", "Can_Attack", "Targetable"],
+		"False": ["Is_Set", "Can_Activate_Effect", "Attack_As_Reinforcement", "Immortal", "Invincible", "Rejuvenation", "Relentless", "Multi_Strike", "Paralysis", "Unstoppable", "Direct_Attack", "Can_Attack"],
 	}
 
 	for key in defaults.keys():
@@ -86,7 +84,7 @@ func _init(card_data):
 	Revival_Health = Health
 	Total_Attack = Attack + ATK_Bonus
 	Total_Health = Health + Health_Bonus
-	Cost_Path = "res://Assets/Cards/Cost/Small/Small_Cost_" + Frame + "_" + str(Cost) + ".png" if Type != "Special" and "Tech" not in Type else ""
+	Cost_Path = "res://Assets/Cards/Cost/Cost_" + Frame + "_" + str(Cost) + ".png" if Type != "Special" and "Tech" not in Type else ""
 	Token_Path = preload("res://Scenes/SupportScenes/Token_Card.tscn")
 	Effects_Disabled = []
 	Immunity = {"Type": [], "Attribute": [], "Effect": [], "Location": []}
@@ -141,11 +139,12 @@ func set_attack_bonus(value: int, context: String = "Initialize"):
 
 func set_total_attack(_value: int = 0, _context: String = "Initialize"):
 	var Parent_Name: String = get_parent().name
+	var Clean_Parent_Name: String = BF.Get_Clean_Slot_Name(Parent_Name)
 	var Field_Slot_Names: Array = ["Fighter", "R"]
 	var Field_Bonus: int = 0
 
 	# Calculate Total Attack based on card's Attack, Attack Bonus, Fusion Level, and Field Attack Bonus
-	if BF.Get_Clean_Slot_Name(get_parent().name) in Field_Slot_Names:
+	if Clean_Parent_Name in Field_Slot_Names or "Target_List" in Parent_Name:
 		Field_Bonus = BM.Player.Field_ATK_Bonus if Parent_Name.left(1) == "W" else BM.Enemy.Field_ATK_Bonus
 	Total_Attack = (Attack * Fusion_Level) + ATK_Bonus + Field_Bonus
 
@@ -196,7 +195,7 @@ func set_total_health():
 	var Field_Bonus: int = 0
 
 	# Calculate Total Health based on card's Health, Health Bonus, Fusion Level, and Field Health Bonus
-	if Clean_Parent_Name in Field_Slot_Names:
+	if Clean_Parent_Name in Field_Slot_Names or "Target_List" in Clean_Parent_Name:
 		Field_Bonus = BM.Player.Field_Health_Bonus if Parent_Name.left(1) == "W" else BM.Enemy.Field_Health_Bonus
 	Total_Health = max(0, (Health * Fusion_Level) + Health_Bonus + Field_Bonus)
 
@@ -274,9 +273,13 @@ func set_effects_disabled(value: String, context: String = "Initialize"):
 	else:
 		if context == "Add":
 			Effects_Disabled.append(value)
+			GameData.Disabled_Effects.append(value)
 		elif context == "Remove":
 			Effects_Disabled.erase(value)
+			GameData.Disabled_Effects.erase(value)
 		elif context == "Reset":
+			for i in range(len(Effects_Disabled)):
+				GameData.Disabled_Effects.erase(Effects_Disabled[i])
 			Effects_Disabled.clear()
 		else:
 			Effects_Disabled = [value]
@@ -287,11 +290,6 @@ func set_can_attack():
 	var in_valid_slot = (Clean_Parent_Name == "Fighter" or (Clean_Parent_Name == "R" and Attack_As_Reinforcement)) and get_parent().name.left(1) == Side
 
 	Can_Attack = true if in_valid_slot and Paralysis == false and Attacks_Remaining > 0 else false
-
-func set_targetable(attacking_card: Node):
-	var Clean_Parent_Name: String = BF.Get_Clean_Slot_Name(get_parent().name)
-
-	Targetable = true if Clean_Parent_Name == "Fighter" or (Clean_Parent_Name == "R" and (attacking_card.Multi_Strike or attacking_card.Target_Reinforcer)) else false
 
 func set_paralysis(value: bool, context: String = "Initialize"):
 	if Unstoppable:
@@ -321,6 +319,7 @@ func Reset_Stats_On_Capture():
 	set_health(0, "Capture")
 	set_health_bonus(0)
 	set_burn_damage(0)
+	set_effects_disabled("", "Reset")
 
 func Reset_Variables_After_Flip_Summon():
 	set_is_set()
@@ -374,6 +373,9 @@ func Spawn_Action_Buttons():
 	var buttons_to_spawn_map = {"Normal": ["Summon"], "Hero": ["Summon"], "Trap": ["Set"], "Magic": ["Summon", "Set"]}
 	var buttons_to_spawn = null
 
+	# Remove any existing action buttons
+	Remove_Action_Buttons()
+
 	# Check for Hero in Reinforcer zone (needed for repositioning logic)
 	var Hero_In_Reinforcements = false
 	for card in Reinforcer_Field_Cards:
@@ -391,7 +393,7 @@ func Spawn_Action_Buttons():
 			buttons_to_spawn = ["Sacrifice"]
 	elif Side + "Backrow" in Parent_Name:
 		buttons_to_spawn = ["Flip"]
-	elif ("Fighter" in Parent_Name and Parent_Name.left(1) != Side) or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name) and GameData.Attacker.Target_Reinforcer):
+	elif ("Fighter" in Parent_Name and Parent_Name.left(1) != Side) or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name)):
 		buttons_to_spawn = ["Target"]
 
 	# Spawn buttons

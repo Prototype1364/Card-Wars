@@ -35,7 +35,10 @@ offset_right = 110.0
 offset_bottom = 178.0
 
 [node name="Cost" type="TextureRect" parent="CostContainer"]
+custom_minimum_size = Vector2(100, 50)
 layout_mode = 0
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Attack" type="Label" parent="."]
 layout_mode = 0

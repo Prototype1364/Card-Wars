@@ -66,7 +66,7 @@ func Reposition_Field_Cards(card) -> void:
 	var Side = card.get_parent().name.left(1)
 	var Side_Opp = "B" if Side == "W" else "W"
 	var card_list = "Reinforcers" if card.Type == "Normal" else "Field (All)"
-	var Chosen_Card_Node = await CardEffects.Get_Card_Selected(card, card_list, Side, Side_Opp, null, [], [], [])
+	var Chosen_Card_Node = await CardEffects.Get_Card_Selected(card, card_list, Side, Side_Opp, null, [], [], []) # FIXME (NOTE): This function should technically exist in the BC, not the CardEffects script. Update its location and all references in the CardEffects script (and here) appropriately.
 	var Destination_Node = Chosen_Card_Node.get_parent()
 	
 	Reparent_Nodes(Chosen_Card_Node, card.get_parent())
