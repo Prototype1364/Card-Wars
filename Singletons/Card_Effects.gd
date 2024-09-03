@@ -140,13 +140,12 @@ func Creature(card):
 				SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 				return # Exit function if Fusion Summon is successful (without checking MainDeck until next turn)
 		
-		# Perform Fusion Summon if a copy of the card exists in the MainDeck
+		# Perform Fusion Summon(s) if a copy of the card exists in the MainDeck
 		for deck_card in Cards_In_Main_Deck:
 			if deck_card.Name == card.Name:
 				card.set_fusion_level(1, "Add")
 				SignalBus.emit_signal("Reparent_Nodes", deck_card, Destination_Node)
 				deck_card.Update_Data()
-				break
 
 func Cryptid(card):
 	pass
@@ -224,6 +223,7 @@ func Spy(card):
 
 func Support(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var Valid_Card_Ignoring_GameState = true if On_Field(card) and Resolvable_Card(card) and Valid_Effect_Type(card) else false
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
 
@@ -244,7 +244,7 @@ func Support(card):
 			SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 			card.Reset_Stats_On_Capture()
 
-	if GameData.Current_Step == "Start":
+	if GameData.Current_Step == "Start" and Valid_Card_Ignoring_GameState:
 		card.set_health(min(card.Revival_Health, ceil(card.Revival_Health / 10)), "Add")
 
 func Titan(card):
@@ -258,6 +258,7 @@ func Trickster(card):
 
 func Warrior(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var Valid_Card_Ignoring_GameState = true if On_Field(card) and Resolvable_Card(card) and Valid_Effect_Type(card) else false
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
 
@@ -272,7 +273,7 @@ func Warrior(card):
 		card.set_attack(min(card.Attack, Attack_Transfer_Value), "Remove")
 		card.set_attack_bonus(ATK_Bonus_Reduction, "Remove")
 
-	if GameData.Current_Step == "Start":
+	if GameData.Current_Step == "Start" and Valid_Card_Ignoring_GameState:
 		card.set_attack(min(card.Base_Attack, ceil(card.Base_Attack / 10)), "Add")
 
 func Wizard(card):
@@ -344,7 +345,7 @@ func Behind_Enemy_Lines(card):
 		var Hero_Deck = BF.Get_Field_Card_Data(Side_Opp, "HeroDeck")
 
 		if Hero_Deck != []:
-			var Targeted_Hero = Hero_Deck[BC.Dice_Roll(len(Hero_Deck))]
+			var Targeted_Hero = Hero_Deck[BC.Dice_Roll(len(Hero_Deck)) - 1]
 			var damage_dealt = int(floor(BC.Dice_Roll(5) / 10 * Targeted_Hero.Health))
 			if not Targeted_Hero.is_immune("Card Effect", card):
 				Targeted_Hero.set_health(damage_dealt, "Remove")
@@ -632,7 +633,8 @@ func Juggernaut(card):
 func Kinship(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 
-	if Valid_Card:
+	if Valid_Card and card.Can_Activate_Effect:
+		card.Can_Activate_Effect = false
 		if card == GameData.Target:
 			var Card_Side = "W" if card.get_parent().name.left(1) == "W" else "B"
 			var Cards_On_Field = BF.Get_Field_Card_Data(Card_Side, "Fighter") + BF.Get_Field_Card_Data(Card_Side, "R")
@@ -641,7 +643,7 @@ func Kinship(card):
 			# Find Excess Fusion Level of Reinforcers
 			var total_fusion_level = 1
 			for current_card in Cards_On_Field:
-				total_fusion_level += current_card.Fusion_Level if current_card != card and current_card.Fusion_Level > 1 else 0
+				total_fusion_level += current_card.Fusion_Level - 1 if current_card != card and current_card.Fusion_Level > 1 else 0
 
 			# Heal back the difference between net damage and true damage taken
 			var true_damage_taken = int(floor(net_damage / total_fusion_level))
@@ -1039,11 +1041,11 @@ func Sword(card):
 	if Valid_Card and Fighter != null and card.Can_Activate_Effect:
 		Fighter.set_attack_bonus(3, "Add")
 
-func Cursed_Mirror(card):
+func Cursed_Mirror(card): # NOTE: Should tokens be spawning on start of enemy turn instead of start of next player turn? Trap cards like this feel slow under current implementation.
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 
-	if Valid_Card and GameData.Attacker != null:
+	if Valid_Card and GameData.Attacker != null and card.Tokens > 0:
 		card.set_tokens(0, "Reset")
 		GameData.Target.set_health(GameData.Attacker.get_net_damage(), "Add")
 		if not GameData.Attacker.is_immune("Card Effect", card):
