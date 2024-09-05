@@ -207,7 +207,7 @@ func Capture_Card(Card_Captured, Capture_Type = "Normal", Reset_Stats = true):
 
 	# Move Equips to Graveyard when Fighter is Captured
 	if Fighter_Captured:
-		var Captured_Card_Side = Card_Captured.get_parent().name.left(1)
+		var Captured_Card_Side = Parent_Name.left(1)
 		var Equip_Magic_Cards = BF.Get_Field_Card_Data(Captured_Card_Side, "EquipMagic")
 		var Equip_Trap_Cards = BF.Get_Field_Card_Data(Captured_Card_Side, "EquipTrap")
 

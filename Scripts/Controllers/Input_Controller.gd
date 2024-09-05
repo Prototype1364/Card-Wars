@@ -1,11 +1,5 @@
 extends VScrollBar
 
-func Advance_GameState(event):
-	if event.is_action_pressed("next_phase"):
-		SignalBus.emit_signal("Advance_Phase")
-	if event.is_action_pressed("end_turn"):
-		SignalBus.emit_signal("Advance_Turn")
-
 func Scroll(event):
 	var Playmat = get_tree().get_root().get_node("SceneHandler/Battle/Playmat")
 	if event is InputEventMouseButton:
@@ -17,6 +11,14 @@ func Scroll(event):
 				self.value += 30
 			Playmat.position.y = 0 - self.value
 
-func Confirm(event):
-	if event.is_action_pressed("Confirm"):
-		SignalBus.emit_signal("Confirm")
+func Resolve_Input(event):
+	var action_signal_map = {
+		"next_phase": "Advance_Phase",
+		"end_turn": "Advance_Turn",
+		"Confirm": "Confirm",
+		"Cancel": "Cancel"
+	}
+
+	for action in action_signal_map.keys():
+		if event.is_action_pressed(action):
+			SignalBus.emit_signal(action_signal_map[action])

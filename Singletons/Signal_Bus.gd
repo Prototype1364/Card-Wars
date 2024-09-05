@@ -56,6 +56,8 @@ signal EffectTargetSelected
 
 signal Confirm
 
+signal Cancel
+
 signal Button_Selected
 
 signal Draw_Card

@@ -3,8 +3,9 @@ extends Control
 class_name Card
 
 # Member variables
-@onready var BM = get_tree().get_root().get_node("SceneHandler/Battle")
-@onready var BF = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots")
+@onready var root = get_tree().get_root()
+@onready var BM = root.get_node("SceneHandler/Battle")
+@onready var BF = root.get_node("SceneHandler/Battle/Playmat/CardSpots")
 var Frame: String
 var Art: String
 var Name: String
@@ -121,6 +122,8 @@ func set_attack(value: int, context: String = "Initialize"):
 		Attack += value
 	elif context == "Remove":
 		Attack -= value
+	elif context == "Capture":
+		Attack = Base_Attack
 	else:
 		Attack = value
 	set_total_attack()
@@ -314,7 +317,7 @@ func Update_Data():
 	set_tokens(Tokens)
 
 func Reset_Stats_On_Capture():
-	set_attack(Attack)
+	set_attack(0, "Capture")
 	set_attack_bonus(0)
 	set_health(0, "Capture")
 	set_health_bonus(0)
@@ -476,11 +479,14 @@ func _on_Action_Button_pressed(Mode):
 	var Parent_Name = get_parent().name
 	var Destination_Node_Map = {"Hero": BF.Find_Open_Slot("Fighter") if BF.Find_Open_Slot("Fighter") != null else BF.Find_Open_Slot("R"), "Normal": BF.Find_Open_Slot("R"), "Magic": BF.Find_Open_Slot("Backrow"), "Trap": BF.Find_Open_Slot("Backrow")}
 	var Destination_Node_Path = Destination_Node_Map[Type] if Attribute != "Equip" else BF.Find_Open_Slot("Equip" + Type)
-	var Destination_Node = get_tree().get_root().get_node(Destination_Node_Path) if Destination_Node_Path != null else null
+	var Destination_Node = root.get_node(Destination_Node_Path) if Destination_Node_Path != null else null
+	var Default_Fusion_Summon_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "R1") if Type == "Normal" else root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Fighter")
 	Remove_Action_Buttons()
 
 	if "Hand" in Parent_Name and Destination_Node != null:
 		SignalBus.emit_signal("Play_Card", Side, Mode, Destination_Node, self)
+	elif "Hand" in Parent_Name and Destination_Node == null and Anchor_Text in ["Creature"]: # Allows for Fusion summons even with a full field
+		SignalBus.emit_signal("Play_Card", Side, Mode, Default_Fusion_Summon_Node, self)
 	elif "Backrow" in Parent_Name and Mode == "Summon":
 		SignalBus.emit_signal("Activate_Set_Card", Side, self)
 	elif Parent_Name in Reposition_Zones and Mode == "Sacrifice":

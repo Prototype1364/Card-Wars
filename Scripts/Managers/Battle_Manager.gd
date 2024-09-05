@@ -1,11 +1,5 @@
 extends Control
 
-const PHASES = ["Opening Phase", "Standby Phase", "Main Phase", "Battle Phase", "End Phase"]
-const PHASE_THRESHOLDS = [3, 5, 6, 11, 16]
-const STEPS = ["Start", "Draw", "Roll", "Recruit", "Effect", "Token", "Main", "Selection", "Target", "Damage", "Capture", "Repeat", "Discard", "Reload", "Effect", "Victory", "End"]
-const EFFECT_STEPS = ["Start", "Effect", "Selection", "Damage", "Capture", "Discard"] # Discard may/may not end up being an Effect Step. You just added it, just in case.
-const FUNC_STEPS = ["Damage"]
-
 # Import Dependencies
 @onready var BC = $Playmat
 @onready var DC = $Playmat/CardSpots/NonHands
@@ -15,6 +9,12 @@ const FUNC_STEPS = ["Damage"]
 @onready var Player = $UI/Duelists/HUD_W
 @onready var Enemy = $UI/Duelists/HUD_B
 
+# Set Constants
+const PHASES = ["Opening Phase", "Standby Phase", "Main Phase", "Battle Phase", "End Phase"]
+const PHASE_THRESHOLDS = [3, 5, 6, 11, 16]
+const STEPS = ["Start", "Draw", "Roll", "Recruit", "Effect", "Token", "Main", "Selection", "Target", "Damage", "Capture", "Repeat", "Discard", "Reload", "Effect", "Victory", "End"]
+const EFFECT_STEPS = ["Start", "Effect", "Selection", "Damage", "Capture", "Discard"] # Discard may/may not end up being an Effect Step. You just added it, just in case.
+const FUNC_STEPS = ["Damage"]
 
 """--------------------------------- Engine Functions ---------------------------------"""
 func _ready():
@@ -37,6 +37,7 @@ func _ready():
 	var _HV16 = SignalBus.connect("Shuffle_Deck", Callable(self, "Shuffle_Deck"))
 	var _HV17 = SignalBus.connect("Sacrifice_Card", Callable(self, "Sacrifice_Card"))
 	var _HV18 = SignalBus.connect("Hero_Deck_Selected", Callable(self, "Hero_Deck_Selected"))
+	var _HV19 = SignalBus.connect("Cancel", Callable(self, "_on_Cancel_pressed"))
 	SignalBus.emit_signal("READY") # Temporary signal to ensure Card_Effects script functions as expected. See note in Card_Effects.gd for more info.
 	
 	Setup_Game()
@@ -151,8 +152,7 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main", Draw_At_Index
 
 """--------------------------------- Pass-Along Functions ---------------------------------"""
 func _input(event):
-	IC.Advance_GameState(event)
-	IC.Confirm(event)
+	IC.Resolve_Input(event)
 
 func Update_HUD_Duelist(Node_To_Update, Dueler):
 	var Side = "W" if Dueler.Name == "Player" else "B"
@@ -297,8 +297,9 @@ func Conduct_End_Phase():
 		print(GameData.Victor + " wins!")
 		return
 
-	# HACK: Close out any card effects that are still awaiting the Confirm signal
+	# HACK: Close out any card effects/action buttons that are still awaiting their signal
 	SignalBus.emit_signal("Confirm")
+	get_tree().call_group("Cards", "Remove_Action_Buttons")
 	
 	# End Step
 	Update_Game_State("Step")
@@ -348,3 +349,6 @@ func _on_Next_Phase_pressed():
 
 func _on_End_Turn_pressed():
 	Update_Game_State("Turn")
+
+func _on_Cancel_pressed():
+	get_tree().call_group("Cards", "Remove_Action_Buttons")
