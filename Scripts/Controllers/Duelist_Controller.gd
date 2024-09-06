@@ -52,6 +52,8 @@ func set_cost_discount_normal(value, context="Initialize"):
 		Cost_Discount_Normal -= value
 	else:
 		Cost_Discount_Normal = value
+	
+	get_tree().call_group("Cards", "set_cost")
 
 func set_cost_discount_hero(value, context="Initialize"):
 	if context == "Add":
@@ -60,6 +62,8 @@ func set_cost_discount_hero(value, context="Initialize"):
 		Cost_Discount_Hero -= value
 	else:
 		Cost_Discount_Hero = value
+	
+	get_tree().call_group("Cards", "set_cost")
 
 func set_cost_discount_magic(value, context="Initialize"):
 	if context == "Add":
@@ -68,6 +72,8 @@ func set_cost_discount_magic(value, context="Initialize"):
 		Cost_Discount_Magic -= value
 	else:
 		Cost_Discount_Magic = value
+	
+	get_tree().call_group("Cards", "set_cost")
 
 func set_cost_discount_trap(value, context="Initialize"):
 	if context == "Add":
@@ -76,6 +82,8 @@ func set_cost_discount_trap(value, context="Initialize"):
 		Cost_Discount_Trap -= value
 	else:
 		Cost_Discount_Trap = value
+	
+	get_tree().call_group("Cards", "set_cost")
 
 func set_field_attack_bonus(value, context="Initialize"):
 	if context == "Add":

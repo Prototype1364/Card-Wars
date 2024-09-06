@@ -148,7 +148,7 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main", Draw_At_Index
 		if Card_Info['Card_Drawn'].Type == "Special" or Card_Info['Card_Drawn'].Type == "Tech":
 			BC.Activate_Summon_Effects(Card_Info['Card_Drawn'])
 
-func Get_Duelist_Discount(Card_Side, Type):
+func Get_Duelist_Cost_Discount(Card_Side, Type):
 	var Duelist = Player if Card_Side == "W" else Enemy
 	return Duelist.get_discount(Type)
 

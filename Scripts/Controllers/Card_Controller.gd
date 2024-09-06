@@ -161,13 +161,31 @@ func set_total_attack(_value: int = 0, _context: String = "Initialize"):
 	else:
 		$SmallCard/Attack.text = ""
 
-func set_cost(value: int):
+func set_cost(value: int = Cost):
+	# Attempt to set outline of Cost art based on card's Cost (with discount). Looks pixelated in current implementation.
+	# Cost = value
+	# var Card_Side = "W" if get_parent().name.left(1) == "W" else "B"
+	# var Discount = BM.Get_Duelist_Cost_Discount(Card_Side, Type)
+	# if Type != "Special" and "Tech" not in Type and "Deck" not in get_parent().name and Cost - Discount >= 0:
+	# 	print(str(max(0, Cost - Discount)))
+	# 	var Cost_Image = Image.load_from_file("res://Assets/Cards/Cost/Cost_" + str(max(0, Cost - Discount)) + ".png")
+	# 	for x in Cost_Image.get_size().x:
+	# 		for y in Cost_Image.get_size().y:
+	# 			if Cost_Image.get_pixel(x, y) != Color("0000ff") and Cost_Image.get_pixel(x, y) != Color("00ffb0") and Cost_Image.get_pixel(x, y).a > 0:
+	# 				const TEXT_OUTLINE_COLOR_DICT_MAP = {"Normal": "676767", "Hero": "cdaf2f", "Magic": "7a51a0", "Trap": "ff0000", "Tech": "1f8742", "Status": "000000"}
+	# 				Cost_Image.set_pixel(x, y, Color(TEXT_OUTLINE_COLOR_DICT_MAP[Type]))
+	# 	var Cost_Texture = ImageTexture.create_from_image(Cost_Image)
+	# 	$SmallCard/CostContainer/Cost.texture = Cost_Texture
+	# else:
+	# 	$SmallCard/CostContainer/Cost.texture = null
+
 	Cost = value
 	var Card_Side = "W" if get_parent().name.left(1) == "W" else "B"
-	var Discount = BM.Get_Cost_Discount(Card_Side, Type)
-	if Type != "Special" and "Tech" not in Type and "Deck" not in get_parent().name and Cost - Discount >= 0:
-		$SmallCard/CostContainer/Cost.texture = load("Cost_" + str(max(0, Cost - Discount)) + ".png")
-
+	var Discount = BM.Get_Duelist_Cost_Discount(Card_Side, Type)
+	if Type != "Special" and "Tech" not in Type and "Deck" not in get_parent().name and Cost + Discount > 0:
+		$SmallCard/CostContainer/Cost.texture = load("res://Assets/Cards/Cost/Cost_" + Type + "_" + str(Cost + Discount) + ".png")
+	elif Type != "Special" and "Tech" not in Type and "Deck" not in get_parent().name and Cost + Discount <= 0:
+		$SmallCard/CostContainer/Cost.texture = load("res://Assets/Cards/Cost/Cost_0.png")
 	else:
 		$SmallCard/CostContainer/Cost.texture = null
 
@@ -439,7 +457,7 @@ func On_Target_Selection():
 # Signal-Related Functions
 func focusing():
 	if "Deck" not in get_parent().name:
-		SignalBus.emit_signal("LookAtCard", self, Type, Art, Name, Cost, Attribute)
+		SignalBus.emit_signal("LookAtCard", self, Type, Art, Name, $SmallCard/CostContainer/Cost.texture, Attribute)
 
 func defocusing():
 	SignalBus.emit_signal("NotLookingAtCard")
