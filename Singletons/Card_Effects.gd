@@ -245,7 +245,7 @@ func Support(card):
 			card.Reset_Stats_On_Capture()
 
 	if GameData.Current_Step == "Start" and Valid_Card_Ignoring_GameState:
-		card.set_health(min(card.Revival_Health, ceil(card.Revival_Health / 10)), "Add")
+		card.set_health(ceil(float(card.Revival_Health) / 10), "Add")
 
 func Titan(card):
 	pass
@@ -274,7 +274,7 @@ func Warrior(card):
 		card.set_attack_bonus(ATK_Bonus_Reduction, "Remove")
 
 	if GameData.Current_Step == "Start" and Valid_Card_Ignoring_GameState:
-		card.set_attack(min(card.Base_Attack, ceil(card.Base_Attack / 10)), "Add")
+		card.set_attack(ceil(float(card.Base_Attack) / 10), "Add")
 
 func Wizard(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -1058,6 +1058,12 @@ func Cursed_Mirror(card): # NOTE: Should tokens be spawning on start of enemy tu
 		var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "Graveyard")
 		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 
+func Grenade(card):
+	# An Equip Magic card that allows the Fighter to deal damage to one of the opponent's Reinforcers when attacking the Opposing Fighter.
+	# When combined with Tidal_Wave, overflow damage will hit the Reinforcer(s) first, and if any remains will then hit the Hero Deck.
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	get_tree().call_group("Cards", "set_can_deal_overflow_damage", Valid_Card)
+
 
 
 """--------------------------------- Tech Effects ---------------------------------"""
@@ -1113,6 +1119,13 @@ func Medicine(card):
 		SignalBus.emit_signal("Update_HUD_Duelist", Node_To_Update, Dueler)
 		await get_tree().create_timer(0.05).timeout # Creating a timer ensures that the HUD variable is updated before the signal is emitted
 		get_tree().call_group("Cards", "set_total_health")
+
+func Tidal_Wave(card):
+	# An effect that allows for all overflow damage to be dealt to the opponent's Reinforcers and (if applicable) cards in Hero Deck.
+	# Overflow damage will hit reinforcers first, and if any remains will then hit the Hero Deck.
+	# This should help to solve the issue of Attack Power (and thus Warrior effects) becoming irrelevant after a certain point because you 1-shot everything.
+	if On_Field(card):
+		get_tree().call_group("Cards", "set_perfected_overflow", card.get_parent().name.left(1)) 
 
 
 

@@ -30,6 +30,8 @@ var Health: int
 var Health_Bonus: int # Used to keep track of Equip card bonuses specifically.
 var Total_Health: int
 var Burn_Damage: int # Damage taken by card each turn due to Poison (and other) burn-damage style ailments.
+var Can_Deal_Overflow_Damage: bool # Refers to whether a card can deal overflow damage to the opponent's Reinforcers.
+var Perfected_Overflow: bool # Refers to whether a card can deal overflow damage to the opponent's Hero Deck after Reinforcers are eliminated.
 var Revival_Health: int # HP that a card resets to upon Capture.
 var Special_Edition_Text: String
 var Rarity: String
@@ -243,6 +245,12 @@ func set_burn_damage(value: int, context: String = "Initialize"):
 			Burn_Damage -= value
 		else:
 			Burn_Damage = value
+
+func set_can_deal_overflow_damage(Valid_Equip: bool):
+	Can_Deal_Overflow_Damage = true if Valid_Equip and BF.Get_Clean_Slot_Name() == "Fighter" else false
+
+func set_perfected_overflow(Valid_Card_Side: String):
+	Perfected_Overflow = true if Valid_Card_Side == get_parent().name.left(1) else false
 
 func set_revival_health(_value: int):
 	Revival_Health = Health
