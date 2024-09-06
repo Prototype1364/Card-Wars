@@ -388,10 +388,10 @@ func Counter(card):
 func Defiance(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 
-	if Valid_Card and card.Total_Health == 0:
+	if Valid_Card and card.Total_Health <= 0:
 		var Coin_Flip = BC.Dice_Roll(2)
 		if Coin_Flip == 1: # Defiance succeeds
-			card.set_health(card.Revival_Health, "Add")
+			card.set_health(card.Revival_Health, "Set")
 			card.set_health_bonus(0, "Set")
 
 func Detonate(card):
