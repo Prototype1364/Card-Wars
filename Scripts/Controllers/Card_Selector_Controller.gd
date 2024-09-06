@@ -86,7 +86,7 @@ func Populate_Card_Options_List(Card_List):
 		copy.Update_Data()
 		
 		# Hides Advance Tech Card from list (but still spawns it to ensure correct card is chosen from Card_Selector scene)
-		if original.Frame == "Special":
+		if original.Type == "Special":
 			copy.visible = false
 		
 		# Hide Button Selector Scene if present

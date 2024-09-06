@@ -6,7 +6,6 @@ func Create_Card(cardPasscode):
 	for card in GameData.CardData:
 		if card["Passcode"] == cardPasscode:
 			var card_data = {
-				"Frame": card["CardType"],
 				"Art": card["CardArt"],
 				"Name": card["CardName"],
 				"Type": card["CardType"],
