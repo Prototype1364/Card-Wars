@@ -85,7 +85,7 @@ func _init(card_data):
 	Revival_Health = Health
 	Total_Attack = Attack + ATK_Bonus
 	Total_Health = Health + Health_Bonus
-	Cost_Path = "res://Assets/Cards/Cost/Cost_" + Frame + "_" + str(Cost) + ".png" if Type != "Special" and "Tech" not in Type else ""
+	Cost_Path = "res://Assets/Cards/Cost/Cost_" + Type + "_" + str(Cost) + ".png" if Type != "Special" and "Tech" not in Type else ""
 	Token_Path = preload("res://Scenes/SupportScenes/Token_Card.tscn")
 	Effects_Disabled = []
 	Immunity = {"Type": [], "Attribute": [], "Effect": [], "Location": []}
@@ -100,12 +100,12 @@ func _ready():
 
 
 # Setters
-func set_frame(frame: String):
-	var texture_path = "res://Assets/Cards/Frame/Small_Card_Back.png" if "Deck" in get_parent().name else ("res://Assets/Cards/Frame/Small_Frame_" + frame + ".png" if Frame != "Special" else "res://Assets/Cards/Frame/Small_Advance_Tech_Card.png")
+func set_frame(type: String):
+	var texture_path = "res://Assets/Cards/Frame/Small_Card_Back.png" if "Deck" in get_parent().name else ("res://Assets/Cards/Frame/Small_Frame_" + type + ".png" if Type != "Special" else "res://Assets/Cards/Frame/Small_Advance_Tech_Card.png")
 	$SmallCard/Frame.texture = load(texture_path)
 
 func set_art():
-	$SmallCard/ArtContainer/Art.texture = load(Art) if "Deck" not in get_parent().name and Frame != "Special" else null
+	$SmallCard/ArtContainer/Art.texture = load(Art) if "Deck" not in get_parent().name and Type != "Special" else null
 
 func set_attacks_remaining(value: int = 1, context: String = "Initialize"):
 	if context == "Attack":
@@ -163,8 +163,11 @@ func set_total_attack(_value: int = 0, _context: String = "Initialize"):
 
 func set_cost(value: int):
 	Cost = value
-	if Type != "Special" and "Tech" not in Type and "Deck" not in get_parent().name and Cost > 0:
-		$SmallCard/CostContainer/Cost.texture = load(Cost_Path)
+	var Card_Side = "W" if get_parent().name.left(1) == "W" else "B"
+	var Discount = BM.Get_Cost_Discount(Card_Side, Type)
+	if Type != "Special" and "Tech" not in Type and "Deck" not in get_parent().name and Cost - Discount >= 0:
+		$SmallCard/CostContainer/Cost.texture = load("Cost_" + str(max(0, Cost - Discount)) + ".png")
+
 	else:
 		$SmallCard/CostContainer/Cost.texture = null
 
@@ -307,7 +310,7 @@ func set_paralysis(value: bool, context: String = "Initialize"):
 
 # Primary Functions
 func Update_Data():
-	set_frame(Frame)
+	set_frame(Type)
 	set_art()
 	set_attack(Attack)
 	set_attack_bonus(ATK_Bonus)
@@ -436,7 +439,7 @@ func On_Target_Selection():
 # Signal-Related Functions
 func focusing():
 	if "Deck" not in get_parent().name:
-		SignalBus.emit_signal("LookAtCard", self, Frame, Art, Name, Cost, Attribute)
+		SignalBus.emit_signal("LookAtCard", self, Type, Art, Name, Cost, Attribute)
 
 func defocusing():
 	SignalBus.emit_signal("NotLookingAtCard")

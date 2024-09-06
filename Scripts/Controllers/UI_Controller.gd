@@ -63,21 +63,21 @@ func Update_HUD_Duelist_Token(Dueler, Side):
 
 
 """--------------------------------- Card Display Functions ---------------------------------"""
-func LookAtCard(CardNode, FrameData, ArtData, NameData, CostData, AttributeData):
+func LookAtCard(CardNode, TypeData, ArtData, NameData, CostData, AttributeData):
 	SelectedCard = CardNode
 	BigCardNode.visible = true
 	
 	if SelectedCard != null:
-		if FrameData != "Special": # Card is NOT Advance Tech card
+		if TypeData != "Special": # Card is NOT Advance Tech card
 			const TEXT_OUTLINE_NODE_NAMES = ["NameContainer/Name", "Description", "Attack", "Health"]
 			const TEXT_OUTLINE_COLOR_DICT_MAP = {"Normal": "676767", "Hero": "cdaf2f", "Magic": "7a51a0", "Trap": "ff0000", "Tech": "1f8742", "Status": "000000"}
 			const TEXT_COLOR_DICT_MAP = {"Normal": "000000", "Hero": "000000", "Magic": "000000", "Trap": "000000", "Tech": "000000", "Status": "ffffff"}
-			var Text_Outline_Color = Color(TEXT_OUTLINE_COLOR_DICT_MAP[FrameData])
-			var Text_Color = Color(TEXT_COLOR_DICT_MAP[FrameData])
+			var Text_Outline_Color = Color(TEXT_OUTLINE_COLOR_DICT_MAP[TypeData])
+			var Text_Color = Color(TEXT_COLOR_DICT_MAP[TypeData])
 			
-			BigCardNode.get_node("Frame").texture = load("res://Assets/Cards/Frame/Large_Frame_" + FrameData + ".png")
+			BigCardNode.get_node("Frame").texture = load("res://Assets/Cards/Frame/Large_Frame_" + TypeData + ".png")
 			BigCardNode.get_node("ArtContainer/Art").texture = load(ArtData) # ImageContainer/CardImage of BigCard scene MUST REMAIN as a TEXTURE_BUTTON node type as it allows for auto-expansion of image proportions, thus cutting Eric's card art work in half.
-			BigCardNode.get_node("CostContainer/Cost").texture = load("res://Assets/Cards/Cost/Cost_" + FrameData + "_" + str(CostData) + ".png") if FrameData != "Tech" and CostData != 0 else null
+			BigCardNode.get_node("CostContainer/Cost").texture = load("res://Assets/Cards/Cost/Cost_" + TypeData + "_" + str(CostData) + ".png") if TypeData != "Tech" and CostData != 0 else null
 			BigCardNode.get_node("NameContainer/Name").text = NameData
 			BigCardNode.get_node("Description").text = "[" + SelectedCard.Anchor_Text + "] " + SelectedCard.Short_Description if SelectedCard.Anchor_Text != null and SelectedCard.Short_Description != null else "This card has no Short Description." if SelectedCard.Short_Description == null else SelectedCard.Short_Description
 			BigCardNode.get_node("Attack").text = str(max(SelectedCard.Total_Attack, 0)) if SelectedCard.Type in ["Normal", "Hero"] else ""

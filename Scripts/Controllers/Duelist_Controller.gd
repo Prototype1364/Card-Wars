@@ -19,6 +19,16 @@ var Muggle_Mode = false
 var Hand_Size_Limit = 5
 var Shield_Wall_Active = false
 
+func get_discount(discount_type):
+	var discount_map = {
+		"Normal": Cost_Discount_Normal,
+		"Hero": Cost_Discount_Hero,
+		"Magic": Cost_Discount_Magic,
+		"Trap": Cost_Discount_Trap
+	}
+
+	return discount_map.get(discount_type, 0)
+
 func set_hand_size_limit(value, context="Initialize"):
 	if context == "Add":
 		Hand_Size_Limit = min(6, Hand_Size_Limit + value)
