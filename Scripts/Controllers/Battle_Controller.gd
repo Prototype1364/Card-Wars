@@ -4,9 +4,32 @@ extends TextureRect
 @onready var BF = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots")
 
 """--------------------------------- Pre-Filled Functions ---------------------------------"""
-func Resolve_Card_Effects():
-	for card in get_tree().get_nodes_in_group("Cards"):
-		CardEffects.call(card.Anchor_Text, card)
+func Resolve_Card_Effects(card: Node = null):
+	CardEffects.call(card.Anchor_Text, card)
+	Remove_Card_Effect_Availability(card)
+
+func Check_For_Resolvable_Effects(card_to_check: Node = null):
+	var Card_Is_Valid
+
+	if card_to_check == null:
+		for card in get_tree().get_nodes_in_group("Cards"):
+			Card_Is_Valid = true if CardEffects.On_Field(card) && CardEffects.Resolvable_Card(card) && CardEffects.Valid_GameState(card) && CardEffects.Valid_Effect_Type(card) else false
+			if Card_Is_Valid:
+				Animate_Card_Effect_Availability(card)
+	else:
+		Card_Is_Valid = true if CardEffects.On_Field(card_to_check) && CardEffects.Resolvable_Card(card_to_check) && CardEffects.Valid_GameState(card_to_check) && CardEffects.Valid_Effect_Type(card_to_check) else false
+		if Card_Is_Valid:
+			Animate_Card_Effect_Availability(card_to_check)
+
+func Animate_Card_Effect_Availability(card: Node):
+	card.Can_Activate_Effect = true
+	# Play snake animation and await for player click input on focus sensor
+	pass
+
+func Remove_Card_Effect_Availability(card: Node):
+	card.Can_Activate_Effect = false
+	# Stop snake animation
+	pass
 
 
 
@@ -22,11 +45,14 @@ func Dice_Roll(d_type: int = 6) -> int:
 
 func Draw_Card(Turn_Player, Deck_Source = "MainDeck", Draw_At_Index = 0) -> Dictionary:
 	var Side = "W" if Turn_Player.Name == "Player" else "B"
-	var Card_Drawn = get_node("CardSpots/NonHands/" + Side + Deck_Source).get_child(Draw_At_Index)
-	var Destinations = {"Hero": get_node("CardSpots/NonHands/" + Side + "Fighter"), "Tech": get_node("CardSpots/NonHands/" + Side + "TechZone")}
-	var Destination_Node = Destinations.get(Card_Drawn.Type, get_node("CardSpots/" + Side + "HandScroller/" + Side + "Hand"))
-	
-	return {'Card_Drawn': Card_Drawn, 'Destination_Node': Destination_Node}
+
+	if get_node("CardSpots/NonHands/" + Side + Deck_Source).get_child_count() >= Draw_At_Index:
+		var Card_Drawn = get_node("CardSpots/NonHands/" + Side + Deck_Source).get_child(Draw_At_Index)
+		var Destinations = {"Hero": get_node("CardSpots/NonHands/" + Side + "Fighter"), "Tech": get_node("CardSpots/NonHands/" + Side + "TechZone")}
+		var Destination_Node = Destinations.get(Card_Drawn.Type, get_node("CardSpots/" + Side + "HandScroller/" + Side + "Hand"))
+		return {'Card_Drawn': Card_Drawn, 'Destination_Node': Destination_Node}
+	else:
+		return {'Card_Drawn': null, 'Destination_Node': null}
 
 func Summon_Affordable(Dueler, Net_Cost) -> bool:
 	if Net_Cost <= Dueler.Summon_Crests:
@@ -92,9 +118,11 @@ func Activate_Summon_Effects(Chosen_Card):
 
 	# Check if any condition for activating effects is met
 	if is_valid_summon_effect:
-		Chosen_Card.Can_Activate_Effect = true
-		CardEffects.call(Chosen_Card.Anchor_Text, Chosen_Card)
-		Chosen_Card.Can_Activate_Effect = false # Reset to ensure card doesn't activate from Graveyard
+		Check_For_Resolvable_Effects()
+		#Chosen_Card.Can_Activate_Effect = true
+		#Resolve_Card_Effects(Chosen_Card, false)
+		#CardEffects.call(Chosen_Card.Anchor_Text, Chosen_Card)
+		#Chosen_Card.Can_Activate_Effect = false # Reset to ensure card doesn't activate from Graveyard
 
 func Set_Attacks_To_Launch():
 	var player = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
@@ -131,8 +159,8 @@ func Set_Turn_Player():
 		GameData.Current_Turn = "Player" if GameData.Current_Turn == "Enemy" else "Enemy"
 
 func Choose_Starting_Player():
-	var random_number = 1
-	#	var random_number = RNGesus(1, 2)
+	var random_number = 2
+	#var random_number = RNGesus(1, 2)
 	GameData.Current_Turn = "Player" if random_number == 1 else "Enemy"
 	
 	# Flip field (if Black goes first)
@@ -160,8 +188,8 @@ func Resolve_Burn_Damage():
 	for card in Cards_On_Field:
 		if not card.is_immune("Burn Damage", null): # Ensures that cards immune to any kind of burn damage are not affected.
 			card.set_health(card.Burn_Damage, "Remove")
-			if card.Total_Health <= 0 and not card.is_immune("Capture", null):
-				Capture_Card(card)
+			# if card.Total_Health <= 0 and not card.is_immune("Capture", null):
+			# 	Capture_Card(card)
 
 func Resolve_Battle_Damage():
 	var player = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
@@ -176,10 +204,32 @@ func Resolve_Battle_Damage():
 			GameData.Attacker.set_attacks_remaining(1, "Attack")
 			for card in Targets:
 				if not card.is_immune("Battle Damage", GameData.Attacker):
+					var Overflow_Damage = max(0, GameData.Attacker.get_net_damage() - card.Total_Health)
 					card.set_health(GameData.Attacker.get_net_damage(), "Remove")
 					CardEffects.call(card.Anchor_Text, card) # Call any effects that may trigger on damage (Defiance, Kinship, etc.)
-					if card.Total_Health <= 0 and not card.is_immune("Capture", GameData.Attacker):
-						Capture_Card(card)
+					# if card.Total_Health <= 0 and not card.is_immune("Capture", GameData.Attacker):
+					# 	Capture_Card(card)
+					if card.Total_Health <= 0 and GameData.Attacker.Can_Deal_Overflow_Damage and Overflow_Damage > 0:
+						Resolve_Overflow_Damage(GameData.Attacker, GameData.Target, Overflow_Damage)
+
+func Resolve_Overflow_Damage(Attacker, Target, Overflow_Damage):
+	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
+	var Cards_On_Field_Opp = BF.Get_Field_Card_Data(Side_Opp, "Fighter") + BF.Get_Field_Card_Data(Side_Opp, "R")
+	Cards_On_Field_Opp.erase(Target)
+
+	for card in Cards_On_Field_Opp:
+		if not card.is_immune("Overflow Damage", Attacker):
+			card.set_health(Overflow_Damage, "Remove")
+			Overflow_Damage = max(0, Overflow_Damage - card.Total_Health)
+			# if card.Total_Health <= 0 and not card.is_immune("Capture", Attacker):
+			# 	Capture_Card(card)
+			if Overflow_Damage == 0:
+				break
+
+func Check_For_Captures(trigger_card: Node = null):
+	for card in get_tree().get_nodes_in_group("Cards"):
+		if card.Total_Health <= 0 and not card.is_immune("Capture", trigger_card) and card.Type in ["Normal", "Hero"]:
+			Capture_Card(card)
 
 func Activate_Set_Card(Chosen_Card):
 	var Dueler = BM.Player if Chosen_Card.get_parent().name.left(1) == "W" else BM.Enemy

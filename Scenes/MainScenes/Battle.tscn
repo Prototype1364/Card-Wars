@@ -566,9 +566,11 @@ flat = true
 
 [node name="BHeroDeck" type="Button" parent="Playmat/CardSpots/NonHands"]
 layout_mode = 0
-offset_left = -150.0
-offset_right = -22.0
-offset_bottom = 188.0
+offset_left = 1025.0
+offset_top = 190.0
+offset_right = 1153.0
+offset_bottom = 378.0
+rotation = 3.14159
 button_mask = 0
 icon = ExtResource("6_m6o3k")
 
@@ -689,10 +691,9 @@ vertical_alignment = 1
 
 [node name="BHeroDeckCardCount" type="Label" parent="Playmat/CardSpots"]
 layout_mode = 0
-offset_left = -150.0
-offset_top = 60.0
-offset_right = -75.0
-offset_bottom = 113.0
+offset_left = 1000.0
+offset_right = 1075.0
+offset_bottom = 53.0
 rotation = 3.14159
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("8")
@@ -717,8 +718,9 @@ vertical_alignment = 1
 
 [node name="BSacrificePower" type="Label" parent="Playmat/CardSpots"]
 layout_mode = 0
-offset_left = -60.0
+offset_left = 1000.0
 offset_top = 280.0
+offset_right = 1060.0
 offset_bottom = 362.0
 rotation = 3.14159
 theme_override_colors/font_color = Color(0, 0, 0, 1)

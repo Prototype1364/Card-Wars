@@ -14,7 +14,7 @@ func Get_Field_Card_Parent_Data(side, slot):
 	var card_data: Array = BF.Get_Field_Card_Data(side, slot)
 	return card_data[0].get_parent() if len(card_data) > 0 else null
 
-func Determine_Card_List(selection_type, slot = null, Desired_Attributes: Array = [], Desired_Types: Array = [], Previous_Cards_Selected: Array = []) -> Array:
+func Determine_Card_List(selection_type, slot = null, Desired_Attributes: Array = [], Desired_Types: Array = [], Previous_Cards_Selected: Array = [], Repositioned_Card = null) -> Array:
 	var converted_selection_type = selection_type.replace("Opponent ", "")
 	var Selection_Side = ("W" if GameData.Current_Turn == "Player" else "B") if "Opponent" not in selection_type else ("B" if GameData.Current_Turn == "Player" else "W")
 	var Selection_Source = []
@@ -58,11 +58,12 @@ func Determine_Card_List(selection_type, slot = null, Desired_Attributes: Array 
 			Selection_Side = source.name.left(1) if "Both" in selection_type or "Universal" in selection_type else Selection_Side
 			var cards = BF.Get_Field_Card_Data(Selection_Side, BF.Get_Clean_Slot_Name(source.name))
 			for card in cards:
+				var card_is_not_self = card != Repositioned_Card
 				var card_not_previously_selected = card not in Previous_Cards_Selected
 				var card_is_acceptable_type = card.Type in Desired_Types or Desired_Types == [] or "Any" in Desired_Types
 				var card_is_acceptable_attribute = card.Attribute in Desired_Attributes or Desired_Attributes == [] or "Any" in Desired_Attributes
 				var card_is_not_in_list = card not in Card_List
-				var card_is_valid = card_not_previously_selected and card_is_acceptable_type and card_is_acceptable_attribute and card_is_not_in_list
+				var card_is_valid = card_is_not_self and card_not_previously_selected and card_is_acceptable_type and card_is_acceptable_attribute and card_is_not_in_list
 				if card_is_valid:
 					Card_List.append(card)
 	

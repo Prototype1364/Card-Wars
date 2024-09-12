@@ -36,6 +36,8 @@ signal Advance_Turn
 
 signal Activate_Summon_Effects
 
+signal Check_For_Resolvable_Effects
+
 signal Resolve_Card_Effects
 
 signal Update_HUD_Duelist

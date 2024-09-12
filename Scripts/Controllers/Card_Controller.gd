@@ -46,13 +46,13 @@ var Attack_As_Reinforcement: bool # Refers to a card's ability to launch an atta
 var Immortal: bool # Refers to whether a card can be captured with 0 HP. Demeter (in SAP version) is the first card to have this effect.
 var Invincible: bool # Refers to a card that cannot take Battle Damage. It must be defeated by a Hero/Magic/Trap/Tech card's effects. "The Level Beyond" is the first card to have this ability.
 var Rejuvenation: bool # Refers to a card that cannot take Burn Damage. It must be defeated by a Hero/Magic/Trap/Tech card's effects or through battle. Used in Juggernaut cards.
+var Warded: bool # Refers to a card that cannot take Overflow Damage. Can still be defeated by direct Battle Damage.
 var Relentless: bool # Refers to a card that gains double bonus on any alteration to its Attacks_Remaining variable (including the turn reset). King Leonidas was the first card to have this ability.
 var Multi_Strike: bool # Refers to a card's ability to deal damage to cards in the opponent's Reinforcement zone (Zeus is the first card to have this ability).
 var Paralysis: bool # Refers to a card's ability to launch an attack. Lancelot is the first card to utilize this Attribute (there's a 1/3 chance that his effect will result in him being unable to attack during that turn's Battle Phase).
 var Unstoppable: bool # Refers to a card that cannot be Paralyzed.
-var Direct_Attack: bool
 var Effects_Disabled: Array # An Array of all effects disabled by this card.
-var Owner: String # Refers to the card's original Owner (Player or Enemy). Used as part of Mordred's Hero card effect.
+var Guardianship: Node # Refers to the card that this card is protecting.
 var Can_Attack: bool
 var Immunity: Dictionary # Refers to the types, attributes, and effects that this card is immune to (and locations where it's immune to card effects or other events [i.e. Battle Damage]).
 
@@ -72,7 +72,7 @@ func _init(card_data):
 	var defaults = {
 		"0": ["ATK_Bonus", "Health_Bonus", "Tokens", "Burn_Damage"],
 		"1": ["Fusion_Level", "Attacks_Remaining"],
-		"False": ["Is_Set", "Can_Activate_Effect", "Attack_As_Reinforcement", "Immortal", "Invincible", "Rejuvenation", "Relentless", "Multi_Strike", "Paralysis", "Unstoppable", "Direct_Attack", "Can_Attack"],
+		"False": ["Is_Set", "Can_Activate_Effect", "Attack_As_Reinforcement", "Immortal", "Invincible", "Rejuvenation", "Warded", "Relentless", "Multi_Strike", "Paralysis", "Unstoppable", "Can_Attack"],
 	}
 
 	for key in defaults.keys():
@@ -91,7 +91,6 @@ func _init(card_data):
 	Token_Path = preload("res://Scenes/SupportScenes/Token_Card.tscn")
 	Effects_Disabled = []
 	Immunity = {"Type": [], "Attribute": [], "Effect": [], "Location": []}
-	Owner = "Game"
 
 func _ready():
 	Update_Data()
@@ -217,7 +216,7 @@ func set_health_bonus(value: int, context: String = "Initialize"):
 func set_total_health():
 	var Parent_Name: String = get_parent().name
 	var Clean_Parent_Name: String = BF.Get_Clean_Slot_Name(Parent_Name)
-	var Field_Slot_Names: Array = ["Fighter", "R1", "R2", "R3"]
+	var Field_Slot_Names: Array = ["Fighter", "R"]
 	var Field_Bonus: int = 0
 
 	# Calculate Total Health based on card's Health, Health Bonus, Fusion Level, and Field Health Bonus
@@ -381,6 +380,9 @@ func is_immune(action_type: String, trigger_card: Node) -> bool:
 	elif action_type == "Burn Damage":
 		if Rejuvenation:
 			return true
+	elif action_type == "Overflow Damage":
+		if Warded:
+			return true
 	elif action_type == "Capture":
 		if Immortal:
 			return true
@@ -398,6 +400,7 @@ func get_net_damage() -> int:
 
 func Spawn_Action_Buttons():
 	var Side: String = "W" if GameData.Current_Turn == "Player" else "B"
+	var Card_On_Turn_Side = get_parent().name.left(1) == Side
 	var Parent_Name: String = get_parent().name
 	var Reposition_Zones: Array = [Side + "Fighter", Side + "R1", Side + "R2", Side + "R3"]
 	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
@@ -427,6 +430,10 @@ func Spawn_Action_Buttons():
 		buttons_to_spawn = ["Flip"]
 	elif ("Fighter" in Parent_Name and Parent_Name.left(1) != Side) or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name)):
 		buttons_to_spawn = ["Target"]
+
+	# Add Activate Effect Button if card can activate its effect
+	if Can_Activate_Effect and Card_On_Turn_Side:
+		buttons_to_spawn.append("Activate Effect")
 
 	# Spawn buttons
 	if buttons_to_spawn != null:
@@ -498,9 +505,9 @@ func on_FocusSensor_pressed():
 				if "Hand" in Parent_Name:
 					SignalBus.emit_signal("Discard_Card", Parent_Name.left(1), self)
 	
-	# Allows user to re-open card Effect scenes during turn
-	if Parent_Name.left(1) == Side:
-		CardEffects.call(Anchor_Text, self)
+	# # Allows user to re-open card Effect scenes during turn
+	# if Parent_Name.left(1) == Side:
+	# 	CardEffects.call(Anchor_Text, self)
 
 func _on_Action_Button_pressed(Mode):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
@@ -525,3 +532,5 @@ func _on_Action_Button_pressed(Mode):
 	elif Mode == "Target":
 		GameData.Target = self
 		On_Target_Selection()
+	elif Mode == "Activate Effect":
+		SignalBus.emit_signal("Resolve_Card_Effects", self)

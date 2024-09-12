@@ -38,14 +38,16 @@ func Valid_GameState(card) -> bool:
 	return true if (GameData.Current_Phase == card.Resolve_Phase and GameData.Current_Step == card.Resolve_Step) or card.Resolve_Step == "Any" else false
 
 func Valid_Effect_Type(card) -> bool:
-	return true if card.Anchor_Text not in GameData.Disabled_Effects else false
+	var Dueler = BM.Player if card.get_parent().name.left(1) == "W" else BM.Enemy
 
-func Get_Card_Selected(card, card_list, Side, Side_Opp, slot = null, desired_attributes: Array = [], desired_types: Array = [], previous_cards_selected: Array = []) -> Card:
+	return false if card.Anchor_Text in GameData.Disabled_Effects or (card.Type == "Magic" and Dueler.Muggle_Mode) else true
+
+func Get_Card_Selected(card, card_list, Side, Side_Opp, slot = null, desired_attributes: Array = [], desired_types: Array = [], previous_cards_selected: Array = [], repositioned_card = null) -> Card:
 	var Card_Selector = load("res://Scenes/SupportScenes/Card_Selector.tscn").instantiate()
 	var Battle_Scene = root.get_node("SceneHandler/Battle")
 	var Chosen_Card_Node
 	Battle_Scene.add_child(Card_Selector)
-	var Card_Options = Card_Selector.Determine_Card_List(card_list, slot, desired_attributes, desired_types, previous_cards_selected)
+	var Card_Options = Card_Selector.Determine_Card_List(card_list, slot, desired_attributes, desired_types, previous_cards_selected, repositioned_card)
 	Card_Selector.Set_Effect_Card(card)
 
 	# Automatically select card if only 1 option exists
@@ -156,6 +158,16 @@ func Engineer(card):
 func Explorer(card):
 	pass
 
+func Master(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+
+	if Valid_Card:
+		var Side = "W" if GameData.Current_Turn == "Player" else "B"
+		var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
+		var Chosen_Card_Node = await Get_Card_Selected(card, "Reinforcers", Side, Side_Opp)
+
+		Chosen_Card_Node.Attack_As_Reinforcement = true
+
 func Mythological(card):
 	pass
 
@@ -180,6 +192,23 @@ func Philosopher(card):
 
 func Politician(card):
 	pass
+
+func Protector(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+
+	if Valid_Card:
+		var Side = "W" if GameData.Current_Turn == "Player" else "B"
+		var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
+		card.Guardianship = await Get_Card_Selected(card, "Reinforcers", Side, Side_Opp, null, [], [], [], card)
+
+	if GameData.Target == card.Guardianship and GameData.Current_Step == "Damage" and card.Guardianship != null:
+		var damage_dealt = GameData.Attacker.get_net_damage()
+		card.set_health(damage_dealt, "Remove")
+		GameData.Target.set_health(damage_dealt, "Add")
+
+		# # Capture card if it dies
+		# if card.Total_Health <= 0:
+		# 	SignalBus.emit_signal("Capture_Card", card)
 
 func Ranged(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -238,7 +267,7 @@ func Support(card):
 		card.set_health(min(card.Health, Health_Transfer_Value), "Remove")
 		card.set_health_bonus(Health_Bonus_Reduction, "Remove")
 
-		# Capture card if it dies
+		# Move card to MedBay for healing if it dies
 		if card.Total_Health <= 0:
 			var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "MedBay")
 			SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
@@ -344,9 +373,10 @@ func Behind_Enemy_Lines(card):
 		var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 		var Hero_Deck = BF.Get_Field_Card_Data(Side_Opp, "HeroDeck")
 
-		if Hero_Deck != []:
+		if Hero_Deck != [] and card.Can_Activate_Effect:
+			card.Can_Activate_Effect = false
 			var Targeted_Hero = Hero_Deck[BC.Dice_Roll(len(Hero_Deck)) - 1]
-			var damage_dealt = int(floor(BC.Dice_Roll(5) / 10 * Targeted_Hero.Health))
+			var damage_dealt = int(floor(float(BC.Dice_Roll(5)) / 10 * Targeted_Hero.Health))
 			if not Targeted_Hero.is_immune("Card Effect", card):
 				Targeted_Hero.set_health(damage_dealt, "Remove")
 
@@ -498,10 +528,9 @@ func Earthbound(card):
 
 
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var Dueler = BM.Enemy if card.get_parent().name.left(1) == "W" else BM.Player
 	
-	if Valid_Card:
-		var Dueler = BM.Enemy if card.get_parent().name.left(1) == "W" else BM.Player
-		Dueler.Muggle_Mode = true
+	Dueler.Muggle_Mode = true if Valid_Card else false
 
 func Expansion(card):
 	pass
@@ -611,7 +640,7 @@ func Invincibility(card):
 func Juggernaut(card):
 	"""
 	Effect (PROTOTYPE UPDATE):
-		- This card can only be damaged by battle while on the field. This effect cannot be disabled and this card can't suffer from burn damage or inhibiting effects (i.e. paralysis) while on the field. Magic/Trap/Status cards have no effect on it while on the field.
+		- This card can only be damaged by direct battle damage while on the field. This effect cannot be disabled and this card can't suffer from burn damage or inhibiting effects (i.e. paralysis) while on the field. Magic/Trap/Status cards have no effect on it while on the field.
 		- ACE SETUP: Maximized by being the sole hero in the deck, or by having a deck that can consistently keep this card on the field.
 		- COUNTERPLAY: Disorient-style effects that can move this card off the field without needing to defeat it, capturing it before it hits the field through a targeted-damage effect (Atrocity), or using your own beatstick to do enough damage through battle to capture it quickly.
 	"""
@@ -625,10 +654,12 @@ func Juggernaut(card):
 		card.Immunity["Type"].append("Status") # Immune to all Status cards
 		card.Unstoppable = true # Immune to Paralysis
 		card.Rejuvenation = true # Immune to Burn Damage
+		card.Warded = true # Immune to Overflow Damage
 	elif On_Field(card) == false:
 		card.Immunity["Type"].clear() # Remove all immunities when off the field
 		card.Unstoppable = false # Remove Paralysis immunity when off the field
 		card.Rejuvenation = false # Remove Burn Damage immunity when off the field
+		card.Warded = false # Remove Overflow Damage immunity when off the field
 
 func Kinship(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -733,8 +764,8 @@ func Spawn(card):
 		var Fighter_Opp = BF.Get_Field_Card_Data(Side_Opp, "Fighter")[0] if BF.Get_Field_Card_Data(Side_Opp, "Fighter") != [] else null
 		if Fighter_Opp != null and not Fighter_Opp.is_immune("Card Effect", card):
 			Fighter_Opp.set_health(card.Tokens, "Remove")
-			if Fighter_Opp.Total_Health <= 0:
-				SignalBus.emit_signal("Capture_Card", Fighter_Opp)
+			# if Fighter_Opp.Total_Health <= 0:
+			# 	SignalBus.emit_signal("Capture_Card", Fighter_Opp)
 	
 	# Neutralize damage taken using spawned tokens as shields. Barrage attacks will destroy all tokens simultaneously (and damage card).
 	elif On_Field(card) && Valid_Effect_Type(card):
@@ -798,6 +829,37 @@ func Blade_Song(card):
 		if Chosen_Card_Node != null:		
 			SignalBus.emit_signal("Reparent_Nodes", Chosen_Card_Node, Destination_Hand)
 		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Graveyard)
+
+func Crook(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+
+	if Valid_Card and card.Can_Activate_Effect:
+		card.Can_Activate_Effect = false
+		var Side = "W" if GameData.Current_Turn == "Player" else "B"
+		var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
+		var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
+
+		if Fighter != null:
+			for reinforcer in Reinforcers:
+				if reinforcer.Attribute == "Creature":
+					Fighter.set_health(int(ceil(float(reinforcer.Total_Health) / 4)), "Add")
+
+func Cursed_Mirror(card): # NOTE: Should tokens be spawning on start of enemy turn instead of start of next player turn? Trap cards like this feel slow under current implementation.
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
+
+	if Valid_Card and GameData.Attacker != null and card.Tokens > 0:
+		card.set_tokens(0, "Reset")
+		GameData.Target.set_health(GameData.Attacker.get_net_damage(), "Add")
+		if not GameData.Attacker.is_immune("Card Effect", card):
+			GameData.Attacker.set_health(GameData.Attacker.get_net_damage(), "Remove")
+
+			if GameData.Attacker.Total_Health <= 0:
+				SignalBus.emit_signal("Capture_Card", GameData.Attacker, "Inverted")
+		
+		# Reparent Nodes
+		var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "Graveyard")
+		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 
 func Deep_Pit(card):
 	"""
@@ -881,6 +943,12 @@ func Excalibur(card):
 		if GameData.Current_Step == "Start" and Dueler.Name == GameData.Current_Turn:
 			card.Can_Activate_Effect = true
 
+func Grenade(card):
+	# An Equip Magic card that allows the Fighter to deal damage to one of the opponent's Reinforcers when attacking the Opposing Fighter.
+	# When combined with Tidal_Wave, overflow damage will hit the Reinforcer(s) first, and if any remains will then hit the Hero Deck.
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+	get_tree().call_group("Cards", "set_can_deal_overflow_damage", Valid_Card)
+
 func Heart_of_the_Underdog(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
@@ -898,9 +966,10 @@ func Last_Stand(card):
 	var Valid_But_Off_Field = true if Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Parent_Name = card.get_parent().name
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
-	var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
-	var Cards_On_Field = [Fighter] + Reinforcers if Fighter != null else Reinforcers
+	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
+	var Cards_On_Field = BF.Get_Field_Card_Data(Side, "Fighter") + BF.Get_Field_Card_Data(Side, "R")
+	var Cards_On_Field_Opp = BF.Get_Field_Card_Data(Side_Opp, "Fighter") + BF.Get_Field_Card_Data(Side_Opp, "R")
+	var Cards_On_Field_Used = Cards_On_Field if card in GameData.Last_Equip_Card_Replaced else Cards_On_Field_Opp
 
 	# Reset card's Can_Activate_Effect value to allow for resolving the effect from Graveyard (once per turn)
 	if card in GameData.Cards_Captured_This_Turn or card in GameData.Last_Equip_Card_Replaced:
@@ -911,9 +980,9 @@ func Last_Stand(card):
 	if Valid_Card and card.Can_Activate_Effect:
 		for current_card in Cards_On_Field:
 			current_card.set_attack_bonus(5, "Add")
-	elif Valid_But_Off_Field and "Graveyard" in Parent_Name and card.Can_Activate_Effect:
+	elif Valid_But_Off_Field and "Graveyard" in Parent_Name and card.Can_Activate_Effect and GameData.Current_Phase == "End Phase" and GameData.Current_Step == "Effect":
 		card.Can_Activate_Effect = false
-		for current_card in Cards_On_Field:
+		for current_card in Cards_On_Field_Used:
 			current_card.set_attack_bonus(8, "Remove")
 
 func Miraculous_Recovery(card):
@@ -974,6 +1043,25 @@ func Morale_Boost(card):
 			var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side + "Graveyard")
 			SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 
+func Pans_Pipes(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+
+	if Valid_Card and card.Can_Activate_Effect:
+		card.Can_Activate_Effect = false
+		var Side = "W" if GameData.Current_Turn == "Player" else "B"
+		var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
+		var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
+
+		if Fighter != null:
+			var highest_fusion_level = 1
+			for reinforcer in Reinforcers:
+				if reinforcer.Fusion_Level > highest_fusion_level:
+					highest_fusion_level = reinforcer.Fusion_Level
+
+			# Multiply Fighter's Attack and Health by highest Fusion Level
+			Fighter.set_attack(Fighter.Attack * highest_fusion_level, "Set")
+			Fighter.set_health(Fighter.Health * highest_fusion_level, "Set")
+
 func Prayer(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 
@@ -1033,6 +1121,27 @@ func Runetouched(card):
 		Dueler.set_cost_discount_magic(1, "Remove")
 		SignalBus.emit_signal("Update_HUD_Duelist", Node_To_Update, Dueler)
 
+func Stampede(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+
+	if Valid_Card:
+		var Side = "W" if GameData.Current_Turn == "Player" else "B"
+		var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
+
+		for reinforcer in Reinforcers:
+			if reinforcer.Attribute == "Creature":
+				reinforcer.Attack_As_Reinforcement = true
+
+func Summon_Monster(card):
+	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
+
+	if Valid_Card:
+		var Side = "W" if GameData.Current_Turn == "Player" else "B"
+		var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
+		var Chosen_Card_Node = await Get_Card_Selected(card, "Reinforcers", Side, Side_Opp, null, ["Creature"])
+
+		Chosen_Card_Node.set_fusion_level(1, "Add")
+
 func Sword(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
@@ -1041,32 +1150,35 @@ func Sword(card):
 	if Valid_Card and Fighter != null and card.Can_Activate_Effect:
 		Fighter.set_attack_bonus(3, "Add")
 
-func Cursed_Mirror(card): # NOTE: Should tokens be spawning on start of enemy turn instead of start of next player turn? Trap cards like this feel slow under current implementation.
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
+func Whip(card):
+	var Valid_Card = true if On_Field(card) and Resolvable_Card(card) and Valid_GameState(card) and Valid_Effect_Type(card) else false
 
-	if Valid_Card and GameData.Attacker != null and card.Tokens > 0:
-		card.set_tokens(0, "Reset")
-		GameData.Target.set_health(GameData.Attacker.get_net_damage(), "Add")
-		if not GameData.Attacker.is_immune("Card Effect", card):
-			GameData.Attacker.set_health(GameData.Attacker.get_net_damage(), "Remove")
+	if Valid_Card and card.Can_Activate_Effect:
+		card.Can_Activate_Effect = false
+		var Side = "W" if GameData.Current_Turn == "Player" else "B"
+		var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
+		var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")[0] if BF.Get_Field_Card_Data(Side, "Fighter") != [] else null
+		var Fighter_Opp = BF.Get_Field_Card_Data(Side_Opp, "Fighter")[0] if BF.Get_Field_Card_Data(Side_Opp, "Fighter") != [] else null
+		var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
 
-			if GameData.Attacker.Total_Health <= 0:
-				SignalBus.emit_signal("Capture_Card", GameData.Attacker, "Inverted")
-		
-		# Reparent Nodes
-		var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + Side_Opp + "Graveyard")
-		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
+		if Fighter != null and Fighter_Opp != null:
+			var Reinforcer_Power = 0
+			for reinforcer in Reinforcers:
+				if reinforcer.Attribute == "Creature":
+					Reinforcer_Power += reinforcer.Total_Attack
 
-func Grenade(card):
-	# An Equip Magic card that allows the Fighter to deal damage to one of the opponent's Reinforcers when attacking the Opposing Fighter.
-	# When combined with Tidal_Wave, overflow damage will hit the Reinforcer(s) first, and if any remains will then hit the Hero Deck.
-	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
-	get_tree().call_group("Cards", "set_can_deal_overflow_damage", Valid_Card)
+			# Inflict damage to Fighter_Opp equal to half the combined attack power of all Reinforcers
+			Fighter_Opp.set_health(int(ceil(float(Reinforcer_Power) / 2)), "Remove")
 
 
 
 """--------------------------------- Tech Effects ---------------------------------"""
+func Concrete(card):
+	if card.Can_Activate_Effect:
+		card.Can_Activate_Effect = false
+		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
+		Dueler.set_hand_size_limit(1, "Add")
+
 func Fire(card):
 	if card.Can_Activate_Effect:
 		card.Can_Activate_Effect = false
@@ -1074,34 +1186,9 @@ func Fire(card):
 		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
 		var Node_To_Update = root.get_node("SceneHandler/Battle/UI/Duelists/HUD_" + Side)
 		
-		Dueler.set_field_health_bonus(5, "Add")
+		Dueler.set_field_health_bonus(10, "Add")
 		SignalBus.emit_signal("Update_HUD_Duelist", Node_To_Update, Dueler)
-		get_tree().call_group("Cards", "set_total_health")
-
-func The_Wheel(card):
-	if card.Can_Activate_Effect:
-		card.Can_Activate_Effect = false
-		var Side = "W" if GameData.Current_Turn == "Player" else "B"
-		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
-		var Node_To_Update = root.get_node("SceneHandler/Battle/UI/Duelists/HUD_" + Side)
-		
-		Dueler.set_cost_discount_normal(1, "Remove")
-		Dueler.set_cost_discount_hero(1, "Remove")
-		Dueler.set_cost_discount_magic(1, "Remove")
-		Dueler.set_cost_discount_trap(1, "Remove")
-		SignalBus.emit_signal("Update_HUD_Duelist", Node_To_Update, Dueler)
-
-func Shield_Wall(card):
-	if card.Can_Activate_Effect:
-		card.Can_Activate_Effect = false
-		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
-		Dueler.Shield_Wall_Active = true
-
-func Concrete(card):
-	if card.Can_Activate_Effect:
-		card.Can_Activate_Effect = false
-		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
-		Dueler.set_hand_size_limit(1, "Add")
+	get_tree().call_group("Cards", "set_total_health")
 
 func Medicine(card):
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
@@ -1119,6 +1206,25 @@ func Medicine(card):
 		SignalBus.emit_signal("Update_HUD_Duelist", Node_To_Update, Dueler)
 		await get_tree().create_timer(0.05).timeout # Creating a timer ensures that the HUD variable is updated before the signal is emitted
 		get_tree().call_group("Cards", "set_total_health")
+
+func Shield_Wall(card):
+	if card.Can_Activate_Effect:
+		card.Can_Activate_Effect = false
+		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
+		Dueler.Shield_Wall_Active = true
+
+func The_Wheel(card):
+	if card.Can_Activate_Effect:
+		card.Can_Activate_Effect = false
+		var Side = "W" if GameData.Current_Turn == "Player" else "B"
+		var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
+		var Node_To_Update = root.get_node("SceneHandler/Battle/UI/Duelists/HUD_" + Side)
+		
+		Dueler.set_cost_discount_normal(1, "Remove")
+		Dueler.set_cost_discount_hero(1, "Remove")
+		Dueler.set_cost_discount_magic(1, "Remove")
+		Dueler.set_cost_discount_trap(1, "Remove")
+		SignalBus.emit_signal("Update_HUD_Duelist", Node_To_Update, Dueler)
 
 func Tidal_Wave(card):
 	# An effect that allows for all overflow damage to be dealt to the opponent's Reinforcers and (if applicable) cards in Hero Deck.

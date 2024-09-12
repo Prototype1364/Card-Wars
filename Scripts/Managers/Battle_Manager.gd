@@ -29,15 +29,16 @@ func _ready():
 	var _HV8 = SignalBus.connect("Update_HUD_Duelist", Callable(self, "Update_HUD_Duelist"))
 	var _HV9 = SignalBus.connect("Summon_Affordable", Callable(self, "Summon_Affordable"))
 	var _HV10 = SignalBus.connect("Reload_Deck", Callable(self, "Reload_Deck"))
-	var _HV11 = SignalBus.connect("Resolve_Card_Effects", Callable(self, "Resolve_Card_Effects"))
-	var _HV12 = SignalBus.connect("Reposition_Field_Cards", Callable(self, "Reposition_Field_Cards"))
-	var _HV13 = SignalBus.connect("Play_Card", Callable(self, "Play_Card"))
-	var _HV14 = SignalBus.connect("Draw_Card", Callable(self, "Draw_Card"))
-	var _HV15 = SignalBus.connect("Reparent_Nodes", Callable(self, "Reparent_Nodes"))
-	var _HV16 = SignalBus.connect("Shuffle_Deck", Callable(self, "Shuffle_Deck"))
-	var _HV17 = SignalBus.connect("Sacrifice_Card", Callable(self, "Sacrifice_Card"))
-	var _HV18 = SignalBus.connect("Hero_Deck_Selected", Callable(self, "Hero_Deck_Selected"))
-	var _HV19 = SignalBus.connect("Cancel", Callable(self, "_on_Cancel_pressed"))
+	var _HV11 = SignalBus.connect("Check_For_Resolvable_Effects", Callable(self, "Check_For_Resolvable_Effects"))
+	var _HV12 = SignalBus.connect("Resolve_Card_Effects", Callable(self, "Resolve_Card_Effects"))
+	var _HV13 = SignalBus.connect("Reposition_Field_Cards", Callable(self, "Reposition_Field_Cards"))
+	var _HV14 = SignalBus.connect("Play_Card", Callable(self, "Play_Card"))
+	var _HV15 = SignalBus.connect("Draw_Card", Callable(self, "Draw_Card"))
+	var _HV16 = SignalBus.connect("Reparent_Nodes", Callable(self, "Reparent_Nodes"))
+	var _HV17 = SignalBus.connect("Shuffle_Deck", Callable(self, "Shuffle_Deck"))
+	var _HV18 = SignalBus.connect("Sacrifice_Card", Callable(self, "Sacrifice_Card"))
+	var _HV19 = SignalBus.connect("Hero_Deck_Selected", Callable(self, "Hero_Deck_Selected"))
+	var _HV20 = SignalBus.connect("Cancel", Callable(self, "_on_Cancel_pressed"))
 	SignalBus.emit_signal("READY") # Temporary signal to ensure Card_Effects script functions as expected. See note in Card_Effects.gd for more info.
 	
 	Setup_Game()
@@ -65,7 +66,8 @@ func Update_Game_Step():
 	
 	# Call required funcs at appropriate Steps (and contain step values within bounds of current Phase)
 	if GameData.Current_Step in EFFECT_STEPS: # Ensures that Card Effects are resolved when appropriate (moved to first if statement to ensure effects are resolved before step is handled [important for Damage step-related card efffects])
-		BC.Resolve_Card_Effects()
+		#Resolve_Card_Effects()
+		Check_For_Resolvable_Effects()
 	if STEPS.find(GameData.Current_Step) == 9: # Current Step is Damage Step
 		BC.Resolve_Damage("Battle")
 	if STEPS.find(GameData.Current_Step) == 12 and get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > player.Hand_Size_Limit and GameData.Victor == null: # Ensures cards are discarded when appropriate
@@ -79,6 +81,7 @@ func Update_Game_Step():
 	elif STEPS.find(GameData.Current_Step) == 4 and GameData.Current_Phase == "End Phase": # Fixes bug where Step state would reset to Standby Phases' Effect Step (instead of End Phases' Effect Step)
 		GameData.Current_Step = STEPS[15]
 	elif STEPS.find(GameData.Current_Step) == 10 and player.Valid_Attackers == 0: # Skips Repeat Step if no valid attackers remain
+		Check_For_Captures()
 		GameData.Current_Phase = PHASES[4]
 		GameData.Current_Step = STEPS[12]
 	else:
@@ -141,12 +144,14 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main", Draw_At_Index
 	
 	for _i in range(Cards_To_Draw):
 		var Card_Info = BC.Draw_Card(player, Deck_Type + "Deck", Draw_At_Index)
-		BF.Reparent_Nodes(Card_Info['Card_Drawn'], Card_Info['Destination_Node'])
-		Card_Info['Card_Drawn'].Update_Data()
+		
+		if Card_Info != null:
+			BF.Reparent_Nodes(Card_Info['Card_Drawn'], Card_Info['Destination_Node'])
+			Card_Info['Card_Drawn'].Update_Data()
 
-		# Activate Card Effect when Drawing a Tech Card or Activate Tech Card
-		if Card_Info['Card_Drawn'].Type == "Special" or Card_Info['Card_Drawn'].Type == "Tech":
-			BC.Activate_Summon_Effects(Card_Info['Card_Drawn'])
+			# Activate Card Effect when Drawing a Tech Card or Activate Tech Card
+			if Card_Info['Card_Drawn'].Type == "Special" or Card_Info['Card_Drawn'].Type == "Tech":
+				BC.Activate_Summon_Effects(Card_Info['Card_Drawn'])
 
 func Get_Duelist_Cost_Discount(Card_Side, Type):
 	var Duelist = Player if Card_Side == "W" else Enemy
@@ -171,8 +176,11 @@ func Reparent_Nodes(Source_Node, Destination_Node):
 func Reposition_Field_Cards(Side):
 	BF.Reposition_Field_Cards(Side)
 
-func Resolve_Card_Effects():
-	BC.Resolve_Card_Effects()
+func Resolve_Card_Effects(card):
+	BC.Resolve_Card_Effects(card)
+
+func Check_For_Resolvable_Effects(Chosen_Card = null):
+	BC.Check_For_Resolvable_Effects(Chosen_Card)
 
 func Sacrifice_Card(Card_Sacrificed):
 	BC.Sacrifice_Card(Card_Sacrificed)
@@ -180,13 +188,16 @@ func Sacrifice_Card(Card_Sacrificed):
 func Hero_Deck_Selected():
 	BC._on_Deck_Slot_pressed()
 
+func Check_For_Captures():
+	BC.Check_For_Captures()
+
 
 
 """--------------------------------- Setup Game Functions ---------------------------------"""
 func Setup_Game():
 	# Populate Duelist Data
-	Player.set_duelist_data("Player", 0)
-	Enemy.set_duelist_data("Enemy", 0)
+	Player.set_duelist_data("Player", 5)
+	Enemy.set_duelist_data("Enemy", 5)
 
 	# Populates & Shuffles Player/Enemy Decks
 	DC.Create_Deck("Arthurian", "Player")
