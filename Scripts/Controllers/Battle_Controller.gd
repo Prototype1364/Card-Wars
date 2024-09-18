@@ -24,13 +24,18 @@ func Check_For_Resolvable_Effects(card_to_check: Node = null):
 	else:
 		Card_Is_Valid = true if CardEffects.On_Field(card_to_check) && CardEffects.Resolvable_Card(card_to_check) && CardEffects.Valid_GameState(card_to_check) && CardEffects.Valid_Effect_Type(card_to_check) else false
 		if Card_Is_Valid:
+			print(card_to_check.Name + " is valid")
 			Animate_Card_Effect_Availability(card_to_check)
+		else:
+			print(card_to_check.Name + " is NOT valid")
 
 func Animate_Card_Effect_Availability(card: Node):
-	card.set_can_activate_effect()
+	card.set_can_activate_effect(true)
+	print(card.Name + " is activated")
 
 func Remove_Card_Effect_Availability(card: Node):
-	card.set_can_activate_effect()
+	card.set_can_activate_effect(false)
+	print(card.Name + " is DEactivated")
 
 
 
@@ -111,19 +116,20 @@ func Add_Tokens():
 
 func Activate_Summon_Effects(Chosen_Card):
 	# Define conditions for activating summon effects
-	var Dueler = BM.Player if Chosen_Card.get_parent().name.left(1) == "W" else BM.Enemy
-	var is_valid_type = Chosen_Card.Type in ["Normal", "Hero", "Tech", "Special"]
-	var is_magic_not_set_or_disabled = Chosen_Card.Type == "Magic" and not Chosen_Card.Is_Set and not Dueler.Muggle_Mode
-	var is_equipped_trap = Chosen_Card.Type == "Trap" and not Chosen_Card.Is_Set and Chosen_Card.Attribute == "Equip"
-	var is_valid_summon_effect = is_valid_type or is_magic_not_set_or_disabled or is_equipped_trap
-
-	# Check if any condition for activating effects is met
-	if is_valid_summon_effect:
-		Check_For_Resolvable_Effects(Chosen_Card)
+	#var Dueler = BM.Player if Chosen_Card.get_parent().name.left(1) == "W" else BM.Enemy
+	#var is_valid_type = Chosen_Card.Type in ["Normal", "Hero", "Tech", "Special"]
+	#var is_magic_not_set_or_disabled = Chosen_Card.Type == "Magic" and not Chosen_Card.Is_Set and not Dueler.Muggle_Mode
+	#var is_equipped_trap = Chosen_Card.Type == "Trap" and not Chosen_Card.Is_Set and Chosen_Card.Attribute == "Equip"
+	#var is_valid_summon_effect = is_valid_type or is_magic_not_set_or_disabled or is_equipped_trap
+#
+	## Check if any condition for activating effects is met
+	#if is_valid_summon_effect:
+		#Check_For_Resolvable_Effects(Chosen_Card)
 		#Chosen_Card.Can_Activate_Effect = true
 		#Resolve_Card_Effects(Chosen_Card, false)
 		#CardEffects.call(Chosen_Card.Anchor_Text, Chosen_Card)
 		#Chosen_Card.Can_Activate_Effect = false # Reset to ensure card doesn't activate from Graveyard
+	pass
 
 func Set_Attacks_To_Launch():
 	var player = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
@@ -177,7 +183,7 @@ func Set_Field_Card_Effect_Status():
 
 	if Cards_On_Field != []:
 		for card in Cards_On_Field:
-			card.Can_Activate_Effect = true
+			Check_For_Resolvable_Effects(card)
 
 func Resolve_Burn_Damage():
 	var Side = "W" if GameData.Current_Turn == "Player" else "B"
@@ -236,9 +242,9 @@ func Activate_Set_Card(Chosen_Card):
 	var Dueler = BM.Player if Chosen_Card.get_parent().name.left(1) == "W" else BM.Enemy
 
 	if (Chosen_Card.Type == "Magic" and Dueler.Muggle_Mode == false) or ((Chosen_Card.Type == "Trap" and Chosen_Card.Tokens > 0)):
-		Chosen_Card.Can_Activate_Effect = true
+		Chosen_Card.set_can_activate_effect(true)
 		CardEffects.call(Chosen_Card.Anchor_Text, Chosen_Card)
-		Chosen_Card.Can_Activate_Effect = false # Reset to ensure card doesn't activate from Graveyard
+		Chosen_Card.set_can_activate_effect(false) # Reset to ensure card doesn't activate from Graveyard
 
 func Resolve_Damage(damage_type: String):
 	# Resolve Damage based on damage type
@@ -303,7 +309,7 @@ func Recruit_Hero(): # FIXME: Heroes are not recruited immediately after the pre
 	
 		# Ensures that Summon type effect heroes can activate their effects (Periodic effects are activated in Set_Field_Card_Effect_Status() func)
 		if Drawn_Card['Card_Drawn'].Effect_Type in ["Summon"]:
-			Drawn_Card['Card_Drawn'].Can_Activate_Effect = true
+			Check_For_Resolvable_Effects(Drawn_Card['Card_Drawn'])
 	elif Fighter == [] and HeroDeck == []:
 		var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
 		var Replacement_Fighter_Found = false
@@ -311,6 +317,7 @@ func Recruit_Hero(): # FIXME: Heroes are not recruited immediately after the pre
 			if card.Type == "Hero":
 				Replacement_Fighter_Found = true
 				SignalBus.emit_signal("Reparent_Nodes", card, get_node("CardSpots/NonHands/" + Side + "Fighter"))
+				Check_For_Resolvable_Effects(card)
 				break
 		if not Replacement_Fighter_Found:
 			GameData.Victor = BM.Enemy.Name if GameData.Current_Turn == "Player" else BM.Player.Name
@@ -426,6 +433,7 @@ func _on_Deck_Slot_pressed():
 				var Destination_Node = get_tree().get_root().get_node(Slot_Used)
 				SignalBus.emit_signal("Reparent_Nodes", Hero_Card_Summoned, Destination_Node)
 				Hero_Card_Summoned.Update_Data()
+				Check_For_Resolvable_Effects(Hero_Card_Summoned)
 				GameData.Cards_Summoned_This_Turn.append(Hero_Card_Summoned)
 				var starting_summon_power = int(summon_power_label.text)
 				starting_summon_power -= Hero_Card_Summoned.Cost

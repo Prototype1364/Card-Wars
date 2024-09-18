@@ -282,13 +282,13 @@ func set_tokens(value: int, context: String = "Initialize"):
 func set_is_set(context: String = "Initialize"):
 	Is_Set = true if context == "Set" else false
 
-func set_can_activate_effect():
+func set_can_activate_effect(value: bool):
 	var Parent_Name: String = get_parent().name
 	var Side: String = "W" if GameData.Current_Turn == "Player" else "B"
 	var Resolvable_Side: bool = true if Resolve_Side == "Both" or Side == Parent_Name.left(1) else false
 
 	# Ensures that only cards on the field (on correct side), that aren't set, and haven't already activated their summon effect can activate their effects.
-	if BF.Get_Clean_Slot_Name(Parent_Name) in ["Fighter", "R", "Backrow"] and not Is_Set and Resolvable_Side and Effect_Type != "Summon":
+	if BF.Get_Clean_Slot_Name(Parent_Name) in ["Fighter", "R", "Backrow"] and not Is_Set and Resolvable_Side and Effect_Type != "Summon" and value == true:
 		Can_Activate_Effect = true
 	else:
 		Can_Activate_Effect = false
@@ -420,7 +420,7 @@ func Update_Icons():
 	for icon in CARD_ICONS:
 		match icon:
 			"Attacks Remaining":
-				Icon_Parent.get_node(icon).visible = true if Attacks_Remaining > 0 else false
+				Icon_Parent.get_node(icon).visible = true if Attacks_Remaining > 0 and Can_Attack else false
 				Icon_Parent.get_node(icon).get_node(icon).text = str(Attacks_Remaining)
 			"Burn Damage":
 				Icon_Parent.get_node(icon).visible = true if Burn_Damage > 0 else false
@@ -482,7 +482,7 @@ func Reset_Stats_On_Capture():
 
 func Reset_Variables_After_Flip_Summon():
 	set_is_set()
-	set_can_activate_effect() # Ensures effects aren't triggered from the Graveyard
+	set_can_activate_effect(false) # Ensures effects aren't triggered from the Graveyard
 	set_tokens(0, "Reset")
 
 func hide_action_buttons():
