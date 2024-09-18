@@ -406,58 +406,66 @@ func Update_Data():
 
 func Update_Icons(icon_type: String):
 	var Icon_Parent = $SmallCard/Icon_Container/VBoxContainer
+	var Clean_Parent_Name = BF.Get_Clean_Slot_Name(get_parent().name)
+	var Field_Card_Zones = ["Fighter", "R", "Backrow", "EquipMagic", "EquipTrap"]
 
-	match icon_type:
-		"Attacks Remaining":
-			Icon_Parent.get_node(icon_type).visible = true if Attacks_Remaining > 0 else false
-			Icon_Parent.get_node(icon_type).get_node(icon_type).text = str(Attacks_Remaining)
-		"Burn Damage":
-			Icon_Parent.get_node(icon_type).visible = true if Burn_Damage > 0 else false
-			Icon_Parent.get_node(icon_type).get_node(icon_type).text = str(Burn_Damage)
-		"Overflow":
-			Icon_Parent.get_node(icon_type).visible = Can_Deal_Overflow_Damage
-		"Perfected Overflow":
-			Icon_Parent.get_node(icon_type).visible = Perfected_Overflow
-		"Can Activate Effect":
-			get_node("SmallCard/Can Activate Effect").visible = Can_Activate_Effect
-		"Fusion Level":
-			Icon_Parent.get_node(icon_type).visible = Fusion_Level > 1
-			Icon_Parent.get_node(icon_type).get_node(icon_type).text = str(Fusion_Level)
-		"Effects Disabled":
-			Icon_Parent.get_node(icon_type).visible = true if Anchor_Text in GameData.Disabled_Effects else false
-		"Paralysis":
-			Icon_Parent.get_node(icon_type).visible = Paralysis
-		"Guardianship":
-			Icon_Parent.get_node(icon_type).visible = true if Guardianship != null else false
-			Icon_Parent.get_node(icon_type).tooltip_text = "Guardianship: " + Guardianship.Name
-		"Immortal":
-			Icon_Parent.get_node(icon_type).visible = Immortal
-		"Invincible":
-			Icon_Parent.get_node(icon_type).visible = Invincible
-		"Rejuvenation":
-			Icon_Parent.get_node(icon_type).visible = Rejuvenation
-		"Warded":
-			Icon_Parent.get_node(icon_type).visible = Warded
-		"Relentless":
-			Icon_Parent.get_node(icon_type).visible = Relentless
-		"Multi Strike":
-			Icon_Parent.get_node(icon_type).visible = Multi_Strike
-		"Unstoppable":
-			Icon_Parent.get_node(icon_type).visible = Unstoppable
-		"Toxicity":
-			Icon_Parent.get_node(icon_type).visible = true if Toxicity > 0 else false
-			Icon_Parent.get_node(icon_type).get_node(icon_type).text = str(Toxicity)
-		"Immunity":
-			Icon_Parent.get_node("Immunity_Card_Type").visible = true if Immunity["Type"] != [] else false
-			Icon_Parent.get_node("Immunity_Card_Type").tooltip_text = "Immune to: " + str(Immunity["Type"])
-			Icon_Parent.get_node("Immunity_Card_Attribute").visible = true if Immunity["Attribute"] != [] else false
-			Icon_Parent.get_node("Immunity_Card_Attribute").tooltip_text = "Immune to: " + str(Immunity["Attribute"])
-			Icon_Parent.get_node("Immunity_Card_Effect").visible = true if Immunity["Effect"] != [] else false
-			Icon_Parent.get_node("Immunity_Card_Effect").tooltip_text = "Immune to: " + str(Immunity["Effect"])
-			Icon_Parent.get_node("Immunity_Card_Location").visible = true if Immunity["Location"] != [] else false
-			Icon_Parent.get_node("Immunity_Card_Location").tooltip_text = "Immune within: " + str(Immunity["Location"])
-			Icon_Parent.get_node("Immunity_Battle_Damage").visible = true if Invincible or (BF.Get_Clean_Slot_Name(get_parent().name) == "R" and "Multi_Strike" in Immunity["Effect"]) else false
-			Icon_Parent.get_node("Immunity_Burn_Damage").visible = true if Rejuvenation else false
+	if Clean_Parent_Name in Field_Card_Zones:
+		match icon_type:
+			"Attacks Remaining":
+				Icon_Parent.get_node(icon_type).visible = true if Attacks_Remaining > 0 else false
+				Icon_Parent.get_node(icon_type).get_node(icon_type).text = str(Attacks_Remaining)
+			"Burn Damage":
+				Icon_Parent.get_node(icon_type).visible = true if Burn_Damage > 0 else false
+				Icon_Parent.get_node(icon_type).get_node(icon_type).text = str(Burn_Damage)
+			"Overflow":
+				Icon_Parent.get_node(icon_type).visible = Can_Deal_Overflow_Damage
+			"Perfected Overflow":
+				Icon_Parent.get_node(icon_type).visible = Perfected_Overflow
+			"Can Activate Effect":
+				get_node("SmallCard/Can Activate Effect").visible = Can_Activate_Effect
+			"Fusion Level":
+				Icon_Parent.get_node(icon_type).visible = Fusion_Level > 1
+				Icon_Parent.get_node(icon_type).get_node(icon_type).text = str(Fusion_Level)
+			"Effects Disabled":
+				Icon_Parent.get_node(icon_type).visible = true if Anchor_Text in GameData.Disabled_Effects else false
+			"Paralysis":
+				Icon_Parent.get_node(icon_type).visible = Paralysis
+			"Guardianship":
+				Icon_Parent.get_node(icon_type).visible = true if Guardianship != null else false
+				Icon_Parent.get_node(icon_type).tooltip_text = "Guardianship: " + Guardianship.Name
+			"Immortal":
+				Icon_Parent.get_node(icon_type).visible = Immortal
+			"Invincible":
+				Icon_Parent.get_node(icon_type).visible = Invincible
+			"Rejuvenation":
+				Icon_Parent.get_node(icon_type).visible = Rejuvenation
+			"Warded":
+				Icon_Parent.get_node(icon_type).visible = Warded
+			"Relentless":
+				Icon_Parent.get_node(icon_type).visible = Relentless
+			"Multi Strike":
+				Icon_Parent.get_node(icon_type).visible = Multi_Strike
+			"Unstoppable":
+				Icon_Parent.get_node(icon_type).visible = Unstoppable
+			"Toxicity":
+				Icon_Parent.get_node(icon_type).visible = true if Toxicity > 0 else false
+				Icon_Parent.get_node(icon_type).get_node(icon_type).text = str(Toxicity)
+			"Immunity":
+				Icon_Parent.get_node("Immunity_Card_Type").visible = true if Immunity["Type"] != [] else false
+				Icon_Parent.get_node("Immunity_Card_Type").tooltip_text = "Immune to: " + str(Immunity["Type"])
+				Icon_Parent.get_node("Immunity_Card_Attribute").visible = true if Immunity["Attribute"] != [] else false
+				Icon_Parent.get_node("Immunity_Card_Attribute").tooltip_text = "Immune to: " + str(Immunity["Attribute"])
+				Icon_Parent.get_node("Immunity_Card_Effect").visible = true if Immunity["Effect"] != [] else false
+				Icon_Parent.get_node("Immunity_Card_Effect").tooltip_text = "Immune to: " + str(Immunity["Effect"])
+				Icon_Parent.get_node("Immunity_Card_Location").visible = true if Immunity["Location"] != [] else false
+				Icon_Parent.get_node("Immunity_Card_Location").tooltip_text = "Immune within: " + str(Immunity["Location"])
+				Icon_Parent.get_node("Immunity_Battle_Damage").visible = true if Invincible or (BF.Get_Clean_Slot_Name(get_parent().name) == "R" and "Multi_Strike" in Immunity["Effect"]) else false
+				Icon_Parent.get_node("Immunity_Burn_Damage").visible = true if Rejuvenation else false
+	else:
+		# Hide all icons if not on the field
+		for icon in Icon_Parent.get_children():
+			icon.visible = false
+		get_node("SmallCard/Can Activate Effect").visible = false
 
 func Reset_Stats_On_Capture():
 	set_attack(0, "Capture")
