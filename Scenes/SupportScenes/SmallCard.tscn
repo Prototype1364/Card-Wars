@@ -1,6 +1,111 @@
-[gd_scene load_steps=3 format=3 uid="uid://drsw0l0otqsm0"]
+[gd_scene load_steps=44 format=3 uid="uid://drsw0l0otqsm0"]
 
 [ext_resource type="FontFile" uid="uid://co858100nof5b" path="res://Resources/Fonts/MTCORSVA.TTF" id="1"]
+[ext_resource type="Texture2D" uid="uid://dhxdvh77uypac" path="res://Assets/Cards/Icons/Card_Effect_Active/0.png" id="2_ga8mt"]
+[ext_resource type="Texture2D" uid="uid://c8atwpdn5pkef" path="res://Assets/Cards/Icons/Card_Effect_Active/1.png" id="3_71x65"]
+[ext_resource type="Texture2D" uid="uid://bhva841f0l87h" path="res://Assets/Cards/Icons/Card_Effect_Active/2.png" id="4_ysl5l"]
+[ext_resource type="Texture2D" uid="uid://csjtr50xiycch" path="res://Assets/Cards/Icons/Card_Effect_Active/3.png" id="5_i56x2"]
+[ext_resource type="Texture2D" uid="uid://csli6yrnciav8" path="res://Assets/Cards/Icons/Card_Effect_Active/4.png" id="6_dm12l"]
+[ext_resource type="Texture2D" uid="uid://dxn1f53mtv4cb" path="res://Assets/Cards/Icons/Card_Effect_Active/5.png" id="7_b2drj"]
+[ext_resource type="Texture2D" uid="uid://c3ws06anxx542" path="res://Assets/Cards/Icons/Card_Effect_Active/6.png" id="8_mt4u6"]
+[ext_resource type="Texture2D" uid="uid://cmbg7hyb183ex" path="res://Assets/Cards/Icons/Card_Effect_Active/7.png" id="9_lmc7e"]
+[ext_resource type="Texture2D" uid="uid://dvi5d2u4bjoa6" path="res://Assets/Cards/Icons/Card_Effect_Active/8.png" id="10_g1bw8"]
+[ext_resource type="Texture2D" uid="uid://dpofgkxo46nn0" path="res://Assets/Cards/Icons/Card_Effect_Active/9.png" id="11_kmup5"]
+[ext_resource type="Texture2D" uid="uid://bvvc3dh3m1hrq" path="res://Assets/Cards/Icons/Card_Effect_Active/10.png" id="12_7o7yj"]
+[ext_resource type="Texture2D" uid="uid://blj7hdpulkq36" path="res://Assets/Cards/Icons/Card_Effect_Active/11.png" id="13_1pooc"]
+[ext_resource type="Texture2D" uid="uid://babu0kgaowudt" path="res://Assets/Cards/Icons/Card_Effect_Active/12.png" id="14_07cnj"]
+[ext_resource type="Texture2D" uid="uid://63fjri4tmhpv" path="res://Assets/Cards/Icons/Card_Effect_Active/13.png" id="15_bf3n3"]
+[ext_resource type="Texture2D" uid="uid://dfwbighip7jsy" path="res://Assets/Cards/Icons/Card_Effect_Active/14.png" id="16_y4c7m"]
+[ext_resource type="Texture2D" uid="uid://bxuim1bog6iok" path="res://Assets/Cards/Icons/Card_Effect_Active/15.png" id="17_t85gl"]
+[ext_resource type="Texture2D" uid="uid://dgvmydi30r2i5" path="res://Assets/Cards/Icons/Card_Effect_Active/16.png" id="18_14kp6"]
+[ext_resource type="Texture2D" uid="uid://desr6v8jlua1j" path="res://Assets/Cards/Icons/Card_Effect_Active/17.png" id="19_qx8jq"]
+[ext_resource type="Texture2D" uid="uid://k118us1u2pnt" path="res://Assets/Cards/Icons/Card_Effect_Active/18.png" id="20_rmu7x"]
+[ext_resource type="Texture2D" uid="uid://7rspvah0rf01" path="res://Assets/Cards/Icons/Icon_Attacks_Remaining.png" id="21_gmrid"]
+[ext_resource type="Texture2D" uid="uid://cih7x7pp2utx" path="res://Assets/Cards/Icons/Icon_Burn_Damage.png" id="22_w3qwx"]
+[ext_resource type="Texture2D" uid="uid://c3ny4xkmy5g1g" path="res://Assets/Cards/Icons/Icon_Fusion_Level.png" id="23_0fsyv"]
+[ext_resource type="Texture2D" uid="uid://iqc5i7pr8vny" path="res://Assets/Cards/Icons/Icon_Overflow.png" id="23_1fihh"]
+[ext_resource type="Texture2D" uid="uid://ccvmuosmkrjxu" path="res://Assets/Cards/Icons/Icon_Perfected_Overflow.png" id="24_rincy"]
+[ext_resource type="Texture2D" uid="uid://ddj628lgxk62y" path="res://Assets/Cards/Icons/Icon_Effect_Disabled.png" id="26_q51j7"]
+[ext_resource type="Texture2D" uid="uid://bocr870d5qwjv" path="res://Assets/Cards/Icons/Icon_Paralyzed.png" id="27_qktlc"]
+[ext_resource type="Texture2D" uid="uid://cdqqrk02ibf4h" path="res://Assets/Cards/Icons/Icon_Guardianship.png" id="28_xiq8v"]
+[ext_resource type="Texture2D" uid="uid://digy67effs8e2" path="res://Assets/Cards/Icons/Icon_Immortal.png" id="29_yh17d"]
+[ext_resource type="Texture2D" uid="uid://cpwdlqwwgvqcq" path="res://Assets/Cards/Icons/Icon_Invincible.png" id="30_u1vo3"]
+[ext_resource type="Texture2D" uid="uid://cw431jk74ocnw" path="res://Assets/Cards/Icons/Icon_Rejuvenation.png" id="31_dfycg"]
+[ext_resource type="Texture2D" uid="uid://cahhipjc68mb7" path="res://Assets/Cards/Icons/Icon_Relentless.png" id="32_fyset"]
+[ext_resource type="Texture2D" uid="uid://dhtsrws8snen7" path="res://Assets/Cards/Icons/Icon_Unstoppable.png" id="33_vorwh"]
+[ext_resource type="Texture2D" uid="uid://d2oyuqbm1olt6" path="res://Assets/Cards/Icons/Icon_Warded.png" id="34_obspv"]
+[ext_resource type="Texture2D" uid="uid://0ej52rv675tx" path="res://Assets/Cards/Icons/Icon_Toxicity.png" id="35_lvkop"]
+[ext_resource type="Texture2D" uid="uid://bmg5xrfitoqgb" path="res://Assets/Cards/Icons/Icon_Immunity_Card_Type.png" id="35_xj4qo"]
+[ext_resource type="Texture2D" uid="uid://quxady5t6y5h" path="res://Assets/Cards/Icons/Icon_Immunity_Effect.png" id="36_6rfcf"]
+[ext_resource type="Texture2D" uid="uid://dbhmo0apoe0ph" path="res://Assets/Cards/Icons/Icon_Immunity_Location.png" id="37_5rrdj"]
+[ext_resource type="Texture2D" uid="uid://c5ef0msn1rnmr" path="res://Assets/Cards/Icons/Icon_Immunity_Card_Attribute.png" id="38_qun6u"]
+[ext_resource type="Texture2D" uid="uid://n72pkgqeodvl" path="res://Assets/Cards/Icons/Icon_Immunity_Battle_Damage.png" id="39_vlr77"]
+[ext_resource type="Texture2D" uid="uid://cj5nn0mw07ksy" path="res://Assets/Cards/Icons/Icon_Immunity_Burn_Damage.png" id="40_k6fpk"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_t1cnh"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_ga8mt")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_71x65")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ysl5l")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_i56x2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_dm12l")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_b2drj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_mt4u6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_lmc7e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_g1bw8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_kmup5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_7o7yj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_1pooc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_07cnj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_bf3n3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_y4c7m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_t85gl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_14kp6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_qx8jq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_rmu7x")
+}],
+"loop": true,
+"name": &"default",
+"speed": 30.0
+}]
 
 [sub_resource type="StyleBoxFlat" id="2"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -89,12 +194,270 @@ offset_bottom = 180.0
 [node name="VBoxContainer" type="VBoxContainer" parent="TokenContainer"]
 layout_mode = 2
 
+[node name="Can Activate Effect" type="AnimatedSprite2D" parent="."]
+visible = false
+scale = Vector2(1.1, 1.1)
+sprite_frames = SubResource("SpriteFrames_t1cnh")
+frame_progress = 0.410968
+centered = false
+offset = Vector2(-6, -9)
+
 [node name="FocusSensor" type="Button" parent="."]
 custom_minimum_size = Vector2(120, 180)
 layout_mode = 0
 theme_override_styles/focus = SubResource("2")
 action_mode = 0
 flat = true
+
+[node name="IconContainer" type="ScrollContainer" parent="."]
+custom_minimum_size = Vector2(32, 180)
+layout_mode = 2
+offset_left = 120.0
+offset_right = 152.0
+offset_bottom = 180.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="IconContainer"]
+layout_mode = 2
+
+[node name="Attacks Remaining" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Attacks Remaining"
+texture = ExtResource("21_gmrid")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Attacks Remaining" type="Label" parent="IconContainer/VBoxContainer/Attacks Remaining"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 30.0
+theme_override_fonts/font = ExtResource("1")
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Burn Damage" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Burn Damage"
+texture = ExtResource("22_w3qwx")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Burn Damage" type="Label" parent="IconContainer/VBoxContainer/Burn Damage"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 30.0
+theme_override_fonts/font = ExtResource("1")
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Fusion Level" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Fusion Level"
+texture = ExtResource("23_0fsyv")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Fusion Level" type="Label" parent="IconContainer/VBoxContainer/Fusion Level"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 30.0
+theme_override_fonts/font = ExtResource("1")
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Toxicity" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Toxicity"
+texture = ExtResource("35_lvkop")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Toxicity" type="Label" parent="IconContainer/VBoxContainer/Toxicity"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 30.0
+theme_override_fonts/font = ExtResource("1")
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Overflow" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Overflow"
+texture = ExtResource("23_1fihh")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Perfected Overflow" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Perfected Overflow"
+texture = ExtResource("24_rincy")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Effect Disabled" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Effect Disabled"
+texture = ExtResource("26_q51j7")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Paralysis" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Paralyzed"
+texture = ExtResource("27_qktlc")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Guardianship" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("28_xiq8v")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Immortal" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Immortal"
+texture = ExtResource("29_yh17d")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Invincible" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Invincible"
+texture = ExtResource("30_u1vo3")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Multi Strike" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Multi-Strike"
+texture = ExtResource("27_qktlc")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Rejuvenation" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Rejuevenation"
+texture = ExtResource("31_dfycg")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Relentless" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Relentless"
+texture = ExtResource("32_fyset")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Unstoppable" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Unstoppable
+"
+texture = ExtResource("33_vorwh")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Warded" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Warded"
+texture = ExtResource("34_obspv")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Immunity_Card_Type" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("35_xj4qo")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Immunity_Card_Effect" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("36_6rfcf")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Immunity_Card_Location" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("37_5rrdj")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Immunity_Card_Attribute" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("38_qun6u")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Immunity_Battle_Damage" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("39_vlr77")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Immunity_Burn_Damage" type="TextureRect" parent="IconContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("40_k6fpk")
+expand_mode = 1
+stretch_mode = 4
 
 [node name="Action_Button_Container" type="VBoxContainer" parent="."]
 custom_minimum_size = Vector2(120, 20)

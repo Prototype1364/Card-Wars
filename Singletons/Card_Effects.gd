@@ -199,7 +199,8 @@ func Protector(card):
 	if Valid_Card:
 		var Side = "W" if GameData.Current_Turn == "Player" else "B"
 		var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
-		card.Guardianship = await Get_Card_Selected(card, "Reinforcers", Side, Side_Opp, null, [], [], [], card)
+		var Guardianship = await Get_Card_Selected(card, "Reinforcers", Side, Side_Opp, null, [], [], [], card)
+		card.set_guardianship(Guardianship)
 
 	if GameData.Target == card.Guardianship and GameData.Current_Step == "Damage" and card.Guardianship != null:
 		var damage_dealt = GameData.Attacker.get_net_damage()
@@ -355,7 +356,7 @@ func Barrage(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	
 	if Valid_Card:
-		card.Multi_Strike = true
+		card.set_multi_strike(true)
 
 func Behind_Enemy_Lines(card):
 	"""
@@ -542,9 +543,9 @@ func Faithful(card):
 	var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
 	
 	if (Valid_Card and Reinforcers.size() >= 3) and Card_On_Correct_Side:
-		card.Immortal = true
+		card.set_immortal(true)
 	elif (Reinforcers.size() < 3 or On_Field(card) == false) and Card_On_Correct_Side:
-		card.Immortal = false
+		card.set_immortal(false)
 
 func For_Honor_And_Glory(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -633,9 +634,9 @@ func Invincibility(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	
 	if Valid_Card:
-		card.Invincible = true
+		card.set_invincible(true)
 	elif On_Field(card) == false or Valid_Effect_Type(card) == false:
-		card.Invincible = false
+		card.set_invincible(false)
 
 func Juggernaut(card):
 	"""
@@ -649,17 +650,17 @@ func Juggernaut(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 
 	if Valid_Card:
-		card.Immunity["Type"].append("Magic") # Immune to all Magic cards
-		card.Immunity["Type"].append("Trap") # Immune to all Trap cards
-		card.Immunity["Type"].append("Status") # Immune to all Status cards
-		card.Unstoppable = true # Immune to Paralysis
-		card.Rejuvenation = true # Immune to Burn Damage
-		card.Warded = true # Immune to Overflow Damage
+		card.set_immunity("Type", "Magic", "Add") # Immune to all Magic cards
+		card.set_immunity("Type", "Trap", "Add") # Immune to all Trap cards
+		card.set_immunity("Type", "Status", "Add") # Immune to all Status cards
+		card.set_unstoppable(true) # Immune to Paralysis
+		card.set_rejuvenation(true) # Immune to Burn Damage
+		card.set_warded(true) # Immune to Overflow Damage
 	elif On_Field(card) == false:
-		card.Immunity["Type"].clear() # Remove all immunities when off the field
-		card.Unstoppable = false # Remove Paralysis immunity when off the field
-		card.Rejuvenation = false # Remove Burn Damage immunity when off the field
-		card.Warded = false # Remove Overflow Damage immunity when off the field
+		card.set_immunity("Type", "N/A", "Reset") # Remove all type-related immunities (including those granted by other cards) when off the field
+		card.set_unstoppable(false) # Remove Paralysis immunity when off the field
+		card.set_rejuvenation(false) # Remove Burn Damage immunity when off the field
+		card.set_warded(false) # Remove Overflow Damage immunity when off the field
 
 func Kinship(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -732,9 +733,9 @@ func Relentless(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
 	
 	if Valid_Card:
-		card.Relentless = true
+		card.set_relentless(true)
 	elif On_Field(card) == false or Valid_Effect_Type(card) == false:
-		card.Relentless = false
+		card.set_relentless(false)
 
 func Retribution(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
@@ -924,7 +925,7 @@ func Excalibur(card):
 			if GameData.Current_Phase == "Standby Phase" and GameData.Current_Step == "Effect" and card.Can_Activate_Effect:
 				card.Can_Activate_Effect = false
 				for current_card in Cards_On_Field:
-					current_card.Rejuvenation = true
+					current_card.set_rejuvenation(true)
 					current_card.set_attacks_remaining(1, "Add")
 					if current_card.Attribute == "Warrior":
 						current_card.set_attack_bonus(3, "Add")
@@ -1085,7 +1086,7 @@ func Prayer(card):
 				elif roll_result == 5:
 					Effect_Target.set_paralysis(true, "Add")
 				elif roll_result == 6:
-					Effect_Target.Invincible = true
+					Effect_Target.set_invincible(true)
 
 func Resurrection(card):
 	var Valid_Card = true if On_Field(card) && Resolvable_Card(card) && Valid_GameState(card) && Valid_Effect_Type(card) else false
