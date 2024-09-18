@@ -103,6 +103,7 @@ func Play_Card(Side, Net_Cost, Summon_Mode, Destination_Node, Chosen_Card):
 	#SignalBus.emit_signal("Resolve_Card_Effects")
 	SignalBus.emit_signal("Check_For_Resolvable_Effects", Chosen_Card)
 	SignalBus.emit_signal("Update_HUD_Duelist", get_parent().get_parent().get_node("UI/Duelists/HUD_" + Side), Dueler)
+	Chosen_Card.Update_Icons()
 
 func Activate_Set_Card(Side, Chosen_Card):
 	# Replaces current Equip card with activated card & Reparents appropriate Nodes

@@ -196,11 +196,9 @@ layout_mode = 2
 
 [node name="Can Activate Effect" type="AnimatedSprite2D" parent="."]
 visible = false
-scale = Vector2(1.1, 1.1)
 sprite_frames = SubResource("SpriteFrames_t1cnh")
 frame_progress = 0.410968
 centered = false
-offset = Vector2(-6, -9)
 
 [node name="FocusSensor" type="Button" parent="."]
 custom_minimum_size = Vector2(120, 180)

@@ -9,6 +9,11 @@ func Resolve_Card_Effects(card: Node = null):
 	Remove_Card_Effect_Availability(card)
 
 func Check_For_Resolvable_Effects(card_to_check: Node = null):
+	if card_to_check != null:
+		print(card_to_check.Name)
+	else:
+		print("Null card")
+
 	var Card_Is_Valid
 
 	if card_to_check == null:
@@ -22,14 +27,10 @@ func Check_For_Resolvable_Effects(card_to_check: Node = null):
 			Animate_Card_Effect_Availability(card_to_check)
 
 func Animate_Card_Effect_Availability(card: Node):
-	card.Can_Activate_Effect = true
-	# Play snake animation and await for player click input on focus sensor
-	pass
+	card.set_can_activate_effect()
 
 func Remove_Card_Effect_Availability(card: Node):
-	card.Can_Activate_Effect = false
-	# Stop snake animation
-	pass
+	card.set_can_activate_effect()
 
 
 
@@ -118,7 +119,7 @@ func Activate_Summon_Effects(Chosen_Card):
 
 	# Check if any condition for activating effects is met
 	if is_valid_summon_effect:
-		Check_For_Resolvable_Effects()
+		Check_For_Resolvable_Effects(Chosen_Card)
 		#Chosen_Card.Can_Activate_Effect = true
 		#Resolve_Card_Effects(Chosen_Card, false)
 		#CardEffects.call(Chosen_Card.Anchor_Text, Chosen_Card)
