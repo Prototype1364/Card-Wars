@@ -61,18 +61,18 @@ func Summon_Affordable(Dueler, Net_Cost) -> bool:
 	else:
 		return false
 
-func Valid_Destination(Side, Destination, Chosen_Card) -> bool:
+func Valid_Destination(Destination, Chosen_Card) -> bool:
 	var zone_mapping = {
-		Side + "Fighter": ["Hero"],
-		Side + "R1": ["Normal", "Hero"],
-		Side + "R2": ["Normal", "Hero"],
-		Side + "R3": ["Normal", "Hero"],
-		Side + "EquipTrap": ["Trap"],
-		Side + "EquipMagic": ["Magic"],
-		Side + "Backrow1": ["Magic", "Trap"],
-		Side + "Backrow2": ["Magic", "Trap"],
-		Side + "Backrow3": ["Magic", "Trap"],
-		Side + "TechZone": ["Tech"]
+		BM.Side + "Fighter": ["Hero"],
+		BM.Side + "R1": ["Normal", "Hero"],
+		BM.Side + "R2": ["Normal", "Hero"],
+		BM.Side + "R3": ["Normal", "Hero"],
+		BM.Side + "EquipTrap": ["Trap"],
+		BM.Side + "EquipMagic": ["Magic"],
+		BM.Side + "Backrow1": ["Magic", "Trap"],
+		BM.Side + "Backrow2": ["Magic", "Trap"],
+		BM.Side + "Backrow3": ["Magic", "Trap"],
+		BM.Side + "TechZone": ["Tech"]
 	}
 
 	if Destination.name in zone_mapping and Chosen_Card.Type in zone_mapping[Destination.name]:
@@ -89,11 +89,11 @@ func Calculate_Net_Cost(player, Chosen_Card) -> int:
 	else:
 		return 0
 
-func Valid_Card(Side, Chosen_Card, Destination_Node) -> bool:
+func Valid_Card(Chosen_Card, Destination_Node) -> bool:
 	# Define conditions for invalid card play
-	var is_not_turn_player = (Side == "W" and GameData.Current_Turn == "Enemy") or (Side == "B" and GameData.Current_Turn == "Player")
+	var is_not_turn_player = (BM.Side == "W" and BM.Current_Turn == "Enemy") or (BM.Side == "B" and BM.Current_Turn == "Player")
 	var is_invalid_equip_slot = Chosen_Card.Attribute != "Equip" and "Equip" in Destination_Node.name
-	var is_restricted_reinforcer = Destination_Node.name in ["R1", "R2", "R3"] and GameData.For_Honor_And_Glory
+	var is_restricted_reinforcer = Destination_Node.name in ["R1", "R2", "R3"] and BM.For_Honor_And_Glory
 
 	# Check if any invalid condition is met
 	if is_not_turn_player or is_invalid_equip_slot or is_restricted_reinforcer:
@@ -102,8 +102,7 @@ func Valid_Card(Side, Chosen_Card, Destination_Node) -> bool:
 		return true
 
 func Add_Tokens():
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Backrow_Cards = BF.Get_Field_Card_Data(Side, "Backrow")
+	var Backrow_Cards = BF.Get_Field_Card_Data(BM.Side, "Backrow")
 
 	for card in Backrow_Cards:
 		if card.Type == "Trap":
@@ -126,43 +125,39 @@ func Activate_Summon_Effects(Chosen_Card):
 		#Chosen_Card.Can_Activate_Effect = false # Reset to ensure card doesn't activate from Graveyard
 
 func Set_Attacks_To_Launch():
-	var player = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")
-	var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
+	var player = BM.Player if BM.Current_Turn == "Player" else BM.Enemy
+	var Fighter = BF.Get_Field_Card_Data(BM.Side, "Fighter")
+	var Reinforcers = BF.Get_Field_Card_Data(BM.Side, "R")
 
 	for card in Fighter + Reinforcers:
 		if card in Fighter or (card.Attack_As_Reinforcement and card in Reinforcers):
 			player.Valid_Attackers += 1
 
-func Reset_Turn_Variables(PHASES, STEPS):
+func Reset_Turn_Variables():
 	BM.Player.Valid_Attackers = 0
 	BM.Enemy.Valid_Attackers = 0
-	GameData.Cards_Summoned_This_Turn.clear()
-	GameData.Cards_Captured_This_Turn.clear()
-	GameData.Last_Equip_Card_Replaced.clear()
-	GameData.Turn_Counter += 1
-	GameData.Current_Phase = PHASES[0]
-	GameData.Current_Step = STEPS[0]
-	GameData.Attacker = null
-	GameData.Target = null
+	BM.Cards_Summoned_This_Turn.clear()
+	BM.Cards_Captured_This_Turn.clear()
+	BM.Last_Equip_Card_Replaced.clear()
+	BM.Turn_Counter += 1
+	BM.Attacker = null
+	BM.Target = null
 
 func Reset_Attacks_Remaining():
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")
-	var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
+	var Fighter = BF.Get_Field_Card_Data(BM.Side, "Fighter")
+	var Reinforcers = BF.Get_Field_Card_Data(BM.Side, "R")
 
 	for card in Fighter + Reinforcers:
 		card.set_attacks_remaining(1, "Reset")
 
 func Set_Turn_Player():
-	if GameData.Turn_Counter != 1: # Ensures that the program doesn't switch the Turn_Player on the first Opening Phase of the Game.
-		GameData.Current_Turn = "Player" if GameData.Current_Turn == "Enemy" else "Enemy"
+	if BM.Turn_Counter != 1: # Ensures that the program doesn't switch the Turn_Player on the first Opening Phase of the Game.
+		BM.Current_Turn = "Player" if BM.Current_Turn == "Enemy" else "Enemy"
 
 func Choose_Starting_Player():
 	var random_number = 2
 	#var random_number = RNGesus(1, 2)
-	GameData.Current_Turn = "Player" if random_number == 1 else "Enemy"
+	BM.Current_Turn = "Player" if random_number == 1 else "Enemy"
 	
 	# Flip field (if Black goes first)
 	if random_number == 2:
@@ -172,17 +167,15 @@ func Choose_Starting_Player():
 		SignalBus.emit_signal("Update_HUD_GameState")
 
 func Set_Field_Card_Effect_Status():
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Cards_On_Field = BF.Get_Field_Card_Data(Side, "Fighter") + BF.Get_Field_Card_Data(Side, "R")
+	var Cards_On_Field = BF.Get_Field_Card_Data(BM.Side, "Fighter") + BF.Get_Field_Card_Data(BM.Side, "R")
 
 	if Cards_On_Field != []:
 		for card in Cards_On_Field:
 			card.Can_Activate_Effect = true
 
 func Resolve_Burn_Damage():
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")
-	var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
+	var Fighter = BF.Get_Field_Card_Data(BM.Side, "Fighter")
+	var Reinforcers = BF.Get_Field_Card_Data(BM.Side, "R")
 	var Cards_On_Field = Fighter + Reinforcers
 
 	# Loop through all cards on appropriate side of field, apply burn damage, and capture if applicable
@@ -193,29 +186,27 @@ func Resolve_Burn_Damage():
 			# 	Capture_Card(card)
 
 func Resolve_Battle_Damage():
-	var player = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
-	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
-	var Reinforcers_Opp = BF.Get_Field_Card_Data(Side_Opp, "R")
+	var player = BM.Player if BM.Current_Turn == "Player" else BM.Enemy
+	var Reinforcers_Opp = BF.Get_Field_Card_Data(BM.BM.Side_Opp, "R")
 
-	if GameData.Attacker != null and GameData.Target != null: # Ensures no error is thrown when func is called with empty player field.
+	if BM.Attacker != null and BM.Target != null: # Ensures no error is thrown when func is called with empty player field.
 		player.Valid_Attackers -= 1
-		var Targets = Reinforcers_Opp + [GameData.Target] if GameData.Attacker.Multi_Strike else [GameData.Target]
+		var Targets = Reinforcers_Opp + [BM.Target] if BM.Attacker.Multi_Strike else [BM.Target]
 
-		for _i in range(GameData.Attacker.Attacks_Remaining):
-			GameData.Attacker.set_attacks_remaining(1, "Attack")
+		for _i in range(BM.Attacker.Attacks_Remaining):
+			BM.Attacker.set_attacks_remaining(1, "Attack")
 			for card in Targets:
-				if not card.is_immune("Battle Damage", GameData.Attacker):
-					var Overflow_Damage = max(0, GameData.Attacker.get_net_damage() - card.Total_Health)
-					card.set_health(GameData.Attacker.get_net_damage(), "Remove")
+				if not card.is_immune("Battle Damage", BM.Attacker):
+					var Overflow_Damage = max(0, BM.Attacker.get_net_damage() - card.Total_Health)
+					card.set_health(BM.Attacker.get_net_damage(), "Remove")
 					CardEffects.call(card.Anchor_Text, card) # Call any effects that may trigger on damage (Defiance, Kinship, etc.)
-					# if card.Total_Health <= 0 and not card.is_immune("Capture", GameData.Attacker):
+					# if card.Total_Health <= 0 and not card.is_immune("Capture", BM.Attacker):
 					# 	Capture_Card(card)
-					if card.Total_Health <= 0 and GameData.Attacker.Can_Deal_Overflow_Damage and Overflow_Damage > 0:
-						Resolve_Overflow_Damage(GameData.Attacker, GameData.Target, Overflow_Damage)
+					if card.Total_Health <= 0 and BM.Attacker.Can_Deal_Overflow_Damage and Overflow_Damage > 0:
+						Resolve_Overflow_Damage(BM.Attacker, BM.Target, Overflow_Damage)
 
 func Resolve_Overflow_Damage(Attacker, Target, Overflow_Damage):
-	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
-	var Cards_On_Field_Opp = BF.Get_Field_Card_Data(Side_Opp, "Fighter") + BF.Get_Field_Card_Data(Side_Opp, "R")
+	var Cards_On_Field_Opp = BF.Get_Field_Card_Data(BM.Side_Opp, "Fighter") + BF.Get_Field_Card_Data(BM.Side_Opp, "R")
 	Cards_On_Field_Opp.erase(Target)
 
 	for card in Cards_On_Field_Opp:
@@ -253,7 +244,7 @@ func Capture_Card(Card_Captured, Capture_Type = "Normal", Reset_Stats = true):
 	var Fighter_Captured = true if "Fighter" in Parent_Name else false
 	
 	# Capture Targeted Card, remove effects disabled by the card, and Reparent Nodes
-	GameData.Cards_Captured_This_Turn.append(Card_Captured)
+	BM.Cards_Captured_This_Turn.append(Card_Captured)
 	BF.Reparent_Nodes(Card_Captured, Destination_Node)
 
 	# Move Equips to Graveyard when Fighter is Captured
@@ -263,7 +254,7 @@ func Capture_Card(Card_Captured, Capture_Type = "Normal", Reset_Stats = true):
 		var Equip_Trap_Cards = BF.Get_Field_Card_Data(Captured_Card_Side, "EquipTrap")
 
 		for card in Equip_Magic_Cards + Equip_Trap_Cards:
-			GameData.Cards_Captured_This_Turn.append(card)
+			BM.Cards_Captured_This_Turn.append(card)
 			BF.Reparent_Nodes(card, Destination_Node)
 
 		# Recruit new Hero if own Fighter slot is empty
@@ -276,55 +267,51 @@ func Capture_Card(Card_Captured, Capture_Type = "Normal", Reset_Stats = true):
 	
 func Get_Destination_Node_On_Capture(Capture_Type, Card_Captured) -> Node:
 	var Destination_Node
-	var Duelist = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
+	var Duelist = BM.Player if BM.Current_Turn == "Player" else BM.Enemy
 	var Destination_Node_Name = Duelist.Capture_Destination
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Side_Opp = "B" if GameData.Current_Turn == "Player" else "W"
 	
 	if Capture_Type == "Normal":
-		Destination_Node = get_node("CardSpots/NonHands/" + Side + "Graveyard") if Card_Captured.Type in ["Hero", "Magic", "Trap"] else get_node("CardSpots/NonHands/" + Side + Destination_Node_Name)
+		Destination_Node = get_node("CardSpots/NonHands/" + BM.Side + "Graveyard") if Card_Captured.Type in ["Hero", "Magic", "Trap"] else get_node("CardSpots/NonHands/" + BM.Side + Destination_Node_Name)
 	else:
-		Destination_Node = get_node("CardSpots/NonHands/" + Side_Opp + "Graveyard") if Card_Captured.Type in ["Hero", "Magic", "Trap"] else get_node("CardSpots/NonHands/" + Side_Opp + Destination_Node_Name)
+		Destination_Node = get_node("CardSpots/NonHands/" + BM.Side_Opp + "Graveyard") if Card_Captured.Type in ["Hero", "Magic", "Trap"] else get_node("CardSpots/NonHands/" + BM.Side_Opp + Destination_Node_Name)
 	
 	return Destination_Node
 
-func Recruit_Hero(): # FIXME: Heroes are not recruited immediately after the previous hero is captured. This could lead to issues with cards that have multiple attacks per turn effects (since if the Hero is captured on the first attack, the second attack has no impact [in theory it should hit the next Hero that gets recruited]). If this is something we want to address, some small tweaks may be needed in this function as well as the Capture_Card func (and the associated GameData.Target setting logic).
+func Recruit_Hero(): # FIXME: Heroes are not recruited immediately after the previous hero is captured. This could lead to issues with cards that have multiple attacks per turn effects (since if the Hero is captured on the first attack, the second attack has no impact [in theory it should hit the next Hero that gets recruited]). If this is something we want to address, some small tweaks may be needed in this function as well as the Capture_Card func (and the associated BM.Target setting logic).
 	# Recruit new Hero if own Fighter slot is empty
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")
-	var HeroDeck = BF.Get_Field_Card_Data(Side, "HeroDeck")
-	var Player = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
+	var Fighter = BF.Get_Field_Card_Data(BM.Side, "Fighter")
+	var HeroDeck = BF.Get_Field_Card_Data(BM.Side, "HeroDeck")
+	var Player = BM.Player if BM.Current_Turn == "Player" else BM.Enemy
 
 	if Fighter == [] and HeroDeck != []:
 		var Drawn_Card = Draw_Card(Player, "HeroDeck")
 		SignalBus.emit_signal("Reparent_Nodes", Drawn_Card['Card_Drawn'], Drawn_Card['Destination_Node'])
 		Drawn_Card['Card_Drawn'].Update_Data()
-		GameData.Cards_Summoned_This_Turn.append(Drawn_Card['Card_Drawn'])
+		BM.Cards_Summoned_This_Turn.append(Drawn_Card['Card_Drawn'])
 	
 		# Ensures that Summon type effect heroes can activate their effects (Periodic effects are activated in Set_Field_Card_Effect_Status() func)
 		if Drawn_Card['Card_Drawn'].Effect_Type in ["Summon"]:
 			Drawn_Card['Card_Drawn'].Can_Activate_Effect = true
 	elif Fighter == [] and HeroDeck == []:
-		var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
+		var Reinforcers = BF.Get_Field_Card_Data(BM.Side, "R")
 		var Replacement_Fighter_Found = false
 		for card in Reinforcers:
 			if card.Type == "Hero":
 				Replacement_Fighter_Found = true
-				SignalBus.emit_signal("Reparent_Nodes", card, get_node("CardSpots/NonHands/" + Side + "Fighter"))
+				SignalBus.emit_signal("Reparent_Nodes", card, get_node("CardSpots/NonHands/" + BM.Side + "Fighter"))
 				break
 		if not Replacement_Fighter_Found:
-			GameData.Victor = BM.Enemy.Name if GameData.Current_Turn == "Player" else BM.Player.Name
+			BM.Victor = BM.Enemy.Name if BM.Current_Turn == "Player" else BM.Player.Name
 			SignalBus.emit_signal("Update_GameState", "Turn")
 
 func Sacrifice_Card(Chosen_Card):
 	# Reparent Nodes
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
 	var Source_Node = Chosen_Card
-	var Destination_Node = get_node("CardSpots/NonHands/" + Side + "Banished")
+	var Destination_Node = get_node("CardSpots/NonHands/" + BM.Side + "Banished")
 	SignalBus.emit_signal("Reparent_Nodes", Source_Node, Destination_Node)
 
 	# Increase Summon Power
-	var summon_power_label = get_node("CardSpots/" + Side + "SacrificePower")
+	var summon_power_label = get_node("CardSpots/" + BM.Side + "SacrificePower")
 	var summon_power = int(summon_power_label.text)
 	summon_power += Chosen_Card.Cost
 	summon_power_label.text = str(summon_power)
@@ -351,19 +338,18 @@ func Check_For_Deck_Out() -> bool:
 			break
 
 	if not player_hero_found:
-		GameData.Victor = BM.Enemy.Name
+		BM.Victor = BM.Enemy.Name
 		return true
 	elif not enemy_hero_found:
-		GameData.Victor = BM.Player.Name
+		BM.Victor = BM.Player.Name
 		return true
 	else:
 		return false
 	
 func Exodia_Complete() -> bool:
 	# Collect field card data
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")
-	var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
+	var Fighter = BF.Get_Field_Card_Data(BM.Side, "Fighter")
+	var Reinforcers = BF.Get_Field_Card_Data(BM.Side, "R")
 
 	# Check if all cards in Fighter and Reinforcer slots are heroes
 	var hero_count = 0
@@ -375,16 +361,15 @@ func Exodia_Complete() -> bool:
 
 	# Ensure that all 4 slots are filled with heroes
 	if hero_count == 4:
-		GameData.Victor = BM.Player.Name if GameData.Current_Turn == "Player" else BM.Enemy.Name
+		BM.Victor = BM.Player.Name if BM.Current_Turn == "Player" else BM.Enemy.Name
 		return true
 	else:
 		return false
 
 func Check_For_Deck_Reload():
 	# Collect field card data
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var MainDeck = BF.Get_Field_Card_Data(Side, "MainDeck")
-	var HeroDeck = BF.Get_Field_Card_Data(Side, "HeroDeck")
+	var MainDeck = BF.Get_Field_Card_Data(BM.Side, "MainDeck")
+	var HeroDeck = BF.Get_Field_Card_Data(BM.Side, "HeroDeck")
 
 	if len(MainDeck) == 0:
 		SignalBus.emit_signal("Reload_Deck", "MainDeck")
@@ -398,12 +383,11 @@ func Check_For_Deck_Reload():
 #######################################
 func _on_Deck_Slot_pressed():
 	# Get children of deck & sort by Cost (descending)
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Deck_Children = BF.Get_Field_Card_Data(Side, "HeroDeck")
+	var Deck_Children = BF.Get_Field_Card_Data(BM.Side, "HeroDeck")
 	Deck_Children.sort_custom(func(a,b): return a.Cost > b.Cost)
 
 	# Get Sacrifice Power
-	var summon_power_label = get_node("CardSpots/" + Side + "SacrificePower")
+	var summon_power_label = get_node("CardSpots/" + BM.Side + "SacrificePower")
 	var summon_power_check = int(summon_power_label.text)
 
 	# Check for card cost == Sacrifice Power (if multiple, choose randomly between them, if none, reduce cost search by 1 and repeat)
@@ -426,7 +410,7 @@ func _on_Deck_Slot_pressed():
 				var Destination_Node = get_tree().get_root().get_node(Slot_Used)
 				SignalBus.emit_signal("Reparent_Nodes", Hero_Card_Summoned, Destination_Node)
 				Hero_Card_Summoned.Update_Data()
-				GameData.Cards_Summoned_This_Turn.append(Hero_Card_Summoned)
+				BM.Cards_Summoned_This_Turn.append(Hero_Card_Summoned)
 				var starting_summon_power = int(summon_power_label.text)
 				starting_summon_power -= Hero_Card_Summoned.Cost
 				summon_power_label.text = str(starting_summon_power)

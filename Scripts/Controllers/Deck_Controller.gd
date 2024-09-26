@@ -1,9 +1,10 @@
 extends Node
 
 @onready var BC = get_parent().get_parent()
+@onready var BM = get_tree().get_root().get_node("SceneHandler/Battle")
 
 func Create_Card(cardPasscode):
-	for card in GameData.CardData:
+	for card in BM.CardData:
 		if card["Passcode"] == cardPasscode:
 			var card_data = {
 				"Art": card["CardArt"],
@@ -13,7 +14,6 @@ func Create_Card(cardPasscode):
 				"Anchor_Text": card["AnchorText"],
 				"Resolve_Side": card["ResolveSide"],
 				"Resolve_Phase": card["ResolvePhase"],
-				"Resolve_Step": card["ResolveStep"],
 				"Attribute": card["Attribute"],
 				"Description": card["Description"],
 				"Short_Description": card["ShortDescription"],
@@ -29,17 +29,17 @@ func Create_Card(cardPasscode):
 			var Created_Card = Card.new(card_data)
 			var Card_Controller = load('res://Scenes/SupportScenes/SmallCard.tscn').instantiate()
 			Created_Card.add_child(Card_Controller)
-			Created_Card.name = "Card" + str(GameData.CardCounter)
-			GameData.CardCounter += 1
+			Created_Card.name = "Card" + str(BM.CardCounter)
+			BM.CardCounter += 1
 			Created_Card.custom_minimum_size = Vector2(120,180)
 			Created_Card.add_to_group("Cards")
 			return Created_Card
 
 func Create_Deck(Deck_List, Current_Duelist):	
-	for card in GameData.CardData:
-		if card["Passcode"] in GameData.Master_Deck_List["Decks"][Deck_List]:
+	for card in BM.CardData:
+		if card["Passcode"] in BM.Master_Deck_List["Decks"][Deck_List]:
 			var Passcode = card["Passcode"]
-			for _copies in range(0,GameData.Master_Deck_List["Decks"][Deck_List].count(Passcode)):
+			for _copies in range(0,BM.Master_Deck_List["Decks"][Deck_List].count(Passcode)):
 				var Side = "W" if Current_Duelist == "Player" else "B"
 				var Created_Card = Create_Card(card["Passcode"])
 
@@ -52,7 +52,7 @@ func Create_Deck(Deck_List, Current_Duelist):
 
 func Create_Advance_Tech_Card():
 	var Created_Card
-	for card in GameData.CardData:
+	for card in BM.CardData:
 		if card["Passcode"] == 42489363:
 			Created_Card = Create_Card(card["Passcode"])
 

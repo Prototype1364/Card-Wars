@@ -85,7 +85,7 @@ func Play_Card(Side, Net_Cost, Summon_Mode, Destination_Node, Chosen_Card):
 	
 	# Reparents played card (and any previous equip cards, if applicable) and resolves any summon/card effects
 	if Equip_Slot.get_child_count() > 0 and Chosen_Card.Attribute == "Equip" and "Backrow" not in Destination_Node.name:
-		GameData.Last_Equip_Card_Replaced.append(Equip_Slot.get_child(0))
+		BM.Last_Equip_Card_Replaced.append(Equip_Slot.get_child(0))
 		Reparent_Nodes(Equip_Slot.get_child(0), Graveyard)
 	Reparent_Nodes(Chosen_Card, Destination_Node)
 	Set_Focus_Neighbors("Field", Side, Destination_Node.get_child(0))
@@ -99,7 +99,7 @@ func Play_Card(Side, Net_Cost, Summon_Mode, Destination_Node, Chosen_Card):
 		Reparent_Nodes(Chosen_Card, Graveyard)
 	
 	# Updates Card Summoned This Turn Array, Resolves Card Effects that occur during Summon/Set (i.e. Deep Pit), Resets Reposition Variables, & Updates Duelist HUD
-	GameData.Cards_Summoned_This_Turn.append(Chosen_Card)	
+	BM.Cards_Summoned_This_Turn.append(Chosen_Card)	
 	#SignalBus.emit_signal("Resolve_Card_Effects")
 	SignalBus.emit_signal("Check_For_Resolvable_Effects", Chosen_Card)
 	SignalBus.emit_signal("Update_HUD_Duelist", get_parent().get_parent().get_node("UI/Duelists/HUD_" + Side), Dueler)
@@ -112,7 +112,7 @@ func Activate_Set_Card(Side, Chosen_Card):
 	
 	if Chosen_Card.Attribute == "Equip":
 		if EquipSlot.get_child_count() > 0:
-			GameData.Last_Equip_Card_Replaced.append(EquipSlot.get_child(0))
+			BM.Last_Equip_Card_Replaced.append(EquipSlot.get_child(0))
 			Reparent_Nodes(EquipSlot.get_child(0), Graveyard)
 			BC.Activate_Set_Card(EquipSlot.get_child(0)) # Ensures that any effects that trigger upon being sent to the Graveyard are resolved (i.e. Last Stand).
 		Reparent_Nodes(Chosen_Card, EquipSlot)
@@ -121,10 +121,8 @@ func Activate_Set_Card(Side, Chosen_Card):
 
 func Reload_Deck(Deck_To_Reload):
 	# Reparent Nodes from MedBay to appropriate Deck
-	var Dueler = BM.Player if GameData.Current_Turn == "Player" else BM.Enemy
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Deck = get_node("NonHands/" + Side + Deck_To_Reload)
-	var MedBay = get_node("NonHands/" + Side + "MedBay")
+	var Deck = get_node("NonHands/" + BM.Side + Deck_To_Reload)
+	var MedBay = get_node("NonHands/" + BM.Side + "MedBay")
 
 	# Reparents all children of MedBay to Deck
 	for card in MedBay.get_children():
@@ -138,10 +136,10 @@ func Reload_Deck(Deck_To_Reload):
 		Deck.get_child(card).Update_Data()
 
 	# Shuffle the Deck
-	SignalBus.emit_signal("Shuffle_Deck", Dueler, Deck_To_Reload)
+	SignalBus.emit_signal("Shuffle_Deck", BM.Dueler, Deck_To_Reload)
 
 func Find_Open_Slot(Zone: String, Default_Side = null):
-	var Side = Default_Side if Default_Side != null else ("W" if GameData.Current_Turn == "Player" else "B")
+	var Side = Default_Side if Default_Side != null else ("W" if BM.Current_Turn == "Player" else "B")
 	var Zone_Count = Get_Zone_Count(Zone)
 
 	for i in range(0, Zone_Count):

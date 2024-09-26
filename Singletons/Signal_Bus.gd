@@ -69,3 +69,82 @@ signal Sacrifice_Card
 signal Hero_Deck_Selected
 
 signal READY
+
+
+
+# EVENT SIGNALS
+# - Game-Related
+signal Event_Game_Started
+signal Event_Game_Ended
+signal Event_GameState_Changed
+signal Event_Dice_Rolled
+signal Event_Deck_Reloaded
+signal Event_Deck_Shuffled
+
+# - Card-Related
+signal Event_Card_Drawn_Normal
+signal Event_Card_Drawn_Hero
+signal Event_Card_Drawn_Magic
+signal Event_Card_Drawn_Trap
+signal Event_Card_Drawn_Special
+signal Event_Card_Drawn_Status
+signal Event_Card_Summoned_Normal
+signal Event_Card_Summoned_Recruit
+signal Event_Card_Summoned_Sacrificial
+signal Event_Card_Summoned_Revival
+signal Event_Card_Summoned_Fusion
+signal Event_Card_Set
+signal Event_Card_Flipped
+signal Event_Card_Discarded
+signal Event_Card_Banished
+signal Event_Card_Repositioned(Source_Node, Destination_Node)
+signal Event_Card_Moved
+signal Event_Card_Stolen
+signal Event_Card_Switched
+signal Event_Card_Replaced
+signal Event_Card_Sacrificed
+signal Event_Card_Captured
+signal Event_Card_Equipped
+signal Event_Card_Unequipped
+signal Event_Card_Effect_Pending
+signal Event_Card_Effect_Resolved
+
+# - Battle-Related
+signal Event_Attack_Declared
+signal Event_Attack_Resolved
+signal Event_Damage_Dealt_Battle
+signal Event_Damage_Dealt_Burn
+signal Event_Damage_Dealt_Pierce
+
+# Stat-Related
+signal Event_Stat_Changed_Summon_Crests
+signal Event_Stat_Changed_Tokens
+signal Event_Stat_Changed_Attacks_Remaining
+signal Event_Stat_Changed_Toxicity
+signal Event_Stat_Changed_Health
+signal Event_Stat_Changed_Health_Bonus
+signal Event_Stat_Changed_Attack
+signal Event_Stat_Changed_Attack_Bonus
+signal Event_Stat_Changed_Cost
+signal Event_Stat_Changed_Burn_Damage
+
+# - Trait-Related
+signal Event_Traits_Changed_Overflow
+signal Event_Traits_Changed_Perfected_Overflow
+signal Event_Traits_Changed_Can_Attack
+signal Event_Traits_Changed_Paralyzed
+signal Event_Traits_Changed_Guarded
+signal Event_Traits_Changed_Immortal
+signal Event_Traits_Changed_Invincible
+signal Event_Traits_Changed_Rejuvenated
+signal Event_Traits_Changed_Warded
+signal Event_Traits_Changed_Relentless
+signal Event_Traits_Changed_Multi_Strike
+signal Event_Traits_Changed_Unstoppable
+signal Event_Traits_Changed_Immunity_Type
+signal Event_Traits_Changed_Immunity_Attribute
+signal Event_Traits_Changed_Immunity_Effect
+signal Event_Traits_Changed_Immunity_Location
+
+# - Miscellaneous
+signal Event_Effect_Disabled

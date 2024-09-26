@@ -3,6 +3,7 @@ extends Control
 @onready var Active_Effects = []
 @onready var Selected_Button = null
 @onready var BF = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots")
+@onready var BM = get_tree().get_root().get_node("SceneHandler/Battle")
 
 func _ready():
 	var _HV1 = SignalBus.connect("Button_Selected", Callable(self, "On_Button_Selection"))
@@ -12,7 +13,7 @@ func _ready():
 func Get_Active_Card_Effects(desired_types = ["Any"], desired_attributes = ["Any"]):
 	var active_effects_dict = {}
 	for card in get_tree().get_nodes_in_group("Cards"):
-		if card.Anchor_Text not in GameData.Disabled_Effects and card.Anchor_Text != "Juggernaut" and (card.Type in desired_types or desired_types == ["Any"]) and (card.Attribute in desired_attributes or desired_attributes == ["Any"]):
+		if card.Anchor_Text not in BM.Disabled_Effects and card.Anchor_Text != "Juggernaut" and (card.Type in desired_types or desired_types == ["Any"]) and (card.Attribute in desired_attributes or desired_attributes == ["Any"]):
 			active_effects_dict[card.Anchor_Text] = true
 	Active_Effects = active_effects_dict.keys()
 

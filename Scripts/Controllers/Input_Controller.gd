@@ -1,5 +1,7 @@
 extends VScrollBar
 
+@onready var BM = get_tree().get_root().get_node("SceneHandler/Battle")
+
 func Scroll(event):
 	var Playmat = get_tree().get_root().get_node("SceneHandler/Battle/Playmat")
 	if event is InputEventMouseButton:

@@ -2,6 +2,7 @@ extends Control
 
 var Current_Scene = Engine.get_main_loop().get_current_scene()
 var BF = Current_Scene.get_node("Battle/Playmat/CardSpots")
+@onready var BM = get_tree().get_root().get_node("SceneHandler/Battle")
 var Card_Selected = null
 var Card_ID = null
 var Effect_Card = null
@@ -16,7 +17,7 @@ func Get_Field_Card_Parent_Data(side, slot):
 
 func Determine_Card_List(selection_type, slot = null, Desired_Attributes: Array = [], Desired_Types: Array = [], Previous_Cards_Selected: Array = [], Repositioned_Card = null) -> Array:
 	var converted_selection_type = selection_type.replace("Opponent ", "")
-	var Selection_Side = ("W" if GameData.Current_Turn == "Player" else "B") if "Opponent" not in selection_type else ("B" if GameData.Current_Turn == "Player" else "W")
+	var Selection_Side = ("W" if BM.Current_Turn == "Player" else "B") if "Opponent" not in selection_type else ("B" if BM.Current_Turn == "Player" else "W")
 	var Selection_Source = []
 	var Source_Map = {
 		"Deck": "MainDeck",

@@ -10,11 +10,68 @@ extends Control
 @onready var Enemy = $UI/Duelists/HUD_B
 
 # Set Constants
-const PHASES = ["Opening Phase", "Standby Phase", "Main Phase", "Battle Phase", "End Phase"]
-const PHASE_THRESHOLDS = [3, 5, 6, 11, 16]
-const STEPS = ["Start", "Draw", "Roll", "Recruit", "Effect", "Token", "Main", "Selection", "Target", "Damage", "Capture", "Repeat", "Discard", "Reload", "Effect", "Victory", "End"]
-const EFFECT_STEPS = ["Start", "Effect", "Selection", "Damage", "Capture", "Discard"] # Discard may/may not end up being an Effect Step. You just added it, just in case.
-const FUNC_STEPS = ["Damage"]
+enum Phases {OPENING, STANDBY, MAIN, BATTLE, END}
+
+# Duel Data
+var CardData
+var Master_Deck_List
+var Side: String:
+	get:
+		return "W" if Current_Turn == "Player" else "B"
+var Side_Opp: String:
+	get:
+		return "B" if Current_Turn == "Player" else "W"
+var Dueler: Node:
+	get:
+		return Player if Current_Turn == "Player" else Enemy
+var Dueler_Opp: Node:
+	get:
+		return Enemy if Current_Turn == "Player" else Player
+var Card_Effect_Queue = []
+var Victor
+var Current_Turn = "Player"
+var Turn_Counter = 1
+var Current_Phase = Phases.OPENING
+const ATTRIBUTE_LIST = ["Creature","Cryptid","Explorer","Mythological","Olympian","Outlaw","Philosopher","Pirate","Politician","Ranged","Scientist","Spy","Support","Titan","Warrior","Wizard"] # A list of all Normal/Hero card Attributes in the game. Used to reset Summonable_Attributes variable value when "Immanuel Kant" leaves the field.
+var Disabled_Effects = [] # A list of all effects that have had their effects disabled by "Immanuel Kant" Hero card effect.
+var Summonable_Attributes = ATTRIBUTE_LIST # Used to resolve "Immanuel Kant" Hero card effect. Initially contains all Attributes in the game, but is lowered to 1 of the player's choice when Kant is on the field.
+var Cards_Summoned_This_Turn = []
+var Cards_Captured_This_Turn = []
+var Last_Equip_Card_Replaced = []
+var Attacks_To_Launch = 0
+var Attacker
+var Target
+var For_Honor_And_Glory = false
+var CardCounter = 0 # Variable used to name Card nodes
+
+
+
+# Potential Game Events:
+	# Game-Related
+		# - Game, Turn, Phase (Start/End)
+
+	# Card-Related
+		# - Drawn (Unique signals for each card type)
+		# - Discarded
+		# - Banished
+		# - Repositioned/Moved/Stolen/Switched (Track Source & Destination Nodes in BM [Reposition for field cards, Moved for cards in hand/medbay/grave, Stolen for cards taken from opponent, Switched for unique cases like Disorient effect])
+		# - Replaced (for when Equip cards are replaced on the field)
+		# - Sacrificed
+		# - Summoned (Unique signals for each summon type [Normal, Fusion, Recruited, Sacrificial, Revived/Retrieved {card summoned from grave/medbay directly}])
+		# - Set
+		# - Flipped
+		# - Captured (Track Attacking/Target cards [how do we want to handle the Equip cards attached to the captured card?])
+		# - Equipped/Unequipped (for when Equip cards are attached/detached [also should trigger when a card is moved into/out of a Fighter/Reinforcement slot so that stats are updated appropriately])
+		# - Effect Triggered (Unique signals for when an effect is pending resolution and for after an effect has been resolved [to allow for counter effects and post-effect resolution effects])
+		# - Attack Declared
+	
+	# Duelist-Related
+		# - Dice Roll/Summon Crests Changed
+		# - Deck Reloaded
+
+	# Stat-Related
+		# - Stat Changes (Attack, Health, Cost, Tokens, Attacks_Remaining, Toxicity, etc. [Might be best to just have a signal for each setter func, not all would be used currently but that's okay])
+		# - Damage Dealt (Unique signals for Battle, Burn, Pierce, etc. [Track Attacking/Target cards in BM])
 
 """--------------------------------- Engine Functions ---------------------------------"""
 func _ready():
@@ -41,90 +98,50 @@ func _ready():
 	var _HV20 = SignalBus.connect("Cancel", Callable(self, "_on_Cancel_pressed"))
 	SignalBus.emit_signal("READY") # Temporary signal to ensure Card_Effects script functions as expected. See note in Card_Effects.gd for more info.
 	
+	Load_Card_Data()
 	Setup_Game()
 
 
 
 """--------------------------------- GameState Functions ---------------------------------"""
 func Update_Game_State(State_To_Change):
-	if State_To_Change == "Step":
-		Update_Game_Step()
-	elif State_To_Change == "Phase":
+	if Card_Effect_Queue != []:
+		Clear_Card_Effect_Queue()
+	
+	if State_To_Change == "Phase":
 		Update_Game_Phase()
 	elif State_To_Change == "Turn":
 		Update_Game_Turn()
 
 	# Update HUD
 	UI.Update_HUD_GameState()
-	
-	# Print DEBUG
-	print(GameData.Current_Phase + " - " + GameData.Current_Step)
-
-func Update_Game_Step():
-	var player = Player if GameData.Current_Turn == "Player" else Enemy
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"	
-	
-	# Call required funcs at appropriate Steps (and contain step values within bounds of current Phase)
-	if GameData.Current_Step in EFFECT_STEPS: # Ensures that Card Effects are resolved when appropriate (moved to first if statement to ensure effects are resolved before step is handled [important for Damage step-related card efffects])
-		#Resolve_Card_Effects()
-		Check_For_Resolvable_Effects()
-	if STEPS.find(GameData.Current_Step) == 9: # Current Step is Damage Step
-		BC.Resolve_Damage("Battle")
-	if STEPS.find(GameData.Current_Step) == 12 and get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > player.Hand_Size_Limit and GameData.Victor == null: # Ensures cards are discarded when appropriate
-		return
-	
-	# Update Step value
-	if STEPS.find(GameData.Current_Step) + 1 > len(STEPS): # Resets index to start of New Turn.
-		GameData.Current_Step = STEPS[0]
-	elif STEPS.find(GameData.Current_Step) in PHASE_THRESHOLDS: # Ensures that you can't advance to a Step that belongs to a different Phase
-		return
-	elif STEPS.find(GameData.Current_Step) == 4 and GameData.Current_Phase == "End Phase": # Fixes bug where Step state would reset to Standby Phases' Effect Step (instead of End Phases' Effect Step)
-		GameData.Current_Step = STEPS[15]
-	elif STEPS.find(GameData.Current_Step) == 10 and player.Valid_Attackers == 0: # Skips Repeat Step if no valid attackers remain
-		Check_For_Captures()
-		GameData.Current_Phase = PHASES[4]
-		GameData.Current_Step = STEPS[12]
-	else:
-		GameData.Current_Step = STEPS[STEPS.find(GameData.Current_Step) + 1]
 
 func Update_Game_Phase():
-	if PHASES.find(GameData.Current_Phase) + 1 >= len(PHASES): # Ensures game doesn't crash when trying to advance to a non-existent Phase.
-		return
-	elif GameData.Turn_Counter == 1 and PHASES.find(GameData.Current_Phase) == 2: # Skips Battle Phase on first turn of game
-		GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 2]
-		GameData.Current_Step = STEPS[12]
-	else:
-		GameData.Current_Phase = PHASES[PHASES.find(GameData.Current_Phase) + 1]
-		GameData.Current_Step = STEPS[PHASE_THRESHOLDS[PHASES.find(GameData.Current_Phase) - 1] + 1]
-	
-	# Ensures that Attacks to Launch is set at start of each Battle Phase
-	if GameData.Current_Phase == "Battle Phase":
-		BC.Set_Attacks_To_Launch()
-	
-	# Skips Battle Phase if no cards are in player's Fighter/Reinforcement slots
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	var Fighter = BF.Get_Field_Card_Data(Side, "Fighter")
-	var Reinforcers = BF.Get_Field_Card_Data(Side, "R")
-
-	if GameData.Current_Phase == "Battle Phase" and Fighter + Reinforcers == []:
-		Update_Game_Phase()
+	match Current_Phase:
+		Phases.OPENING:
+			Current_Phase = Phases.STANDBY
+		Phases.STANDBY:
+			Current_Phase = Phases.MAIN
+		Phases.MAIN:
+			var Field_Empty = true if BF.Get_Field_Card_Data(Side, "Fighter") + BF.Get_Field_Card_Data(Side, "R") == [] else false
+			Current_Phase = Phases.END if Turn_Counter == 1 or Field_Empty else Phases.BATTLE
+		Phases.BATTLE:
+			BC.Set_Attacks_To_Launch()
+			Current_Phase = Phases.END
+		Phases.END:
+			Update_Game_Turn()
+			Current_Phase = Phases.OPENING
 
 func Update_Game_Turn():
-	var player = Player if GameData.Current_Turn == "Player" else Enemy
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	
 	# Complete all incomplete Phases/Steps for remainder of Turn
-	while GameData.Current_Phase != "End Phase":
-		if STEPS.find(GameData.Current_Step) in PHASE_THRESHOLDS:
-			Update_Game_Phase()
-		else:
-			Update_Game_Step()
+	while Current_Phase != Phases.END:
+		Update_Game_Phase()
 	
 	# Check if Discard Required to avoid exceeding Hand Size Limit
-	if get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() <= player.Hand_Size_Limit or GameData.Victor != null:
+	if get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() <= Dueler.Hand_Size_Limit or Victor != null:
 		Conduct_End_Phase()
-		if GameData.Victor == null:
-			BC.Reset_Turn_Variables(PHASES, STEPS)
+		if Victor == null:
+			BC.Reset_Turn_Variables()
 			BC.Reset_Attacks_Remaining()
 			BC.Set_Turn_Player()
 			UI._on_SwitchSides_pressed()
@@ -163,9 +180,8 @@ func Get_Duelist_Cost_Discount(Card_Side, Type):
 func _input(event):
 	IC.Resolve_Input(event)
 
-func Update_HUD_Duelist(Node_To_Update, Dueler):
-	var Side = "W" if Dueler.Name == "Player" else "B"
-	UI.Update_HUD_Duelist(Dueler, Side)
+func Update_HUD_Duelist(Node_To_Update, Dueler_To_Update):
+	UI.Update_HUD_Duelist(Dueler_To_Update, Side)
 
 func Activate_Summon_Effects(Chosen_Card): # Play Card Supporter
 	BC.Activate_Summon_Effects(Chosen_Card)
@@ -173,7 +189,7 @@ func Activate_Summon_Effects(Chosen_Card): # Play Card Supporter
 func Reparent_Nodes(Source_Node, Destination_Node):
 	BF.Reparent_Nodes(Source_Node, Destination_Node)
 
-func Reposition_Field_Cards(Side):
+func Reposition_Field_Cards():
 	BF.Reposition_Field_Cards(Side)
 
 func Resolve_Card_Effects(card):
@@ -211,12 +227,10 @@ func Setup_Game():
 	BC.Choose_Starting_Player()
 	
 	# Draw Opening Hands
-	GameData.Current_Step = "Draw"
-	Draw_Card(GameData.Current_Turn, 5)
-	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
-	Draw_Card(GameData.Current_Turn, 5)
-	GameData.Current_Turn = "Enemy" if GameData.Current_Turn == "Player" else "Player"
-	GameData.Current_Step = "Start"
+	Draw_Card(Current_Turn, 5)
+	Current_Turn = "Enemy" if Current_Turn == "Player" else "Player"
+	Draw_Card(Current_Turn, 5)
+	Current_Turn = "Enemy" if Current_Turn == "Player" else "Player"
 	
 	# Update GUI
 	UI.Update_HUD_GameState()
@@ -231,16 +245,10 @@ func Setup_Game():
 
 """--------------------------------- Opening Phase ---------------------------------"""
 func Conduct_Opening_Phase():
-	# Opening Phase (Start -> Draw -> Roll -> Recruit)
-	var player = Player if GameData.Current_Turn == "Player" else Enemy
-	var Side = "W" if GameData.Current_Turn == "Player" else "B"
-	
-	Update_Game_State("Step")
-	Draw_Card(GameData.Current_Turn, 1)
-	Update_Game_State("Step")
-	player.set_summon_crests(BC.Dice_Roll(), "Add")
-	UI.Update_HUD_Duelist(player, Side)
-	Update_Game_State("Step")
+	# Opening Phase (Start -> Draw -> Roll -> Recruit)	
+	Draw_Card(Current_Turn, 1)
+	Dueler.set_summon_crests(BC.Dice_Roll(), "Add")
+	UI.Update_HUD_Duelist(Dueler, Side)
 	BC.Recruit_Hero()
 	Update_Game_State("Phase")
 
@@ -251,32 +259,22 @@ func Conduct_Standby_Phase():
 	# Standby Phase (Effect -> Token)
 	BC.Set_Field_Card_Effect_Status() # Sets the Can_Activate_Effect of all Periodic-style Hero cards on the turn player's field == True
 	BC.Resolve_Damage("Burn") # Resolves Burn Damage from any active Burn Effects
-	Update_Game_State("Step")
 	BC.Add_Tokens()
 	Update_Game_State("Phase")
 
 
 
 """--------------------------------- Main Phase ---------------------------------"""
-func Conduct_Main_Phase():
-	# Main Phase (Reposition -> Summon/Set -> Flip)
-	# NOTE: Func skipped entirely due to all steps being handled by other funcs
-	# Reposition handled by Reposition_Field_Cards(),
-	# Summon/Set by _on_Card_Slot_pressed() and Play_Card(),
-	# Flip by on_Focus_Sensor_pressed() in SmallCard.gd and Activate_Set_Card()
-	pass
-
-func Play_Card(Side, Summon_Mode, Destination_Node, Chosen_Card):
-	var player = Player if GameData.Current_Turn == "Player" else Enemy
-	var Card_Is_Valid = BC.Valid_Card(Side, Chosen_Card, Destination_Node)
-	var Card_Net_Cost = BC.Calculate_Net_Cost(player, Chosen_Card)
-	var Destination_Is_Valid = BC.Valid_Destination(Side, Destination_Node, Chosen_Card)
-	var Card_Is_Affordable = BC.Summon_Affordable(player, Card_Net_Cost)
+func Play_Card(Summon_Mode, Destination_Node, Chosen_Card):
+	var Card_Is_Valid = BC.Valid_Card(Chosen_Card, Destination_Node)
+	var Card_Net_Cost = BC.Calculate_Net_Cost(Dueler, Chosen_Card)
+	var Destination_Is_Valid = BC.Valid_Destination(Destination_Node, Chosen_Card)
+	var Card_Is_Affordable = BC.Summon_Affordable(Dueler, Card_Net_Cost)
 	
 	if Card_Is_Valid and Destination_Is_Valid and Card_Is_Affordable:
 		BF.Play_Card(Side, Card_Net_Cost, Summon_Mode, Destination_Node, Chosen_Card)
 
-func Activate_Set_Card(Side, Chosen_Card):
+func Activate_Set_Card(Chosen_Card):
 	BC.Activate_Set_Card(Chosen_Card)
 	BF.Activate_Set_Card(Side, Chosen_Card)
 	Chosen_Card.Reset_Variables_After_Flip_Summon()
@@ -296,31 +294,20 @@ func Capture_Card(Card_Captured, Capture_Type = "Normal", Reset_Stats = true):
 
 """--------------------------------- End Phase ---------------------------------"""
 func Conduct_End_Phase():
-	# End Phase (Discard -> Reload -> Effect -> Victory -> End)		
-	# Reload Step
-	Update_Game_State("Step")
+	# End Phase (Discard -> Reload -> Effect -> Victory -> End)
 	UI.Update_HUD_GameState()	
 	BC.Check_For_Deck_Reload()
 	
-	# Effect Step
-	Update_Game_State("Step")
-	
-	# Victory Step
-	Update_Game_State("Step")
 	if BC.Check_For_Deck_Out() or BC.Exodia_Complete():
 		print("VICTORY")
-		print(GameData.Victor + " wins!")
+		print(Victor + " wins!")
 		return
 
 	# HACK: Close out any card effects/action buttons that are still awaiting their signal
 	SignalBus.emit_signal("Confirm")
 	get_tree().call_group("Cards", "Remove_Action_Buttons")
-	
-	# End Step
-	Update_Game_State("Step")
 
-func Discard_Card(Side, Chosen_Card):
-	var Dueler = Player if GameData.Current_Turn == "Player" else Enemy
+func Discard_Card(Chosen_Card):
 	var MedBay = get_node("Playmat/CardSpots/NonHands/" + Side + "MedBay")
 	
 	# Updates children for parents in From & To locations
@@ -333,7 +320,7 @@ func Discard_Card(Side, Chosen_Card):
 	# Retry to End Turn
 	while get_node("Playmat/CardSpots/" + Side + "HandScroller/" + Side + "Hand").get_child_count() > Dueler.Hand_Size_Limit:
 		return
-	if GameData.Current_Step == "Discard":
+	if Current_Phase == Phases.END:
 		Update_Game_Turn()
 
 func Reload_Deck(Deck_To_Reload):
@@ -341,6 +328,29 @@ func Reload_Deck(Deck_To_Reload):
 
 func Shuffle_Deck(player, deck_source):
 	DC.Shuffle_Deck(player, deck_source)
+
+
+
+"""--------------------------------- Miscellaneous Functions ---------------------------------"""
+func Load_Card_Data():
+	# Loads Card Pool Into Game.
+	var CardData_File = FileAccess.open("res://Data/CardDB.json", FileAccess.READ)
+	var CardData_JSON = JSON.new()
+	CardData_JSON.parse(CardData_File.get_as_text())
+	CardData = CardData_JSON.get_data()
+	
+	# Loads List of Pre-Built Decks Into Game
+	# Currently DOESN'T include Player/Enemy Decks.
+	# During early testing it is assumed that White uses Arthurian Pre-Built Deck & Black uses Olympian.
+	var MasterDeckList_File = FileAccess.open("res://Data/Master_Deck_List.json", FileAccess.READ)
+	var MasterDeckList_JSON = JSON.new()
+	MasterDeckList_JSON.parse(MasterDeckList_File.get_as_text())
+	Master_Deck_List = MasterDeckList_JSON.get_data()
+
+func Clear_Card_Effect_Queue():
+	for card in Card_Effect_Queue:
+		card.get_node("SmallCard/Can_Activate_Effect").visible = false # Hide snake animation
+	Card_Effect_Queue.clear()
 
 
 
@@ -355,9 +365,6 @@ func _on_SwitchSides_pressed():
 
 func _on_Deck_Slot_pressed():
 	BC._on_Deck_Slot_pressed()
-
-func _on_Next_Step_pressed():
-	Update_Game_State("Step")
 
 func _on_Next_Phase_pressed():
 	Update_Game_State("Phase")

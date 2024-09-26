@@ -15,9 +15,10 @@ func _ready():
 
 """--------------------------------- Pre-Filled Functions ---------------------------------"""
 func Update_HUD_GameState():
-	get_node("HUD/HUD_GameState/BG/Player").text = GameData.Current_Turn
-	get_node("HUD/HUD_GameState/BG/GameState").text = GameData.Current_Phase + ", " + GameData.Current_Step
-	get_node("HUD/HUD_GameState/BG/Turn_Count").text = "#" + str(GameData.Turn_Counter)
+	var Phases_Map = {BM.Phases.OPENING: "Opening Phase", BM.Phases.STANDBY: "Standby Phase", BM.Phases.MAIN: "Main Phase", BM.Phases.BATTLE: "Battle Phase", BM.Phases.END: "End Phase"}
+	get_node("HUD/HUD_GameState/BG/Player").text = BM.Current_Turn
+	get_node("HUD/HUD_GameState/BG/GameState").text = Phases_Map[BM.Current_Phase]
+	get_node("HUD/HUD_GameState/BG/Turn_Count").text = "#" + str(BM.Turn_Counter)
 
 func Flip_Duelist_HUDs(HUD_W = $Duelists/HUD_W, HUD_B = $Duelists/HUD_B):
 	var HUD_W_Pos = HUD_W.position
