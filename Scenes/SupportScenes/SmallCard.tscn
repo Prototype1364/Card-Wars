@@ -194,7 +194,7 @@ offset_bottom = 180.0
 [node name="VBoxContainer" type="VBoxContainer" parent="TokenContainer"]
 layout_mode = 2
 
-[node name="Can Activate Effect" type="AnimatedSprite2D" parent="."]
+[node name="Can_Activate_Effect" type="AnimatedSprite2D" parent="."]
 visible = false
 sprite_frames = SubResource("SpriteFrames_t1cnh")
 frame_progress = 0.410968

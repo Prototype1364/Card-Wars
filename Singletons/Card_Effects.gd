@@ -34,7 +34,7 @@ func Resolvable_Card(card) -> bool:
 		return false
 
 func Valid_GameState(card) -> bool:
-	return true if (BM.Current_Phase == card.Resolve_Phase) or card.Resolve_Phase == "Any" else false
+	return true if (BM.Current_Phase == card.Resolve_Phase) or card.Resolve_Phase_String == "Any" else false
 
 func Valid_Effect_Type(card) -> bool:
 	var Dueler = BM.Player if card.get_parent().name.left(1) == "W" else BM.Enemy
@@ -176,10 +176,11 @@ func Politician(card):
 	pass
 
 func Protector(card):
-	var Guardianship = await Get_Card_Selected(card, "Reinforcers", BM.Side, BM.Side_Opp, null, [], [], [], card)
-	card.set_guardianship(Guardianship)
+	if card.Card_Side == BM.Side and BM.Current_Phase == BM.Phases.MAIN:		
+		var Guardianship = await Get_Card_Selected(card, "Reinforcers", BM.Side, BM.Side_Opp, null, [], [], [], card)
+		card.set_guardianship(Guardianship)
 
-	if BM.Target == card.Guardianship and card.Guardianship != null:
+	if BM.Target == card.Guardianship and card.Guardianship != null and card.Card_Side != BM.Side and BM.Current_Phase == BM.Phases.BATTLE:
 		var damage_dealt = BM.Attacker.get_net_damage()
 		card.set_health(damage_dealt, "Remove")
 		BM.Target.set_health(damage_dealt, "Add")
@@ -222,7 +223,7 @@ func Support(card):
 	if (card.Health + card.Health_Bonus) > 0: # Allows for partial transfers on Summon without locking player out of ability to transfer down the road.
 		card.Can_Activate_Effect = true
 
-	if Fighter != null and card != Fighter and (card.Health + card.Health_Bonus) > 0 and card.Can_Activate_Effect:
+	if Fighter != null and card != Fighter and (card.Health + card.Health_Bonus) > 0 and card.Can_Activate_Effect and BM.Current_Phase == BM.Phases.MAIN:
 		card.Can_Activate_Effect = false
 		var Health_Transfer_Value = await Get_Text_Entry_Transfer_Amount(card, card.Health + card.Health_Bonus)		
 		var Health_Bonus_Reduction = max(0, Health_Transfer_Value - card.Health)
@@ -254,7 +255,7 @@ func Warrior(card):
 	if (card.Attack + card.ATK_Bonus) > 0: # Allows for partial transfers on Summon without locking player out of ability to transfer down the road.
 		card.Can_Activate_Effect = true
 
-	if Fighter != null and card != Fighter and (card.Attack + card.ATK_Bonus) > 0 and card.Can_Activate_Effect:
+	if Fighter != null and card != Fighter and (card.Attack + card.ATK_Bonus) > 0 and card.Can_Activate_Effect and BM.Current_Phase == BM.Phases.MAIN:
 		card.Can_Activate_Effect = false
 		var Attack_Transfer_Value = await Get_Text_Entry_Transfer_Amount(card, card.Attack + card.ATK_Bonus)
 		var ATK_Bonus_Reduction = max(0, Attack_Transfer_Value - card.Attack)
@@ -333,6 +334,7 @@ func Bestow(card):
 	var Fighter = BF.Get_Field_Card_Data(BM.Side, "Fighter")[0] if BF.Get_Field_Card_Data(BM.Side, "Fighter") != [] else null
 	var Zones_To_Search = ["MainDeck", "Fighter", "R", "Backrow", "EquipMagic", "EquipTrap", "TechZone", "Graveyard", "MedBay", "Hand"]
 	
+	# FIXME (NOTE): This effect is very niche, only applying when King Arthur is on the field. Should we have another similar effect (Bequeath) that allows the player to give any equip card to the current fighter when the effect hero card hits the field? This would allow this effect to still have its use (since it can activate from the Hero Deck), but allow for more generalized plays using this type of effect.
 	if Fighter != null:
 		if Fighter.Name == "King Arthur":
 			for zone in Zones_To_Search:
@@ -367,7 +369,7 @@ func Defiance(card):
 			card.set_health(card.Revival_Health, "Set")
 			card.set_health_bonus(0, "Set")
 
-func Detonate(card, is_automated):
+func Detonate(card):
 	"""
 	Effect (PROTOTYPE UPDATE):
 		- Upon activation, spawn a new "Bomb" card into the opponent's MainDeck.
@@ -380,13 +382,16 @@ func Detonate(card, is_automated):
 		- COUNTERPLAY: This card is minimized by damage reflecting effects or damage transferrence effects (armor, mirror force).
 	"""
 
+	# Set Automation Settings based on Phase
+	card.Auto_Resolve_Effect = false if BM.Current_Phase == BM.Phases.MAIN else true
 
-	#Effect1
-	card.Can_Activate_Effect = false
-	card.set_tokens(1, "Add")
+	# Effect 1: Add Token to Card during Standby Phase
+	if BM.Current_Phase == BM.Phases.STANDBY:
+		card.Can_Activate_Effect = false
+		card.set_tokens(1, "Add")
 	
-	#Effect2
-	if is_automated == false and card.Tokens > 0:
+	# Effect 2: Manually spawn a Bomb Card into the opponent's MainDeck when card is clicked
+	if card.Tokens > 0 and BM.Current_Phase == BM.Phases.MAIN:
 		# Create Bomb Card and add to Opponent's MainDeck
 		var Bomb_Card = DC.Create_Card(38035971)
 		var Deck_Opp = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + BM.Side_Opp + "MainDeck")
@@ -462,19 +467,25 @@ func Earthbound(card):
 		- COUNTERPLAY: Board wipe/removal effects, multi-strike effects, and highly synergistic hero/support deck builds (i.e. decks that focus on the benefits normal cards provide heroes instead of magic cards)
 	"""
 	
-	var Dueler = BM.Enemy if card.get_parent().name.left(1) == "W" else BM.Player
-	Dueler.Muggle_Mode = true
+	var Dueler = BM.Enemy if card.Card_Side == "W" else BM.Player
+	var Cards_On_Field = BF.Get_Field_Card_Data(card.Card_Side, "Fighter") + BF.Get_Field_Card_Data(card.Card_Side, "R") + BF.Get_Field_Card_Data(card.Card_Side, "Backrow")
+	var earthbound_found = false
+	for current_card in Cards_On_Field:
+		if current_card.Anchor_Text == "Earthbound":
+			earthbound_found = true
+			break
+
+	Dueler.Muggle_Mode = true if earthbound_found else false
 
 func Expansion(card):
 	pass
 
 func Faithful(card):
-	var Card_On_Correct_Side = true if card.get_parent().name.left(1) == BM.Side else false
 	var Reinforcers = BF.Get_Field_Card_Data(BM.Side, "R")
 	
-	if (Reinforcers.size() >= 3) and Card_On_Correct_Side:
+	if (Reinforcers.size() >= 3) and card.Card_Side == BM.Side:
 		card.set_immortal(true)
-	elif (Reinforcers.size() < 3 or On_Field(card) == false) and Card_On_Correct_Side:
+	elif (Reinforcers.size() < 3 or On_Field(card) == false) and card.Card_Side == BM.Side:
 		card.set_immortal(false)
 
 func For_Honor_And_Glory(card):
@@ -648,15 +659,16 @@ func Retribution(card):
 					SignalBus.emit_signal("Capture_Card", Fighter_Opp, "Inverted")
 
 func Spawn(card):
-	card.set_tokens(1, "Add")
+	# Effect 1-2: Add Token to card during Standby Phase, then deal damage to Fighter_Opp if applicable
+	if BM.Current_Phase == BM.Phases.STANDBY:
+		card.set_tokens(1, "Add")
 
-	# Reduce Fighter_Opp's Health by 1 for every Token on card and capture if applicable
-	var Fighter_Opp = BF.Get_Field_Card_Data(BM.Side_Opp, "Fighter")[0] if BF.Get_Field_Card_Data(BM.Side_Opp, "Fighter") != [] else null
-	if Fighter_Opp != null and not Fighter_Opp.is_immune("Card Effect", card):
-		Fighter_Opp.set_health(card.Tokens, "Remove")
-	
-	# Neutralize damage taken using spawned tokens as shields. Barrage attacks will destroy all tokens simultaneously (and damage card).
-	if card.Tokens > 0:
+		var Fighter_Opp = BF.Get_Field_Card_Data(BM.Side_Opp, "Fighter")[0] if BF.Get_Field_Card_Data(BM.Side_Opp, "Fighter") != [] else null
+		if Fighter_Opp != null and not Fighter_Opp.is_immune("Card Effect", card):
+			Fighter_Opp.set_health(card.Tokens, "Remove")
+
+	# Effect 3: Neutralize damage taken using spawned tokens as shields. Barrage attacks will destroy all tokens simultaneously (and damage card).
+	if card.Tokens > 0 and BM.Current_Phase == BM.Phases.BATTLE:
 		if BM.Attacker.Multi_Strike == false or card.is_immune("Card Effect", BM.Attacker):
 			card.set_health(BM.Attacker.Total_Attack, "Add")
 			card.set_tokens(1, "Remove")
@@ -784,7 +796,7 @@ func Excalibur(card):
 				if current_card.Attribute == "Warrior":
 					current_card.set_attack_bonus(3, "Add")
 			for current_card in Cards_On_Field_Opp:
-				if current_card.is_immune("Card Effect", card):
+				if not current_card.is_immune("Card Effect", card):
 					current_card.set_attack_bonus(2, "Remove")
 
 		# Effect 4: Deal a percentage of King Arthur's Total Attack as damage to all opposing Reinforcers (if any)
@@ -921,12 +933,9 @@ func Resurrection(card):
 
 	# Find Open Slot to Summon Chosen Card into
 	if Chosen_Card_Node != null:
-		var Fighter_Open = BF.Find_Open_Slot("Fighter", BM.Side)
 		var Reinforcer_Open = BF.Find_Open_Slot("R", BM.Side)
 		var Destination_Node
-		if Fighter_Open != null:
-			Destination_Node = root.get_node(Fighter_Open)
-		elif Reinforcer_Open != null:
+		if Reinforcer_Open != null:
 			Destination_Node = root.get_node(Reinforcer_Open)
 		else:
 			Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/" + BM.Side + "HandScroller/" + BM.Side + "Hand")
@@ -991,12 +1000,10 @@ func Fire(card):
 	get_tree().call_group("Cards", "set_total_health")
 
 func Medicine(card):
-	var Card_On_Correct_Side = true if card.get_parent().name.left(1) == BM.Side else false
-
-	if On_Field(card) and BM.Current_Phase == BM.Phases.OPENING and Card_On_Correct_Side and BM.Turn_Counter > 1:
+	if BM.Current_Phase == BM.Phases.OPENING and card.Card_Side == BM.Side and BM.Turn_Counter > 1:
 		card.Can_Activate_Effect = true
 
-	if On_Field(card) and Card_On_Correct_Side and card.Can_Activate_Effect:
+	if card.Card_Side == BM.Side and card.Can_Activate_Effect:
 		card.Can_Activate_Effect = false
 		var Node_To_Update = root.get_node("SceneHandler/Battle/UI/Duelists/HUD_" + BM.Side)
 		
@@ -1025,21 +1032,21 @@ func Tidal_Wave(card):
 	# An effect that allows for all overflow damage to be dealt to the opponent's Reinforcers and (if applicable) cards in Hero Deck.
 	# Overflow damage will hit reinforcers first, and if any remains will then hit the Hero Deck.
 	# This should help to solve the issue of Attack Power (and thus Warrior effects) becoming irrelevant after a certain point because you 1-shot everything.
-	if On_Field(card):
-		get_tree().call_group("Cards", "set_perfected_overflow", card.get_parent().name.left(1)) 
+	get_tree().call_group("Cards", "set_perfected_overflow", card.Card_Side)
 
 
 
 """--------------------------------- Status Effects ---------------------------------"""
 func Bomb(card):
 	# Resolve Effect
-	var Fighter = BF.Get_Field_Card_Data(BM.Side, "Fighter")[0] if BF.Get_Field_Card_Data(BM.Side, "Fighter") != [] else null
-	if not Fighter.is_immune("Card Effect", card):
-		Fighter.set_health(card.Attack, "Remove")
+	if "Hand" in card.get_parent().name:
+		var Fighter = BF.Get_Field_Card_Data(BM.Side, "Fighter")[0] if BF.Get_Field_Card_Data(BM.Side, "Fighter") != [] else null
+		if not Fighter.is_immune("Card Effect", card):
+			Fighter.set_health(card.Attack, "Remove")
 
-	# Reparent Nodes
-	var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + BM.Side + "MedBay")
-	SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
+		# Reparent Nodes
+		var Destination_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + BM.Side + "MedBay")
+		SignalBus.emit_signal("Reparent_Nodes", card, Destination_Node)
 
 
 

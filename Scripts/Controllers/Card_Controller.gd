@@ -16,9 +16,13 @@ var Anchor_Text: String
 var Auto_Resolve_Effect: bool
 var ActivationTriggers: Array
 var ValidationRequired: Dictionary = {'On Field': true,'Resolvable Card': true,'Valid GameState': true,'Valid Effect Type': true}
+var Card_Side : String: 
+	get: 
+		return get_parent().name.left(1)
 
 var Resolve_Side: String
-var Resolve_Phase: String
+var Resolve_Phase: int
+var Resolve_Phase_String: String
 var Attribute: String
 var Description: String
 var Short_Description: String
@@ -114,7 +118,7 @@ func Add_To_Queue(): # FIXME: Since the CardDB hasn't been fully updated to incl
 	var Valid_Card = true if On_Field && Resolvable_Card && Valid_GameState && Valid_Effect_Type else false
 
 	if Valid_Card and self.Can_Activate_Effect:
-		BM.Card_Effect_Queues.append(self)
+		BM.Card_Effect_Queue.append(self)
 		if Auto_Resolve_Effect == false:
 			$SmallCard/Can_Activate_Effect.visible = true # Make snake animation visible
 			var button_container = $SmallCard/Action_Button_Container
@@ -127,8 +131,8 @@ func Add_To_Queue(): # FIXME: Since the CardDB hasn't been fully updated to incl
 			Resolve_Effect()
 
 func Resolve_Effect():
-	CardEffects.call(self.Anchor_Text, self).bind(false)
-	BM.Card_Effect_Queues.erase(self)
+	CardEffects.call(self.Anchor_Text, self)
+	BM.Card_Effect_Queue.erase(self)
 	$SmallCard/Can_Activate_Effect.visible = false # Make snake animation invisible
 
 # Setters
@@ -213,7 +217,6 @@ func set_cost(value: int = Cost):
 	# 	$SmallCard/CostContainer/Cost.texture = null
 
 	Cost = value
-	var Card_Side = "W" if get_parent().name.left(1) == "W" else "B"
 	var Discount = BM.Get_Duelist_Cost_Discount(Card_Side, Type)
 	if Type != "Special" and "Tech" not in Type and "Deck" not in get_parent().name and Cost + Discount > 0:
 		$SmallCard/CostContainer/Cost.texture = load("res://Assets/Cards/Cost/Cost_" + Type + "_" + str(Cost + Discount) + ".png")
@@ -458,7 +461,7 @@ func Update_Icons():
 			"Perfected Overflow":
 				Icon_Parent.get_node(icon).visible = Perfected_Overflow
 			"Can Activate Effect":
-				get_node("SmallCard/Can Activate Effect").visible = Can_Activate_Effect
+				$SmallCard/Can_Activate_Effect.visible = Can_Activate_Effect
 			"Fusion Level":
 				Icon_Parent.get_node(icon).visible = Fusion_Level > 1
 				Icon_Parent.get_node(icon).get_node(icon).text = str(Fusion_Level)
@@ -584,6 +587,10 @@ func Spawn_Action_Buttons():
 		buttons_to_spawn = ["Flip"]
 	elif ("Fighter" in Parent_Name and Parent_Name.left(1) != BM.Side) or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name)):
 		buttons_to_spawn = ["Target"]
+
+	# If card can activate its effect, add the Activate Effect button to the list of buttons to spawn
+	if Can_Activate_Effect:
+		buttons_to_spawn.append("Activate Effect")
 
 	# Spawn buttons
 	if buttons_to_spawn != null:

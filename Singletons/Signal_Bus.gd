@@ -93,6 +93,7 @@ signal Event_Card_Summoned_Recruit
 signal Event_Card_Summoned_Sacrificial
 signal Event_Card_Summoned_Revival
 signal Event_Card_Summoned_Fusion
+signal Event_Card_Summoned_Tech
 signal Event_Card_Set
 signal Event_Card_Flipped
 signal Event_Card_Discarded

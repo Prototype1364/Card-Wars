@@ -168,7 +168,8 @@ func Draw_Card(Turn_Player, Cards_To_Draw = 1, Deck_Type = "Main", Draw_At_Index
 
 			# Activate Card Effect when Drawing a Tech Card or Activate Tech Card
 			if Card_Info['Card_Drawn'].Type == "Special" or Card_Info['Card_Drawn'].Type == "Tech":
-				BC.Activate_Summon_Effects(Card_Info['Card_Drawn'])
+				Card_Info['Card_Drawn'].Can_Activate_Effect = true
+				Card_Info['Card_Drawn'].Add_To_Queue()
 
 func Get_Duelist_Cost_Discount(Card_Side, Type):
 	var Duelist = Player if Card_Side == "W" else Enemy

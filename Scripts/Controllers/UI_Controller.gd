@@ -71,8 +71,8 @@ func LookAtCard(CardNode, TypeData, ArtData, NameData, CostTexture, AttributeDat
 	if SelectedCard != null:
 		if TypeData != "Special": # Card is NOT Advance Tech card
 			const TEXT_OUTLINE_NODE_NAMES = ["NameContainer/Name", "Description", "Attack", "Health"]
-			const TEXT_OUTLINE_COLOR_DICT_MAP = {"Normal": "676767", "Hero": "cdaf2f", "Magic": "7a51a0", "Trap": "ff0000", "Tech": "1f8742", "Status": "000000"}
-			const TEXT_COLOR_DICT_MAP = {"Normal": "000000", "Hero": "000000", "Magic": "000000", "Trap": "000000", "Tech": "000000", "Status": "ffffff"}
+			const TEXT_OUTLINE_COLOR_DICT_MAP = {"Normal": "676767", "Hero": "cdaf2f", "Magic": "7a51a0", "Trap": "ff0000", "Tech": "1f8742", "Status": "000000", "Equip": "9e4400"}
+			const TEXT_COLOR_DICT_MAP = {"Normal": "000000", "Hero": "000000", "Magic": "000000", "Trap": "000000", "Tech": "000000", "Status": "ffffff", "Equip": "000000"}
 			var Text_Outline_Color = Color(TEXT_OUTLINE_COLOR_DICT_MAP[TypeData])
 			var Text_Color = Color(TEXT_COLOR_DICT_MAP[TypeData])
 			
