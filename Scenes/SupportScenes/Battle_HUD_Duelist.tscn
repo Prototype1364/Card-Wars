@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://dnao8q2vpkwj4"]
 
 [ext_resource type="FontFile" uid="uid://co858100nof5b" path="res://Resources/Fonts/MTCORSVA.TTF" id="2"]
-[ext_resource type="Script" path="res://Scripts/Controllers/Duelist_Controller.gd" id="2_gjubj"]
+[ext_resource type="Script" uid="uid://q72hkcili3g0" path="res://Scripts/Controllers/Duelist_Controller.gd" id="2_gjubj"]
 [ext_resource type="Texture2D" uid="uid://beu8bpeoxj55q" path="res://Assets/Playmat/Playmat_Duelist_HUD_Holder.png" id="3_8q6kb"]
 
 [sub_resource type="Theme" id="Theme_l313w"]

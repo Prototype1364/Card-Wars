@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cno1he31c2mte"]
 
-[ext_resource type="Script" path="res://Scripts/Controllers/Button_Selector_Controller.gd" id="1_avn8r"]
+[ext_resource type="Script" uid="uid://c0v82usd1lw76" path="res://Scripts/Controllers/Button_Selector_Controller.gd" id="1_avn8r"]
 
 [node name="ButtonSelector" type="Control"]
 top_level = true

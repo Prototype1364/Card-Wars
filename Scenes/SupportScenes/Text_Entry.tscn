@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dsbynd8wjbgru"]
 
-[ext_resource type="Script" path="res://Scripts/Controllers/Text_Entry_Controller.gd" id="1_0p1kl"]
+[ext_resource type="Script" uid="uid://caeqlmmmfqt4v" path="res://Scripts/Controllers/Text_Entry_Controller.gd" id="1_0p1kl"]
 
 [node name="TextEntry" type="Control"]
 layout_mode = 3

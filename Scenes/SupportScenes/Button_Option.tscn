@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://beulqoakyvqbn"]
 
-[ext_resource type="Script" path="res://Scripts/Controllers/Button_Option_Controller.gd" id="1_4e2d7"]
+[ext_resource type="Script" uid="uid://dan7s2v8p2p8a" path="res://Scripts/Controllers/Button_Option_Controller.gd" id="1_4e2d7"]
 
 [node name="Button" type="Button"]
 custom_minimum_size = Vector2(350, 46)
