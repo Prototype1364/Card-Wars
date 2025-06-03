@@ -80,7 +80,7 @@ func _init(card_data):
 	# Set default values that are common across all cards
 	var defaults = {
 		"0": ["ATK_Bonus", "Health_Bonus", "Tokens", "Burn_Damage"],
-		"1": ["Fusion_Level", "Attacks_Remaining"],
+		"1": ["Fusion_Level"],
 		"False": ["Is_Set", "Can_Activate_Effect", "Attack_As_Reinforcement", "Immortal", "Invincible", "Rejuvenation", "Warded", "Relentless", "Multi_Strike", "Paralysis", "Unstoppable", "Can_Attack"],
 	}
 
@@ -100,6 +100,7 @@ func _init(card_data):
 	Token_Path = preload("res://Scenes/SupportScenes/Token_Card.tscn")
 	Effects_Disabled = []
 	Immunity = {"Type": [], "Attribute": [], "Effect": [], "Location": []}
+	Attacks_Remaining = 1 if Type in ["Normal", "Hero"] else 0
 
 func _ready():
 	Update_Data()
@@ -110,7 +111,7 @@ func _ready():
 	for i in ActivationTriggers:
 		SignalBus.connect(i, Callable(self, "Add_To_Queue"))
 
-func Add_To_Queue(): # FIXME: Since the CardDB hasn't been fully updated to include all the required info (validation requirements, activation triggers, etc.) and the Create_Card logic hasn't been updated accordingly, the Activate Effect button and Effect_Queue won't work properly.
+func Add_To_Queue(): # FIXME: CardDB includes all required info (though ActivationTriggers may/may not need to be in a different form than an Array [won't know until bugs are encountered]). The Create_Card logic will need to be updated to include the ActivationTriggers (currently the DeckController's Create_Card func omits a line for ActivationTriggers entirely, therefore it ends up being an empty array in-game). Until these issues are rectified, the Activate Effect button and Effect_Queue won't work properly.
 	var On_Field = true if ValidationRequired['On Field'] == false or (ValidationRequired['On Field'] and CardEffects.On_Field(self)) else false
 	var Resolvable_Card = true if ValidationRequired['Resolvable Card'] == false or (ValidationRequired['Resolvable Card'] and CardEffects.Resolvable_Card(self)) else false
 	var Valid_GameState = true if ValidationRequired['Valid GameState'] == false or (ValidationRequired['Valid GameState'] and CardEffects.Valid_GameState(self)) else false
@@ -131,9 +132,11 @@ func Add_To_Queue(): # FIXME: Since the CardDB hasn't been fully updated to incl
 			Resolve_Effect()
 
 func Resolve_Effect():
-	CardEffects.call(self.Anchor_Text, self)
+	await CardEffects.call(self.Anchor_Text, self)
 	BM.Card_Effect_Queue.erase(self)
 	$SmallCard/Can_Activate_Effect.visible = false # Make snake animation invisible
+	SignalBus.emit_signal("Update_Card_Data") # Update card data after effect resolution
+	SignalBus.emit_signal("Update_Card_Icons") # Update icons after effect resolution
 
 # Setters
 func set_frame(type: String):
@@ -365,6 +368,7 @@ func set_can_attack():
 	var in_valid_slot = (Clean_Parent_Name == "Fighter" or (Clean_Parent_Name == "R" and Attack_As_Reinforcement)) and get_parent().name.left(1) == BM.Side
 
 	Can_Attack = true if in_valid_slot and Paralysis == false and Attacks_Remaining > 0 else false
+	Update_Icons()
 
 func set_paralysis(value: bool, context: String = "Initialize"):
 	if Unstoppable:
@@ -440,6 +444,7 @@ func Update_Data():
 	set_health(Health)
 	set_health_bonus(Health_Bonus)
 	set_tokens(Tokens)
+	set_can_attack()
 
 func Update_Icons():
 	var Icon_Parent = $SmallCard/IconContainer/VBoxContainer
@@ -451,7 +456,7 @@ func Update_Icons():
 	for icon in CARD_ICONS:
 		match icon:
 			"Attacks Remaining":
-				Icon_Parent.get_node(icon).visible = true if Attacks_Remaining > 0 else false
+				Icon_Parent.get_node(icon).visible = true if Attacks_Remaining > 0 and Can_Attack else false
 				Icon_Parent.get_node(icon).get_node(icon).text = str(Attacks_Remaining)
 			"Burn Damage":
 				Icon_Parent.get_node(icon).visible = true if Burn_Damage > 0 else false
@@ -563,7 +568,7 @@ func Spawn_Action_Buttons():
 	var Fighter = BF.Get_Field_Card_Data(BM.Side, "Fighter")[0] if BF.Get_Field_Card_Data(BM.Side, "Fighter") != [] else null
 	var Reinforcer_Field_Cards = BF.Get_Field_Card_Data(BM.Side, "R")
 	var buttons_to_spawn_map = {"Normal": ["Summon"], "Hero": ["Summon"], "Trap": ["Set"], "Magic": ["Summon", "Set"]}
-	var buttons_to_spawn = null
+	var buttons_to_spawn = []
 
 	# Remove any existing action buttons
 	Remove_Action_Buttons()
@@ -578,15 +583,18 @@ func Spawn_Action_Buttons():
 	# Determine which buttons to spawn based on card's location, type, attribute, and game conditions
 	if "Hand" in Parent_Name:
 		buttons_to_spawn = buttons_to_spawn_map[Type] if Attribute != "Equip" else ["Summon"]
-	elif Parent_Name in Reposition_Zones:
+	if Parent_Name in Reposition_Zones:
 		if (Type == "Normal" and BF.Find_Open_Slot("R") == null) or (Type == "Hero" and (Hero_In_Reinforcements and (BF.Find_Open_Slot("R") == null or Fighter == self))) or (Type == "Hero" and BF.Find_Open_Slot("Fighter") == null and Fighter != self):
-			buttons_to_spawn = ["Reposition", "Sacrifice"]
+			buttons_to_spawn.append("Reposition", "Sacrifice")
 		else:
-			buttons_to_spawn = ["Sacrifice"]
-	elif BM.Side + "Backrow" in Parent_Name:
-		buttons_to_spawn = ["Flip"]
-	elif ("Fighter" in Parent_Name and Parent_Name.left(1) != BM.Side) or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name)):
-		buttons_to_spawn = ["Target"]
+			buttons_to_spawn.append("Sacrifice")
+	if BM.Side + "Backrow" in Parent_Name:
+		buttons_to_spawn.append("Flip")
+	if ("Fighter" in Parent_Name and Parent_Name.left(1) != BM.Side) or (("R1" in Parent_Name or "R2" in Parent_Name or "R3" in Parent_Name)):
+		buttons_to_spawn.append("Target")
+	if ("Fighter" in Parent_Name and Parent_Name.left(1) == BM.Side and BM.Current_Phase == BM.Phases.BATTLE and Can_Attack):
+		buttons_to_spawn.append("Attack")
+	 
 
 	# If card can activate its effect, add the Activate Effect button to the list of buttons to spawn
 	if Can_Activate_Effect:
@@ -596,6 +604,7 @@ func Spawn_Action_Buttons():
 	if buttons_to_spawn != null:
 		var button_container = $SmallCard/Action_Button_Container
 		for button in buttons_to_spawn:
+			print("Spawning action button: " + button)
 			var action_button_scene = preload("res://Scenes/SupportScenes/Action_Button_Controller.tscn").instantiate()
 			var Mode = "Summon" if button in ["Summon", "Flip"] else button
 			button_container.add_child(action_button_scene)
@@ -610,8 +619,7 @@ func Remove_Action_Buttons():
 		button.queue_free()
 
 func On_Target_Selection():
-	BM.Target = self
-	SignalBus.emit_signal("Attack_Declared")
+	SignalBus.emit_signal("Event_Attack_Declared")
 
 # Signal-Related Functions
 func focusing():
@@ -649,22 +657,28 @@ func _on_Action_Button_pressed(Mode):
 	var Destination_Node_Map = {"Hero": BF.Find_Open_Slot("Fighter") if BF.Find_Open_Slot("Fighter") != null else BF.Find_Open_Slot("R"), "Normal": BF.Find_Open_Slot("R"), "Magic": BF.Find_Open_Slot("Backrow"), "Trap": BF.Find_Open_Slot("Backrow")}
 	var Destination_Node_Path = Destination_Node_Map[Type] if Attribute != "Equip" else BF.Find_Open_Slot("Equip" + Type)
 	var Destination_Node = root.get_node(Destination_Node_Path) if Destination_Node_Path != null else null
-	var Default_Fusion_Summon_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + BM.Side + "R1") if Type == "Normal" else root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + BM.Side + "Fighter")
+	var Default_Fusion_Summon_Node = root.get_node("SceneHandler/Battle/Playmat/CardSpots/NonHands/" + BM.Side + "Banished")
 	Remove_Action_Buttons()
 
 	if "Hand" in Parent_Name and Destination_Node != null:
 		SignalBus.emit_signal("Play_Card", Mode, Destination_Node, self)
 	elif "Hand" in Parent_Name and Destination_Node == null and Anchor_Text in ["Creature"]: # Allows for Fusion summons even with a full field
-		SignalBus.emit_signal("Play_Card", Mode, Default_Fusion_Summon_Node, self)
+		var Cards_On_Field = BF.Get_Field_Card_Data(BM.Side, "Fighter") + BF.Get_Field_Card_Data(BM.Side, "R")
+		for field_card in Cards_On_Field:
+			if field_card.Name == Name and field_card != self:
+				field_card.set_fusion_level(1, "Add")
+				SignalBus.emit_signal("Reparent_Nodes", self, Default_Fusion_Summon_Node)
+				break
 	elif "Backrow" in Parent_Name and Mode == "Summon":
 		SignalBus.emit_signal("Activate_Set_Card", self)
 	elif Parent_Name in Reposition_Zones and Mode == "Sacrifice":
 		SignalBus.emit_signal("Sacrifice_Card", self)
 	elif Parent_Name in Reposition_Zones and Mode == "Reposition":
 		SignalBus.emit_signal("Reposition_Field_Cards", self)
+	elif Mode == "Attack":
+		BM.Attacker = self
 	elif Mode == "Target":
 		BM.Target = self
 		On_Target_Selection()
 	elif Mode == "Activate Effect":
 		Resolve_Effect()
-		#SignalBus.emit_signal("Resolve_Card_Effects", self)

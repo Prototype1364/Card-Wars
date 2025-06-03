@@ -141,6 +141,15 @@ func Creature(card):
 			card.set_fusion_level(1, "Add")
 			SignalBus.emit_signal("Reparent_Nodes", deck_card, Destination_Node)
 			deck_card.Update_Data()
+			return # Exit function if Fusion Summon is successful (without checking Hand until next turn)
+
+	# Perform Fusion Summon if a copy of the card exists in the Hand
+	for hand_card in BF.Get_Field_Card_Data(BM.Side, "Hand"):
+		if hand_card.Name == card.Name:
+			card.set_fusion_level(1, "Add")
+			SignalBus.emit_signal("Reparent_Nodes", hand_card, Destination_Node)
+			hand_card.Update_Data()
+			break # Exit loop after first match to avoid multiple fusion levels being added
 
 func Cryptid(card):
 	pass

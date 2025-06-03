@@ -4,10 +4,6 @@ extends TextureRect
 @onready var BF = get_tree().get_root().get_node("SceneHandler/Battle/Playmat/CardSpots")
 
 """--------------------------------- Pre-Filled Functions ---------------------------------"""
-func Resolve_Card_Effects(card: Node = null):
-	CardEffects.call(card.Anchor_Text, card)
-	Remove_Card_Effect_Availability(card)
-
 func Check_For_Resolvable_Effects(card_to_check: Node = null):
 	if card_to_check != null:
 		print(card_to_check.Name)
@@ -120,7 +116,6 @@ func Activate_Summon_Effects(Chosen_Card):
 	if is_valid_summon_effect:
 		Check_For_Resolvable_Effects(Chosen_Card)
 		#Chosen_Card.Can_Activate_Effect = true
-		#Resolve_Card_Effects(Chosen_Card, false)
 		#CardEffects.call(Chosen_Card.Anchor_Text, Chosen_Card)
 		#Chosen_Card.Can_Activate_Effect = false # Reset to ensure card doesn't activate from Graveyard
 
@@ -187,7 +182,7 @@ func Resolve_Burn_Damage():
 
 func Resolve_Battle_Damage():
 	var player = BM.Player if BM.Current_Turn == "Player" else BM.Enemy
-	var Reinforcers_Opp = BF.Get_Field_Card_Data(BM.BM.Side_Opp, "R")
+	var Reinforcers_Opp = BF.Get_Field_Card_Data(BM.Side_Opp, "R")
 
 	if BM.Attacker != null and BM.Target != null: # Ensures no error is thrown when func is called with empty player field.
 		player.Valid_Attackers -= 1
@@ -218,7 +213,7 @@ func Resolve_Overflow_Damage(Attacker, Target, Overflow_Damage):
 			if Overflow_Damage == 0:
 				break
 
-func Check_For_Captures(trigger_card: Node = null):
+func Check_For_Captures(trigger_card: Node = null): # FIXME: This func is meant to ensure that all captures (including weird ones like Morgan le Fay poison captures) are handled. Currently it's never called/connected to anything, but here as a placeholder.
 	for card in get_tree().get_nodes_in_group("Cards"):
 		if card.Total_Health <= 0 and not card.is_immune("Capture", trigger_card) and card.Type in ["Normal", "Hero"]:
 			Capture_Card(card)
@@ -376,6 +371,15 @@ func Check_For_Deck_Reload():
 	if len(HeroDeck) == 0:
 		SignalBus.emit_signal("Reload_Deck", "HeroDeck")
 
+func Update_Card_Icons():
+	print("Updating Card Icons...")
+	for card in get_tree().get_nodes_in_group("Cards"):
+		card.Update_Icons()
+
+func Update_Card_Data():
+	print("Updating Card Data...")
+	for card in get_tree().get_nodes_in_group("Cards"):
+		card.Update_Data()
 
 
 #######################################

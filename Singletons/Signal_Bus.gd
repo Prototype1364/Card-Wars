@@ -38,8 +38,6 @@ signal Activate_Summon_Effects
 
 signal Check_For_Resolvable_Effects
 
-signal Resolve_Card_Effects
-
 signal Update_HUD_Duelist
 
 signal Summon_Affordable
@@ -67,6 +65,10 @@ signal Draw_Card
 signal Sacrifice_Card
 
 signal Hero_Deck_Selected
+
+signal Update_Card_Data
+
+signal Update_Card_Icons
 
 signal READY
 

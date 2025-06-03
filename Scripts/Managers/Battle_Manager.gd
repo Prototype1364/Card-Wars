@@ -87,15 +87,17 @@ func _ready():
 	var _HV9 = SignalBus.connect("Summon_Affordable", Callable(self, "Summon_Affordable"))
 	var _HV10 = SignalBus.connect("Reload_Deck", Callable(self, "Reload_Deck"))
 	var _HV11 = SignalBus.connect("Check_For_Resolvable_Effects", Callable(self, "Check_For_Resolvable_Effects"))
-	var _HV12 = SignalBus.connect("Resolve_Card_Effects", Callable(self, "Resolve_Card_Effects"))
-	var _HV13 = SignalBus.connect("Reposition_Field_Cards", Callable(self, "Reposition_Field_Cards"))
-	var _HV14 = SignalBus.connect("Play_Card", Callable(self, "Play_Card"))
-	var _HV15 = SignalBus.connect("Draw_Card", Callable(self, "Draw_Card"))
-	var _HV16 = SignalBus.connect("Reparent_Nodes", Callable(self, "Reparent_Nodes"))
-	var _HV17 = SignalBus.connect("Shuffle_Deck", Callable(self, "Shuffle_Deck"))
-	var _HV18 = SignalBus.connect("Sacrifice_Card", Callable(self, "Sacrifice_Card"))
-	var _HV19 = SignalBus.connect("Hero_Deck_Selected", Callable(self, "Hero_Deck_Selected"))
-	var _HV20 = SignalBus.connect("Cancel", Callable(self, "_on_Cancel_pressed"))
+	var _HV12 = SignalBus.connect("Reposition_Field_Cards", Callable(BF, "Reposition_Field_Cards").bind(Side))
+	var _HV13 = SignalBus.connect("Play_Card", Callable(self, "Play_Card"))
+	var _HV14 = SignalBus.connect("Draw_Card", Callable(self, "Draw_Card"))
+	var _HV15 = SignalBus.connect("Reparent_Nodes", Callable(self, "Reparent_Nodes"))
+	var _HV16 = SignalBus.connect("Shuffle_Deck", Callable(self, "Shuffle_Deck"))
+	var _HV17 = SignalBus.connect("Sacrifice_Card", Callable(self, "Sacrifice_Card"))
+	var _HV18 = SignalBus.connect("Hero_Deck_Selected", Callable(BC, "_on_Deck_Slot_pressed"))
+	var _HV19 = SignalBus.connect("Cancel", Callable(self, "_on_Cancel_pressed"))
+	var _HV20 = SignalBus.connect("Update_Card_Data", Callable(BC, "Update_Card_Data"))
+	var _HV21 = SignalBus.connect("Update_Card_Icons", Callable(BC, "Update_Card_Icons"))
+	var _HV22 = SignalBus.connect("Event_Attack_Declared", Callable(BC, "Resolve_Battle_Damage"))
 	SignalBus.emit_signal("READY") # Temporary signal to ensure Card_Effects script functions as expected. See note in Card_Effects.gd for more info.
 	
 	Load_Card_Data()
@@ -113,8 +115,10 @@ func Update_Game_State(State_To_Change):
 	elif State_To_Change == "Turn":
 		Update_Game_Turn()
 
-	# Update HUD
+	# Update HUD & Card Icons
 	UI.Update_HUD_GameState()
+	BC.Update_Card_Data()
+	BC.Update_Card_Icons()
 
 func Update_Game_Phase():
 	match Current_Phase:
@@ -190,20 +194,11 @@ func Activate_Summon_Effects(Chosen_Card): # Play Card Supporter
 func Reparent_Nodes(Source_Node, Destination_Node):
 	BF.Reparent_Nodes(Source_Node, Destination_Node)
 
-func Reposition_Field_Cards():
-	BF.Reposition_Field_Cards(Side)
-
-func Resolve_Card_Effects(card):
-	BC.Resolve_Card_Effects(card)
-
 func Check_For_Resolvable_Effects(Chosen_Card = null):
 	BC.Check_For_Resolvable_Effects(Chosen_Card)
 
 func Sacrifice_Card(Card_Sacrificed):
 	BC.Sacrifice_Card(Card_Sacrificed)
-
-func Hero_Deck_Selected():
-	BC._on_Deck_Slot_pressed()
 
 func Check_For_Captures():
 	BC.Check_For_Captures()

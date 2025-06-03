@@ -100,7 +100,6 @@ func Play_Card(Side, Net_Cost, Summon_Mode, Destination_Node, Chosen_Card):
 	
 	# Updates Card Summoned This Turn Array, Resolves Card Effects that occur during Summon/Set (i.e. Deep Pit), Resets Reposition Variables, & Updates Duelist HUD
 	BM.Cards_Summoned_This_Turn.append(Chosen_Card)	
-	#SignalBus.emit_signal("Resolve_Card_Effects")
 	SignalBus.emit_signal("Check_For_Resolvable_Effects", Chosen_Card)
 	SignalBus.emit_signal("Update_HUD_Duelist", get_parent().get_parent().get_node("UI/Duelists/HUD_" + Side), Dueler)
 	Chosen_Card.Update_Icons()
